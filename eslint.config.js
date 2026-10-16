@@ -12,12 +12,12 @@ import fsdGaps from './eslint-fsd-gaps.js'
 const LAYERS = ['app', 'pages', 'widgets', 'features', 'entities', 'shared']
 // The layers split into slices, each entered through its index.ts only.
 const SLICED_LAYERS = ['pages', 'widgets', 'features', 'entities']
-// src/ and its alias, which tsconfig.json alone declares ("@/*": ["src/*"]). It is read as JSON,
+// src/ and its alias, which tsconfig.json alone declares ("@/*": ["./src/*"]). It is read as JSON,
 // so a comment in it stops the lint here.
 const SRC = fileURLToPath(new URL('src', import.meta.url))
 const { paths } = JSON.parse(readFileSync(new URL('tsconfig.json', import.meta.url), 'utf8')).compilerOptions
 const SRC_ALIAS = Object.keys(paths)
-  .find((alias) => paths[alias].includes('src/*'))
+  .find((alias) => paths[alias].includes('./src/*'))
   ?.replace('*', '')
 // The segments that hold logic and no UI.
 const LOGIC_SEGMENTS = 'src/**/{model,api,lib}/**'

@@ -1,5 +1,5 @@
 import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
-import { pokemonApi } from '../lib/pokemonApi';
+import { pokemonApi } from '../api/pokemonApi';
 import { mapPokemonFromApi } from '@/entities/pokemon';
 
 const PAGE_SIZE = 24;

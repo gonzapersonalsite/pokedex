@@ -23,6 +23,7 @@ Covers local development, build, testing, PWA behavior, and deployment for the P
 - Run tests:
   - `pnpm test` (single run)
   - `pnpm test:watch` (local watch mode)
+- Lint: `pnpm lint` (ESLint, no warning allowed)
 
 ## 🧪 Testing
 - Vitest + Testing Library

@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { useQuery } from '@tanstack/react-query';
 import { QueryProvider } from './QueryProvider';
-import { useToastStore } from '@/store/toast';
+import { useToastStore } from '@/shared/utils';
 import { HttpError } from '@/shared/utils';
 
 function useFailingQuery(key: string, error: Error) {

@@ -23,6 +23,7 @@ Guía de desarrollo local, build, tests, comportamiento PWA y despliegue del pro
 - Ejecutar tests:
   - `pnpm test` (ejecución única)
   - `pnpm test:watch` (modo watch local)
+- Lint: `pnpm lint` (ESLint, sin avisos permitidos)
 
 ## 🧪 Tests
 - Vitest + Testing Library

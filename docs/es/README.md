@@ -12,7 +12,7 @@
 
 🇪🇸 Español | [🇬🇧 English](../../README.md)
 
-Pokédex moderna construida con React + Vite + TypeScript. Arquitectura por features y separación contenedor/presentacional. Datos con TanStack Query, estado con Zustand, estilos con Tailwind, iconos con Heroicons. Incluye sistema global de toasts y PWA.
+Pokédex moderna construida con React + Vite + TypeScript. Usa Diseño Feature-Sliced, con las reglas de capas e imports comprobadas por ESLint, y separación contenedor/presentacional. Datos con TanStack Query, estado con Zustand, estilos con Tailwind, iconos con Heroicons. Incluye sistema global de toasts y PWA.
 
 **Demo en directo:** [pokedex-pokeapi-gonzalo.vercel.app](https://pokedex-pokeapi-gonzalo.vercel.app/)
 
@@ -28,6 +28,7 @@ Pokédex moderna construida con React + Vite + TypeScript. Arquitectura por feat
 - Instalar: `pnpm install --frozen-lockfile --ignore-scripts`
 - Desarrollo: `pnpm dev`
 - Tests: `pnpm test`
+- Lint: `pnpm lint`
 - Compilar: `pnpm build`
 - Previsualizar: `pnpm preview`
 
@@ -35,6 +36,7 @@ Pokédex moderna construida con React + Vite + TypeScript. Arquitectura por feat
 - React, TypeScript, Vite
 - TanStack Query, Zustand (persist), TailwindCSS, Heroicons
 - Vitest, Testing Library
+- ESLint con las reglas de Feature-Sliced Design y un caso por regla
 
 ## Documentación
 - [Guía de Arquitectura](./ARCHITECTURE.md)

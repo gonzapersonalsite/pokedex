@@ -1,9 +1,7 @@
 import { useState, useRef, useEffect, Suspense } from 'react';
-import { PokemonList, PokemonModal } from '@/features/pokemon/ui';
-import { usePokemonSearch, usePokemonNames, useTypes } from '@/features/pokemon/model';
-import { Button, Loader, PokeballIcon, toast } from '@/shared/ui';
-import { classifyRequestError, cn, getTypeBadgeClass, type RequestErrorKind } from '@/shared/utils';
-import { useTheme } from '@/app/providers';
+import { PokemonList, PokemonModal, usePokemonSearch, usePokemonNames, useTypes } from '@/features/pokemon';
+import { Button, Loader, PokeballIcon } from '@/shared/ui';
+import { classifyRequestError, cn, getTypeBadgeClass, toast, useTheme, type RequestErrorKind } from '@/shared/utils';
 import { SunIcon, MoonIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 type BeforeInstallPromptEvent = Event & {
@@ -82,14 +80,14 @@ export function PokedexPage() {
       {/* Header tipo Pokédex: barra superior clara */}
       <header id="top" className="sticky top-0 z-20 border-b-4 border-slate-800 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4">
-          <div className="grid grid-cols-[auto,1fr] grid-rows-[auto,auto] gap-3 sm:grid-cols-[auto,1fr,auto] sm:grid-rows-1 sm:items-center">
-            <div className="flex items-center gap-3 col-start-1 row-start-1 sm:col-start-1 sm:row-start-1 sm:justify-self-start">
+          <div className="grid grid-cols-[auto,1fr,auto] grid-rows-[auto,auto] gap-3 lg:grid-rows-1 lg:items-center">
+            <div className="flex min-w-0 items-center gap-3 col-span-2 row-start-1 lg:col-span-1 lg:col-start-1 lg:row-start-1 lg:justify-self-start">
               <PokeballIcon size={40} className="shrink-0" />
               <h1 className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100">
                 Pokédex
               </h1>
             </div>
-            <div className="w-full max-w-xl col-span-2 row-start-2 sm:col-start-2 sm:row-start-1 sm:justify-self-center sm:w-auto sm:max-w-2xl sm:mx-auto">
+            <div className="w-full min-w-0 col-span-3 row-start-2 lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:justify-self-center lg:max-w-2xl">
               <SearchBar
                 value={searchQuery}
                 onChange={setSearchQuery}
@@ -103,7 +101,7 @@ export function PokedexPage() {
                 maxSuggestions={SUGGESTIONS_MAX}
               />
             </div>
-            <div className="flex items-center gap-2 justify-self-end col-span-2 row-start-1 sm:col-start-3 sm:row-start-1 sm:justify-self-end">
+            <div className="flex items-center gap-2 justify-self-end row-start-1 col-start-3 self-start lg:self-auto lg:col-start-3 lg:row-start-1 lg:justify-self-end">
               <Button
                 variant="ghost"
                 size="sm"
@@ -310,14 +308,12 @@ function SearchBar({
 
   const showDropdown = open && filtered.length > 0 && value.length > 0;
 
-  useEffect(() => {
-    if (showDropdown && activeIndex === -1) {
-      setActiveIndex(0);
-    }
-    if (!showDropdown) {
-      setActiveIndex(-1);
-    }
-  }, [showDropdown]);
+  // Showing the dropdown hands the cursor to its first suggestion; closing forgets it.
+  const [wasDropdownShown, setWasDropdownShown] = useState(showDropdown);
+  if (showDropdown !== wasDropdownShown) {
+    setWasDropdownShown(showDropdown);
+    setActiveIndex(showDropdown ? 0 : -1);
+  }
 
   const pick = (name: string) => {
     onSelectSuggestion?.(name);

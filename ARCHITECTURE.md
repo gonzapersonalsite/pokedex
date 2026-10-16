@@ -15,7 +15,7 @@
 This document outlines the architectural patterns, design principles, and technology choices for the Pokédex project.
 
 ## 🏗️ Architecture & Principles
-- Feature-Sliced organization with clear separation of concerns.
+- Feature-Sliced Design: the six layers, imports only downwards, and every slice entered through its `index.ts`; the rules are lint rules (`pnpm lint`) with a case per rule in `eslint.config.test.ts`.
 - Composition-first UI; container/presentational split where useful.
 - Readability and simplicity over abstraction; YAGNI by default.
 - Stateless data fetching; client-side state scoped to UI needs.
@@ -31,24 +31,23 @@ This document outlines the architectural patterns, design principles, and techno
 ### Project Structure
 ```
 src/
-├── app/                 # Application layer (providers, App, ErrorBoundary, global styles)
-├── entities/            # Domain models (Pokemon, EvolutionNode, TypeOption)
+├── app/                  # Application layer (providers, theme context, App, ErrorBoundary, main, global styles, types)
+├── entities/
+│   ├── favorites/        # Favorites slice: model (persisted store)
+│   └── pokemon/          # Pokemon slice: types and model (mappers)
 ├── features/
-│   └── pokemon/         # API, hooks (list, search, details, types, evolution), UI (card, list, modal)
-├── hooks/               # Reusable React hooks (useAudio)
+│   └── pokemon/          # One slice: api (pokemonApi), model (hooks), ui (card, list, modal)
 ├── pages/
-│   └── PokedexPage.tsx  # Page composition (filters, favorites, list, modal)
-├── shared/              # UI primitives (Button, Loader, Toast), utils (cn, typeBadge, audioManager, scroll, requestError), tests setup
-├── store/               # Global stores (favorites, toast)
-├── types/               # Type declarations (virtual:pwa-register)
-└── main.tsx
+│   └── pokedex/          # One slice: ui (PokedexPage)
+└── shared/               # api (the only HTTP client), ui (primitives), utils (cn, typeBadge, audio, toast, theme, requestError), test (setup)
 ```
 
 ### Data & API
 - External API: PokeAPI (read-only GET endpoints).
+- Every request goes through the client in `shared/api` — the only module that calls `fetch` — with a deadline that aborts it and the `HttpError` that `classifyRequestError` reads.
 - Query Provider centralizes caching, stale time, retries, and global error toasts (through the `QueryCache` `onError` handler).
 - Failed requests are classified in one place (`shared/utils/requestError.ts`: network, not found or other). The global toasts, the retry policy (a 404 is never retried) and the inline error messages all rely on it.
-- This guide avoids duplicating endpoint lists; see README for example endpoints and the code in features/pokemon/lib.
+- This guide avoids duplicating endpoint lists; see README for example endpoints and the code in `features/pokemon/api`.
 
 ### State Management
 - Keep global state minimal (favorites, toasts).
@@ -76,6 +75,7 @@ src/
 - TypeScript strict mode.
 - Named exports for components and hooks.
 - Utility-first CSS classes; extract shared UI to `shared/ui`.
+- The Feature-Sliced Design boundaries are lint rules: `pnpm lint` fails on a cross-layer import, a sibling-slice import, a relative import that leaves its slice, or an import that skips a slice's `index.ts`.
 
 ---
 

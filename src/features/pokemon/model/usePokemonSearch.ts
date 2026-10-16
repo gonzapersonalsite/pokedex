@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { pokemonApi } from '../lib/pokemonApi';
+import { pokemonApi } from '../api/pokemonApi';
 import { mapPokemonFromApi } from '@/entities/pokemon';
 
 /** Búsqueda por nombre o ID. Desacoplado del listado. */

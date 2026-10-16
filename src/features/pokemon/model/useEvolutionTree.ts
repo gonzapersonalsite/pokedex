@@ -1,5 +1,5 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { pokemonApi } from '../lib/pokemonApi';
+import { pokemonApi } from '../api/pokemonApi';
 import { mapEvolutionChain } from '@/entities/pokemon';
 
 /** Árbol de evolución a partir del ID o nombre del Pokémon. */

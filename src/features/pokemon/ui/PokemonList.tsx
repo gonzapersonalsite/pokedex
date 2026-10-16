@@ -1,11 +1,11 @@
 import { useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { usePokemonList, useTypeRefs, usePokemonListByType } from '../model';
-import { useFavoritesStore } from '@/store/favorites';
+import { useFavoritesStore } from '@/entities/favorites';
 import { PokemonCard } from './PokemonCard';
-import { Loader, toast } from '@/shared/ui';
-import { classifyRequestError } from '@/shared/utils';
-import { pokemonApi } from '../lib/pokemonApi';
+import { Loader } from '@/shared/ui';
+import { classifyRequestError, toast } from '@/shared/utils';
+import { pokemonApi } from '../api/pokemonApi';
 import { mapPokemonFromApi } from '@/entities/pokemon';
 
 export interface PokemonListProps {

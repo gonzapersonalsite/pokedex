@@ -4,7 +4,7 @@
 | Property | Value |
 | --- | --- |
 | Stack | React, TypeScript, Vite, TailwindCSS, TanStack Query, Zustand, Vitest, pnpm |
-| Architecture | Feature-oriented React frontend, described in `ARCHITECTURE.md` |
+| Architecture | Feature-Sliced Design frontend, with its import rules enforced by ESLint, described in `ARCHITECTURE.md` |
 | Purpose | Browser-first Pokédex with search, filters, favorites, evolutions and PWA installability |
 
 ## Where each rule lives
@@ -19,7 +19,7 @@
 ## Quality Baseline
 
 - TypeScript stays strict.
-- `pnpm test` and `pnpm build` must pass before reporting a change as done.
+- `pnpm lint`, `pnpm test` and `pnpm build` must pass before reporting a change as done.
 - Social preview and agent-readable files are part of the product surface: changes to site URL, cover image, metadata or emitted files update their tests in the same change.
 - Do not add dependencies or external services without the owner's confirmation.
 - Generated output in `dist/` is never committed.
@@ -28,6 +28,7 @@
 
 ```bash
 pnpm dev
+pnpm lint
 pnpm test
 pnpm build
 pnpm preview
@@ -39,3 +40,4 @@ pnpm preview
 - The live production address is a single source in `tooling/agent-files/site.ts`.
 - The social cover is `public/og-cover.png`, rendered from `tooling/og-cover.html` with headless Edge at 1200×630.
 - Root routes only: the sitemap lists `/` alone, because the app has no server-rendered subpages.
+- Every request goes through the client in `src/shared/api`; the lint rejects `fetch` anywhere else.

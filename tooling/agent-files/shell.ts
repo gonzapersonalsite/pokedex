@@ -1,4 +1,4 @@
-import { absoluteUrl, COVER_ALT, COVER_PATH, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from './site.ts'
+import { absoluteUrl, COVER_ALT, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from './site.ts'
 
 const replaceOnce = (html: string, pattern: RegExp, replacement: string, what: string): string => {
   const flags = pattern.flags.includes('g') ? pattern.flags : `${pattern.flags}g`

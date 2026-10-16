@@ -11,13 +11,11 @@ import { Fragment, useEffect, useRef, useState } from 'react';
 import { useQueries } from '@tanstack/react-query';
 import { XMarkIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { usePokemonDetails, useEvolutionTree } from '../model';
-import { useFavoritesStore } from '@/store/favorites';
-import { Button, toast } from '@/shared/ui';
-import { Loader } from '@/shared/ui';
-import { useAudio } from '@/hooks/useAudio';
+import { useFavoritesStore } from '@/entities/favorites';
+import { Button, Loader } from '@/shared/ui';
 import type { EvolutionNode } from '@/entities/pokemon';
-import { classifyRequestError, cn, getTypeBadgeClass, scrollToTop } from '@/shared/utils';
-import { pokemonApi } from '../lib/pokemonApi';
+import { classifyRequestError, cn, getTypeBadgeClass, scrollToTop, toast, useAudio } from '@/shared/utils';
+import { pokemonApi } from '../api/pokemonApi';
 
 export interface PokemonModalProps {
   pokemonIdOrName: number | string | null;
@@ -32,7 +30,7 @@ export function PokemonModal({
   onClose,
   onNavigate,
 }: PokemonModalProps) {
-  const [scan, setScan] = useState(false);
+  const [scanRun, setScanRun] = useState<{ target: string; length: number } | null>(null);
   const [blinkBlue, setBlinkBlue] = useState(false);
   const [blinkGreen, setBlinkGreen] = useState(false);
   const { playSound, loadSounds } = useAudio();
@@ -56,20 +54,20 @@ export function PokemonModal({
       playSound('pokedex-on');
     })();
   }, [open, loadSounds, playSound]);
+  // The screen scans while its animation lasts — the long one when it follows a different
+  // Pokémon, the short one when it just opens — and the adjustment happens during render, so
+  // the effect only schedules when the run ends.
+  const scanTarget = !open ? 'closed' : `open:${String(pokemonIdOrName ?? '')}`;
+  if ((scanRun?.target ?? 'closed') !== scanTarget) {
+    const closedBefore = (scanRun?.target ?? 'closed') === 'closed';
+    setScanRun(scanTarget === 'closed' ? null : { target: scanTarget, length: closedBefore ? 1400 : 1600 });
+  }
   useEffect(() => {
-    if (open) {
-      setScan(true);
-      const t = setTimeout(() => setScan(false), 1400);
-      return () => clearTimeout(t);
-    }
-  }, [open]);
-  useEffect(() => {
-    if (open && pokemonIdOrName != null) {
-      setScan(true);
-      const t = setTimeout(() => setScan(false), 1600);
-      return () => clearTimeout(t);
-    }
-  }, [open, pokemonIdOrName]);
+    if (!scanRun) return;
+    const timer = setTimeout(() => setScanRun(null), scanRun.length);
+    return () => clearTimeout(timer);
+  }, [scanRun]);
+  const scan = scanRun !== null;
   const closeWithSound = () => {
     playSound('pokedex-off');
     onClose();

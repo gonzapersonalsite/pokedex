@@ -1,7 +1,6 @@
 import { QueryCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { type ReactNode, useState } from 'react';
-import { toast } from '@/shared/ui';
-import { classifyRequestError, type RequestErrorKind } from '@/shared/utils';
+import { classifyRequestError, toast, type RequestErrorKind } from '@/shared/utils';
 
 const ERROR_TOAST_COOLDOWN_MS = 8000;
 const MAX_QUERY_RETRIES = 2;

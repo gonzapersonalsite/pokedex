@@ -2,4 +2,4 @@ export { Button } from './Button';
 export { Loader } from './Loader';
 export { PokeballLoader } from './PokeballLoader';
 export { PokeballIcon } from './PokeballIcon';
-export { ToastViewport, toast } from './Toast';
+export { ToastViewport } from './Toast';

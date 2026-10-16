@@ -72,7 +72,7 @@ export default defineConfig({
         extends: true,
         test: {
           name: 'app',
-          include: ['src/**/*.{test,spec}.{ts,tsx}'],
+          include: ['src/**/*.{test,spec}.{ts,tsx}', 'eslint.config.test.ts'],
           environment: 'jsdom',
           setupFiles: ['src/shared/test/setup.ts'],
         },

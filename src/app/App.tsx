@@ -1,6 +1,6 @@
 import { QueryProvider, ThemeProvider } from './providers';
 import { ErrorBoundary } from './ErrorBoundary';
-import { PokedexPage } from '@/pages/PokedexPage';
+import { PokedexPage } from '@/pages/pokedex';
 import { ToastViewport } from '@/shared/ui';
 
 export function App() {

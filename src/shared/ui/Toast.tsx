@@ -1,8 +1,5 @@
 import { useEffect } from 'react';
-import { useToastStore, type ToastItem, toast } from '@/store/toast';
-import { cn } from '@/shared/utils';
-
-export { toast };
+import { cn, useToastStore, type ToastItem } from '@/shared/utils';
 
 function ToastCard({ item, onClose }: { item: ToastItem; onClose: () => void }) {
   const color =

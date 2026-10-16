@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { pokemonApi } from '../lib/pokemonApi';
+import { pokemonApi } from '../api/pokemonApi';
 
 /** Lista de todos los nombres + id para sugerencias de búsqueda. Se cachea. */
 export function usePokemonNames() {

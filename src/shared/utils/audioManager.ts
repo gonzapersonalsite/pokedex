@@ -1,3 +1,5 @@
+import { requestArrayBuffer } from '@/shared/api';
+
 export class AudioManager {
   private static instance: AudioManager;
   private audioContext: AudioContext | null = null;
@@ -19,8 +21,12 @@ export class AudioManager {
     this.isInitializing = true;
 
     try {
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      
+      const AudioContextCtor =
+        window.AudioContext ??
+        (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!AudioContextCtor) throw new Error('Web Audio API is not available');
+      this.audioContext = new AudioContextCtor();
+
       // Si el contexto está suspendido, intentar reanudarlo
       if (this.audioContext.state === 'suspended') {
         await this.audioContext.resume();
@@ -42,8 +48,7 @@ export class AudioManager {
     if (!this.audioContext || this.sounds.has(name)) return;
 
     try {
-      const response = await fetch(path);
-      const arrayBuffer = await response.arrayBuffer();
+      const arrayBuffer = await requestArrayBuffer(path);
       const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
       this.sounds.set(name, audioBuffer);
     } catch (error) {
@@ -53,7 +58,7 @@ export class AudioManager {
 
   // Cargar múltiples sonidos
   async loadSounds(soundMap: Record<string, string>): Promise<void> {
-    const loadPromises = Object.entries(soundMap).map(([name, path]) => 
+    const loadPromises = Object.entries(soundMap).map(([name, path]) =>
       this.loadSound(name, path)
     );
     await Promise.allSettled(loadPromises);

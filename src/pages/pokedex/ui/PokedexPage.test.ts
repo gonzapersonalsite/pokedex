@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createElement, type ReactNode } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { QueryProvider, ThemeProvider } from '@/app/providers';
-import { useToastStore } from '@/store/toast';
+import { useToastStore } from '@/shared/utils';
 import { PokedexPage } from './PokedexPage';
 
 const BASE = 'https://pokeapi.co/api/v2';

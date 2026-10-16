@@ -5,14 +5,16 @@
     <title>Pokédex social cover</title>
     <style>
       :root {
-        --red: #ef4444;
-        --red-dark: #b91c1c;
-        --navy: #0f172a;
-        --navy-soft: #1e293b;
-        --panel: rgba(15, 23, 42, 0.78);
-        --ink: #e2e8f0;
+        --page: #020617;
+        --header: #0f172a;
+        --header-line: #334155;
+        --panel: #1e293b;
+        --panel-top: #334155;
+        --panel-border: #475569;
+        --ink: #f8fafc;
         --muted: #94a3b8;
-        --line: rgba(226, 232, 240, 0.1);
+        --subtle: #cbd5e1;
+        --accent: #ef4444;
       }
 
       * {
@@ -24,264 +26,190 @@
         width: 1200px;
         height: 630px;
         overflow: hidden;
-        font-family: Inter, "Segoe UI", system-ui, sans-serif;
-        color: var(--ink);
+        font-family: Outfit, "Segoe UI", system-ui, sans-serif;
         background:
-          radial-gradient(circle at 12% 20%, rgba(239, 68, 68, 0.34), transparent 24%),
-          radial-gradient(circle at 86% 16%, rgba(248, 113, 113, 0.22), transparent 18%),
-          linear-gradient(135deg, #111827 0%, #0f172a 38%, #1e293b 100%);
+          radial-gradient(circle at 50% -20%, rgba(37, 99, 235, 0.18), transparent 30%),
+          linear-gradient(180deg, #020617 0%, #020617 100%);
+        color: var(--ink);
       }
 
-      .frame {
-        position: relative;
+      .app {
         width: 100%;
         height: 100%;
-        padding: 44px;
+        display: flex;
+        flex-direction: column;
       }
 
-      .frame::before {
-        content: "";
-        position: absolute;
-        inset: 22px;
-        border: 1px solid rgba(226, 232, 240, 0.08);
-        border-radius: 28px;
+      .header {
+        background: linear-gradient(180deg, #0f172a 0%, #0b1730 100%);
+        border-bottom: 4px solid var(--header-line);
+        box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+      }
+
+      .header__inner {
+        width: 100%;
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 16px 0 14px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+        gap: 18px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .brand__title {
+        margin: 0;
+        font-size: 25px;
+        font-weight: 700;
+        letter-spacing: -0.03em;
       }
 
       .pokeball {
-        position: absolute;
-        width: 230px;
-        height: 230px;
-        border-radius: 50%;
-        border: 12px solid rgba(226, 232, 240, 0.08);
-        opacity: 0.9;
-      }
-
-      .pokeball::before,
-      .pokeball::after {
-        content: "";
-        position: absolute;
-        left: 0;
-        right: 0;
+        position: relative;
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        overflow: hidden;
+        border: 2px solid #1d1d1b;
+        background: #ffffff;
+        flex-shrink: 0;
       }
 
       .pokeball::before {
-        top: 0;
-        height: 50%;
-        background: linear-gradient(180deg, rgba(239, 68, 68, 0.75), rgba(185, 28, 28, 0.7));
-        border-radius: 999px 999px 0 0;
+        content: "";
+        position: absolute;
+        inset: 0 0 50% 0;
+        background: #dd2120;
       }
 
-      .pokeball::after {
-        top: calc(50% - 5px);
-        height: 10px;
-        background: rgba(226, 232, 240, 0.16);
+      .pokeball__line {
+        position: absolute;
+        left: -2px;
+        right: -2px;
+        top: 50%;
+        height: 7px;
+        margin-top: -3px;
+        background: #1d1d1b;
+        z-index: 1;
       }
 
       .pokeball__button {
         position: absolute;
-        inset: 50%;
-        width: 62px;
-        height: 62px;
-        margin: -31px;
-        border-radius: 50%;
-        border: 10px solid rgba(226, 232, 240, 0.16);
-        background: rgba(248, 250, 252, 0.86);
-      }
-
-      .pokeball--left {
-        top: -36px;
-        left: -14px;
-        transform: rotate(-14deg);
-      }
-
-      .pokeball--right {
-        right: 38px;
-        bottom: 34px;
-        width: 168px;
-        height: 168px;
-        transform: rotate(18deg);
-        opacity: 0.7;
-      }
-
-      .hud {
-        position: absolute;
-        top: 58px;
-        right: 62px;
-        display: grid;
-        gap: 12px;
-      }
-
-      .hud__row {
-        display: flex;
-        gap: 10px;
-        justify-content: flex-end;
-      }
-
-      .hud__pill {
-        width: 56px;
-        height: 10px;
+        top: 50%;
+        left: 50%;
+        width: 13px;
+        height: 13px;
+        margin: -6.5px;
         border-radius: 999px;
-        background: rgba(148, 163, 184, 0.18);
+        border: 2px solid #1d1d1b;
+        background: #ffffff;
+        z-index: 2;
       }
 
-      .layout {
-        position: relative;
-        z-index: 1;
-        display: grid;
-        grid-template-columns: 1.08fr 0.92fr;
-        gap: 26px;
-        width: 100%;
-        height: 100%;
-        align-items: stretch;
-      }
-
-      .hero {
+      .search-wrap {
         display: flex;
         align-items: center;
-        justify-content: center;
-      }
-
-      .hero__panel {
-        width: 630px;
-        max-width: 100%;
-        min-height: 542px;
-        border-radius: 32px;
-        padding: 56px 54px;
-        background:
-          linear-gradient(180deg, rgba(239, 68, 68, 0.16), rgba(239, 68, 68, 0.04)),
-          var(--panel);
-        border: 1px solid var(--line);
-        box-shadow: 0 30px 90px rgba(15, 23, 42, 0.42);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-
-      .eyebrow {
-        margin: 0 0 18px;
-        font-size: 18px;
-        font-weight: 700;
-        letter-spacing: 0.2em;
-        text-transform: uppercase;
-        color: #fda4af;
-      }
-
-      h1 {
-        margin: 0;
-        font-size: 78px;
-        line-height: 0.95;
-        letter-spacing: -0.04em;
-      }
-
-      .tagline {
-        margin: 22px 0 0;
-        font-size: 29px;
-        line-height: 1.2;
-        color: #f8fafc;
-      }
-
-      .stack {
-        margin: 26px 0 0;
-        font-size: 18px;
-        line-height: 1.5;
-        color: var(--muted);
-      }
-
-      .stack strong {
-        color: #fecaca;
-        font-weight: 700;
-      }
-
-      .ui {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .console {
-        width: 100%;
-        max-width: 442px;
-        border-radius: 28px;
-        background:
-          linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
-          rgba(15, 23, 42, 0.68);
-        border: 1px solid var(--line);
-        box-shadow: 0 22px 70px rgba(15, 23, 42, 0.34);
-        overflow: hidden;
-      }
-
-      .console__top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 20px 22px 14px;
-      }
-
-      .console__lights {
-        display: flex;
         gap: 8px;
-      }
-
-      .console__light {
-        width: 12px;
-        height: 12px;
-        border-radius: 999px;
-        background: rgba(248, 250, 252, 0.3);
-      }
-
-      .console__light--red {
-        background: #fb7185;
-      }
-
-      .console__light--amber {
-        background: #f59e0b;
-      }
-
-      .console__light--green {
-        background: #34d399;
-      }
-
-      .console__title {
-        font-size: 14px;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: var(--muted);
-      }
-
-      .console__body {
-        padding: 0 22px 22px;
-        display: grid;
-        gap: 14px;
+        justify-self: center;
       }
 
       .search {
-        border-radius: 18px;
-        background: rgba(15, 23, 42, 0.7);
-        border: 1px solid rgba(148, 163, 184, 0.18);
-        padding: 14px 16px;
+        width: 100%;
+        min-width: 0;
+        max-width: 430px;
+        height: 40px;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 11px;
+        padding: 0 15px;
+        border-radius: 12px;
+        border: 2px solid #334155;
+        background: rgba(30, 41, 59, 0.92);
+        color: #94a3b8;
+        font-size: 15px;
+        font-weight: 500;
       }
 
       .search__icon {
-        width: 12px;
-        height: 12px;
+        width: 16px;
+        height: 16px;
+        border: 2px solid currentColor;
         border-radius: 999px;
-        background: rgba(248, 250, 252, 0.86);
-        box-shadow: 14px 14px 0 -4px rgba(248, 250, 252, 0.86);
-        transform: rotate(-38deg);
+        position: relative;
+        transform: scale(0.82);
       }
 
-      .search__text {
-        color: var(--muted);
+      .search__icon::after {
+        content: "";
+        position: absolute;
+        width: 8px;
+        height: 2px;
+        right: -6px;
+        bottom: -2px;
+        border-radius: 999px;
+        background: currentColor;
+        transform: rotate(45deg);
+      }
+
+      .search-button,
+      .install-button,
+      .icon-button {
+        height: 32px;
+        border-radius: 7px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .search-button {
+        padding: 0 15px;
+        background: #ef4444;
+        color: #ffffff;
+      }
+
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .icon-button {
+        width: 30px;
+        color: #e2e8f0;
+      }
+
+      .install-button {
+        padding: 0 12px;
+        background: #334155;
+        color: #f8fafc;
+      }
+
+      .main {
+        width: 100%;
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 18px 0 0;
+      }
+
+      .label {
+        margin: 0 0 10px;
         font-size: 15px;
+        font-weight: 600;
+        color: var(--subtle);
       }
 
       .chips {
         display: flex;
-        gap: 10px;
         flex-wrap: wrap;
+        gap: 7px;
       }
 
       .chip {
@@ -289,133 +217,264 @@
         border-radius: 999px;
         font-size: 13px;
         font-weight: 700;
-        color: #0f172a;
+        line-height: 1;
+        color: #ffffff;
       }
 
-      .chip--fire { background: #fb7185; }
-      .chip--electric { background: #facc15; }
-      .chip--water { background: #60a5fa; }
+      .chip--all {
+        background: #ef4444;
+        box-shadow: 0 0 0 2px #f87171;
+      }
 
-      .cards {
+      .chip--favorites { background: #475569; }
+      .chip--normal { background: #94a3b8; color: #111827; }
+      .chip--fighting { background: #dc2626; }
+      .chip--flying { background: #818cf8; }
+      .chip--poison { background: #9333ea; }
+      .chip--ground { background: #b45309; }
+      .chip--rock { background: #92400e; }
+      .chip--bug { background: #65a30d; }
+      .chip--ghost { background: #4338ca; }
+      .chip--steel { background: #64748b; }
+      .chip--fire { background: #f97316; }
+      .chip--water { background: #3b82f6; }
+      .chip--grass { background: #22c55e; }
+      .chip--electric { background: #eab308; color: #111827; }
+      .chip--psychic { background: #ec4899; }
+      .chip--ice { background: #06b6d4; color: #082f49; }
+      .chip--dragon { background: #6d28d9; }
+      .chip--dark { background: #0f172a; }
+      .chip--fairy { background: #f9a8d4; color: #111827; }
+
+      .grid {
+        margin-top: 18px;
         display: grid;
-        gap: 12px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
       }
 
       .card {
-        border-radius: 22px;
-        padding: 16px 18px;
-        border: 1px solid rgba(148, 163, 184, 0.14);
-        background: rgba(15, 23, 42, 0.72);
-        display: grid;
-        grid-template-columns: 70px 1fr auto;
-        align-items: center;
-        gap: 14px;
+        overflow: hidden;
+        border-radius: 18px;
+        border: 2px solid var(--panel-border);
+        background: var(--panel);
+        box-shadow: 0 16px 32px rgba(2, 6, 23, 0.35);
       }
 
-      .card__sprite {
-        width: 70px;
-        height: 70px;
-        border-radius: 18px;
-        background:
-          radial-gradient(circle at 34% 32%, rgba(251, 191, 36, 0.96), transparent 28%),
-          radial-gradient(circle at 62% 62%, rgba(239, 68, 68, 0.8), transparent 36%),
-          rgba(248, 250, 252, 0.94);
+      .card__media {
+        position: relative;
+        height: 232px;
+        padding: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(180deg, var(--panel-top) 0%, #253247 100%);
+      }
+
+      .card__media img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 18px 20px rgba(15, 23, 42, 0.32));
+      }
+
+      .favorite {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        border: 2px solid rgba(71, 85, 105, 0.95);
+        background: rgba(30, 41, 59, 0.96);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .favorite svg {
+        width: 15px;
+        height: 15px;
+        stroke: #94a3b8;
+        fill: none;
+        stroke-width: 2;
+      }
+
+      .card__body {
+        padding: 12px 14px 14px;
+        border-top: 1px solid rgba(71, 85, 105, 0.9);
+      }
+
+      .card__number {
+        font-size: 13px;
+        font-weight: 700;
+        color: #94a3b8;
       }
 
       .card__name {
-        font-size: 20px;
+        margin: 2px 0 0;
+        font-size: 17px;
         font-weight: 700;
-        color: #f8fafc;
+        line-height: 1.2;
       }
 
-      .card__meta {
-        margin-top: 4px;
-        font-size: 13px;
-        color: var(--muted);
+      .card__types {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 11px;
       }
 
-      .card__badge {
-        padding: 8px 12px;
+      .type {
+        padding: 5px 9px;
         border-radius: 999px;
-        background: rgba(239, 68, 68, 0.18);
-        color: #fecaca;
-        font-size: 13px;
+        font-size: 11px;
         font-weight: 700;
+        line-height: 1;
+      }
+
+      .type--grass { background: rgba(34, 197, 94, 0.95); color: #ffffff; }
+      .type--poison { background: rgba(147, 51, 234, 0.95); color: #ffffff; }
+      .type--fire { background: rgba(249, 115, 22, 0.95); color: #ffffff; }
+
+      .page-fade {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.04);
       }
     </style>
   </head>
   <body>
-    <div class="frame">
-      <div class="pokeball pokeball--left"><div class="pokeball__button"></div></div>
-      <div class="pokeball pokeball--right"><div class="pokeball__button"></div></div>
-
-      <div class="hud">
-        <div class="hud__row">
-          <div class="hud__pill"></div>
-          <div class="hud__pill" style="width: 86px;"></div>
-        </div>
-        <div class="hud__row">
-          <div class="hud__pill" style="width: 40px;"></div>
-          <div class="hud__pill" style="width: 72px;"></div>
-          <div class="hud__pill" style="width: 28px;"></div>
-        </div>
-      </div>
-
-      <div class="layout">
-        <section class="hero">
-          <div class="hero__panel">
-            <p class="eyebrow">Browser-first app</p>
-            <h1>Pokédex</h1>
-            <p class="tagline">Search Pokémon, types and evolutions.</p>
-            <p class="stack"><strong>React</strong> • <strong>TypeScript</strong> • TanStack Query • Zustand • PWA</p>
+    <div class="app">
+      <header class="header">
+        <div class="header__inner">
+          <div class="brand">
+            <div class="pokeball" aria-hidden="true">
+              <div class="pokeball__line"></div>
+              <div class="pokeball__button"></div>
+            </div>
+            <h1 class="brand__title">Pokédex</h1>
           </div>
+
+          <div class="search-wrap">
+            <div class="search">
+              <span class="search__icon" aria-hidden="true"></span>
+              <span>Search by name or ID...</span>
+            </div>
+            <div class="search-button">Search</div>
+          </div>
+
+          <div class="actions">
+            <div class="icon-button" aria-hidden="true">☼</div>
+            <div class="install-button">Install app</div>
+          </div>
+        </div>
+      </header>
+
+      <main class="main">
+        <p class="label">Filter by type</p>
+        <section class="chips" aria-label="Type filters">
+          <span class="chip chip--all">All</span>
+          <span class="chip chip--favorites">Favorites</span>
+          <span class="chip chip--normal">Normal</span>
+          <span class="chip chip--fighting">Fighting</span>
+          <span class="chip chip--flying">Flying</span>
+          <span class="chip chip--poison">Poison</span>
+          <span class="chip chip--ground">Ground</span>
+          <span class="chip chip--rock">Rock</span>
+          <span class="chip chip--bug">Bug</span>
+          <span class="chip chip--ghost">Ghost</span>
+          <span class="chip chip--steel">Steel</span>
+          <span class="chip chip--fire">Fire</span>
+          <span class="chip chip--water">Water</span>
+          <span class="chip chip--grass">Grass</span>
+          <span class="chip chip--electric">Electric</span>
+          <span class="chip chip--psychic">Psychic</span>
+          <span class="chip chip--ice">Ice</span>
+          <span class="chip chip--dragon">Dragon</span>
+          <span class="chip chip--dark">Dark</span>
+          <span class="chip chip--fairy">Fairy</span>
         </section>
 
-        <section class="ui">
-          <div class="console">
-            <div class="console__top">
-              <div class="console__lights">
-                <span class="console__light console__light--red"></span>
-                <span class="console__light console__light--amber"></span>
-                <span class="console__light console__light--green"></span>
+        <section class="grid" aria-label="Pokemon cards">
+          <article class="card">
+            <div class="card__media">
+              <div class="favorite" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 20.364l-7.682-7.682a4.5 4.5 0 116.364-6.364L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364z" />
+                </svg>
               </div>
-              <span class="console__title">Live browser UI</span>
+              <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png" alt="Bulbasaur" />
             </div>
-            <div class="console__body">
-              <div class="search">
-                <span class="search__icon"></span>
-                <span class="search__text">Search by name or ID...</span>
-              </div>
-              <div class="chips">
-                <span class="chip chip--fire">Fire</span>
-                <span class="chip chip--electric">Electric</span>
-                <span class="chip chip--water">Water</span>
-              </div>
-              <div class="cards">
-                <div class="card">
-                  <div class="card__sprite"></div>
-                  <div>
-                    <div class="card__name">Pikachu</div>
-                    <div class="card__meta">#025 · Electric · Favorite</div>
-                  </div>
-                  <div class="card__badge">Details</div>
-                </div>
-                <div class="card">
-                  <div class="card__sprite" style="background:
-                    radial-gradient(circle at 34% 32%, rgba(96, 165, 250, 0.96), transparent 28%),
-                    radial-gradient(circle at 62% 62%, rgba(14, 165, 233, 0.84), transparent 36%),
-                    rgba(248, 250, 252, 0.94);"></div>
-                  <div>
-                    <div class="card__name">Squirtle</div>
-                    <div class="card__meta">#007 · Water · Evolution chain</div>
-                  </div>
-                  <div class="card__badge" style="background: rgba(59, 130, 246, 0.18); color: #bfdbfe;">Browse</div>
-                </div>
+            <div class="card__body">
+              <div class="card__number">#001</div>
+              <h2 class="card__name">Bulbasaur</h2>
+              <div class="card__types">
+                <span class="type type--grass">Grass</span>
+                <span class="type type--poison">Poison</span>
               </div>
             </div>
-          </div>
+          </article>
+
+          <article class="card">
+            <div class="card__media">
+              <div class="favorite" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 20.364l-7.682-7.682a4.5 4.5 0 116.364-6.364L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364z" />
+                </svg>
+              </div>
+              <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/2.png" alt="Ivysaur" />
+            </div>
+            <div class="card__body">
+              <div class="card__number">#002</div>
+              <h2 class="card__name">Ivysaur</h2>
+              <div class="card__types">
+                <span class="type type--grass">Grass</span>
+                <span class="type type--poison">Poison</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__media">
+              <div class="favorite" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 20.364l-7.682-7.682a4.5 4.5 0 116.364-6.364L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364z" />
+                </svg>
+              </div>
+              <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/3.png" alt="Venusaur" />
+            </div>
+            <div class="card__body">
+              <div class="card__number">#003</div>
+              <h2 class="card__name">Venusaur</h2>
+              <div class="card__types">
+                <span class="type type--grass">Grass</span>
+                <span class="type type--poison">Poison</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <div class="card__media">
+              <div class="favorite" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 20.364l-7.682-7.682a4.5 4.5 0 116.364-6.364L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364z" />
+                </svg>
+              </div>
+              <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png" alt="Charmander" />
+            </div>
+            <div class="card__body">
+              <div class="card__number">#004</div>
+              <h2 class="card__name">Charmander</h2>
+              <div class="card__types">
+                <span class="type type--fire">Fire</span>
+              </div>
+            </div>
+          </article>
         </section>
-      </div>
+      </main>
     </div>
+    <div class="page-fade"></div>
   </body>
 </html>

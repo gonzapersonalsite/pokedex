@@ -58,9 +58,15 @@ src/
 - Estrategia Network First para `https://pokeapi.co/api/v2/` con caché de respaldo.
 - Assets estáticos cacheados con Workbox; ver `vite.config.ts` para detalles.
 
+### Vista previa social y salida legible por agentes
+- Los crawlers y las plataformas sociales leen `index.html` sin ejecutar React. Las etiquetas Open Graph y Twitter estáticas viven ahí, y el tooling de build en `tooling/agent-files/` las reescribe con la URL absoluta de producción.
+- La URL del sitio tiene una única fuente en `tooling/agent-files/site.ts`.
+- El build emite `llms.txt`, `robots.txt` y `sitemap.xml`. El sitemap solo lista `/`, porque la app no tiene subpáginas servidas desde el servidor.
+- `public/og-cover.png` es la imagen social PNG de 1200×630; los tests cruzan su tipo y tamaño declarados con el fichero real.
+
 ## 📚 Tests
 - Tests unitarios e integrados con Vitest + Testing Library.
-- Entorno JSDOM; configuración en `src/shared/test/setup.ts`.
+- Entorno JSDOM para los tests de la app y entorno Node para los tests de tooling que verifican los ficheros emitidos y el plugin de Vite.
 
 ## 🔒 Seguridad y Accesibilidad
 - Sin credenciales ni claves privadas; uso de API pública y de solo lectura.

@@ -58,9 +58,15 @@ src/
 - Network First strategy for `https://pokeapi.co/api/v2/` with fallback cache.
 - Static assets cached via Workbox defaults; see vite.config.ts for details.
 
+### Social Preview & Agent-Readable Output
+- Crawlers and social platforms read `index.html` without running React. Static Open Graph and Twitter tags live there, and the build tooling in `tooling/agent-files/` rewrites them with the absolute production URL.
+- The site URL is a single source in `tooling/agent-files/site.ts`.
+- The build emits `llms.txt`, `robots.txt` and `sitemap.xml`. The sitemap lists only `/`, because the app has no server-rendered subpages.
+- `public/og-cover.png` is the 1200×630 PNG social preview image; tests cross its declared type and size against the real file.
+
 ## 📚 Testing
 - Unit and integration tests with Vitest + Testing Library.
-- JSDOM environment; test setup in `src/shared/test/setup.ts`.
+- JSDOM environment for app tests; Node environment for build-tooling tests that verify emitted metadata files and the Vite plugin.
 
 ## 🔒 Security & Accessibility
 - No credentials or private keys; public, read-only API usage.

@@ -1,0 +1,39 @@
+import type { Plugin } from 'vite'
+import { buildAgentFiles } from './generate.ts'
+import { buildShell } from './shell.ts'
+
+const decodeAssetSource = (source: string | Uint8Array): string =>
+  typeof source === 'string' ? source : new TextDecoder().decode(source)
+
+export function agentFilesPlugin(): Plugin {
+  return {
+    name: 'pokedex-agent-files',
+    enforce: 'post',
+    configureServer(server) {
+      const files = new Map(buildAgentFiles().map((file) => [file.path, file]))
+
+      server.middlewares.use((request, response, next) => {
+        const file = files.get((request.url ?? '').split('?')[0])
+        if (file === undefined) {
+          next()
+          return
+        }
+
+        response.setHeader('Content-Type', file.contentType)
+        response.end(file.source)
+      })
+    },
+    generateBundle(_options, bundle) {
+      const index = bundle['index.html']
+      if (index === undefined || index.type !== 'asset') {
+        throw new Error('agent-files: index.html asset not found in the bundle')
+      }
+
+      index.source = buildShell(decodeAssetSource(index.source))
+
+      for (const file of buildAgentFiles()) {
+        this.emitFile({ type: 'asset', fileName: file.path.slice(1), source: file.source })
+      }
+    },
+  }
+}

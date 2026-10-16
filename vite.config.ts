@@ -4,12 +4,14 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { agentFilesPlugin } from './tooling/agent-files/vitePlugin.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [
     react(),
+    agentFilesPlugin(),
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
@@ -63,8 +65,26 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: 'jsdom',
-    setupFiles: ['src/shared/test/setup.ts'],
-    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    expect: { requireAssertions: true },
+    allowOnly: false,
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'app',
+          include: ['src/**/*.{test,spec}.{ts,tsx}'],
+          environment: 'jsdom',
+          setupFiles: ['src/shared/test/setup.ts'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'tooling',
+          include: ['tooling/**/*.test.ts'],
+          environment: 'node',
+        },
+      },
+    ],
   },
 });

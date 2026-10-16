@@ -32,6 +32,7 @@ Covers local development, build, testing, PWA behavior, and deployment for the P
 ## 📦 Build
 - `pnpm build`
 - Output: `dist/` (static assets)
+- The Vite build rewrites the static social preview in `index.html` and emits `llms.txt`, `robots.txt` and `sitemap.xml`.
 
 ## 📱 PWA
 - vite-plugin-pwa with autoUpdate and dev SW enabled.
@@ -42,6 +43,13 @@ Covers local development, build, testing, PWA behavior, and deployment for the P
 - Vercel deploys every push to `main` to production: https://pokedex-pokeapi-gonzalo.vercel.app/
 - The build runs in Vercel's GitHub integration; the repository has no deploy scripts or workflows.
 - Each deployment's result shows up on the commit as the `Vercel` GitHub status.
+
+## 🖼️ Social Preview
+- Production URL source: `tooling/agent-files/site.ts`
+- Social cover: `public/og-cover.png` (1200×630 PNG)
+- Cover source template: `tooling/og-cover.html`
+- Static tags in `index.html` are placeholders for development; the build rewrites them with the absolute production URL.
+- `pnpm test` verifies the generated metadata files, the social image dimensions, and that the Vite plugin is wired into the real build and dev server.
 
 ## 🔧 Environment Variables
 - None required for PokeAPI usage.

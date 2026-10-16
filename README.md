@@ -40,6 +40,11 @@ Modern Pokédex built with React + Vite + TypeScript. It uses Feature-Sliced arc
 - [Architecture Guide](ARCHITECTURE.md)
 - [Operations Guide](OPERATIONS.md)
 
+## Social Preview & Agent Files
+- Static Open Graph and Twitter tags are written into `index.html` by the build tooling in `tooling/agent-files/`.
+- `public/og-cover.png` is the social preview image (1200×630 PNG), rendered from `tooling/og-cover.html`.
+- The build also emits `llms.txt`, `robots.txt` and `sitemap.xml` for the production site.
+
 ## API Endpoints (PokeAPI)
 - `GET https://pokeapi.co/api/v2/pokemon?offset=&limit=`
 - `GET https://pokeapi.co/api/v2/pokemon/:id|:name`

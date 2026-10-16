@@ -40,6 +40,11 @@ Pokédex moderna construida con React + Vite + TypeScript. Arquitectura por feat
 - [Guía de Arquitectura](./ARCHITECTURE.md)
 - [Guía de Operaciones](./OPERATIONS.md)
 
+## Vista previa social y archivos para agentes
+- Las etiquetas Open Graph y Twitter estáticas se escriben en `index.html` desde el tooling de build en `tooling/agent-files/`.
+- `public/og-cover.png` es la imagen de vista previa social (PNG 1200×630), renderizada desde `tooling/og-cover.html`.
+- El build también emite `llms.txt`, `robots.txt` y `sitemap.xml` para el sitio en producción.
+
 ## Endpoints (PokeAPI)
 - `GET https://pokeapi.co/api/v2/pokemon?offset=&limit=`
 - `GET https://pokeapi.co/api/v2/pokemon/:id|:name`

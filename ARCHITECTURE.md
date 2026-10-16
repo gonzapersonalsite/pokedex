@@ -46,7 +46,7 @@ src/
 - External API: PokeAPI (read-only GET endpoints).
 - Every request goes through the client in `shared/api` — the only module that calls `fetch` — with a deadline that aborts it and the `HttpError` that `classifyRequestError` reads.
 - Query Provider centralizes caching, stale time, retries, and global error toasts (through the `QueryCache` `onError` handler).
-- Failed requests are classified in one place (`shared/utils/requestError.ts`: network, not found or other). The global toasts, the retry policy (a 404 is never retried) and the inline error messages all rely on it.
+- Failed requests are classified in one place (`shared/utils/requestError.ts`: network, timeout, not found or other). The global toasts, the retry policy (a 404 is never retried) and the inline error messages all rely on it.
 - This guide avoids duplicating endpoint lists; see README for example endpoints and the code in `features/pokemon/api`.
 
 ### State Management

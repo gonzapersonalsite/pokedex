@@ -12,6 +12,10 @@ const ERROR_TOASTS: Record<ToastedErrorKind, { title: string; message: string }>
     title: 'Network error',
     message: 'You appear to be offline. Check your connection and try again.',
   },
+  timeout: {
+    title: 'Request timed out',
+    message: 'The server took too long to answer. Check your connection and try again.',
+  },
   other: {
     title: 'Request failed',
     message: 'Could not load Pokémon data. Please try again in a moment.',
@@ -20,7 +24,7 @@ const ERROR_TOASTS: Record<ToastedErrorKind, { title: string; message: string }>
 
 function createQueryClient() {
   // One cooldown per kind, so a burst of failing queries (an outage or a 429) shows a single toast.
-  const lastToastAt: Record<ToastedErrorKind, number> = { network: 0, other: 0 };
+  const lastToastAt: Record<ToastedErrorKind, number> = { network: 0, timeout: 0, other: 0 };
 
   return new QueryClient({
     // TanStack Query v5 ignores onError in defaultOptions.queries; the QueryCache is the global hook.

@@ -1,7 +1,7 @@
-import { HttpError } from '@/shared/utils';
+import { HttpError, HttpTimeoutError } from '@/shared/utils';
 
 // The only module in the product that talks to the network: every request goes through it, so
-// the deadline and the error thrown (the one classifyRequestError knows) are decided here once.
+// the deadline and the errors thrown (the ones classifyRequestError knows) are decided here once.
 const DEFAULT_TIMEOUT_MS = 10_000;
 
 export interface RequestOptions {
@@ -17,17 +17,25 @@ export interface JsonRequestOptions extends RequestOptions {
 interface Deadline {
   signal: AbortSignal;
   release: () => void;
+  /** Whether the abort came from the deadline and not from the caller. */
+  timedOut: () => boolean;
 }
 
-// The caller's signal and the deadline travel together: whichever aborts first ends the request.
+// The caller's signal and the deadline travel together: whichever aborts first ends the request,
+// and only the deadline turns into an HttpTimeoutError; a caller's abort stays a cancellation.
 function withDeadline(signal: AbortSignal | undefined, timeoutMs: number): Deadline {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  let timedOut = false;
+  const timer = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, timeoutMs);
   const forwardAbort = () => controller.abort();
   signal?.addEventListener('abort', forwardAbort);
 
   return {
     signal: controller.signal,
+    timedOut: () => timedOut,
     release: () => {
       clearTimeout(timer);
       signal?.removeEventListener('abort', forwardAbort);
@@ -36,7 +44,8 @@ function withDeadline(signal: AbortSignal | undefined, timeoutMs: number): Deadl
 }
 
 export async function requestJson<T>(url: string, options: JsonRequestOptions = {}): Promise<T> {
-  const deadline = withDeadline(options.signal, options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+  const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const deadline = withDeadline(options.signal, timeoutMs);
 
   try {
     const response = await fetch(url, { signal: deadline.signal });
@@ -48,18 +57,29 @@ export async function requestJson<T>(url: string, options: JsonRequestOptions = 
       throw new HttpError(response.status, message);
     }
     return (await response.json()) as T;
+  } catch (error) {
+    if (deadline.timedOut()) {
+      throw new HttpTimeoutError(`Request timed out after ${timeoutMs} ms: ${url}`);
+    }
+    throw error;
   } finally {
     deadline.release();
   }
 }
 
 export async function requestArrayBuffer(url: string, options: RequestOptions = {}): Promise<ArrayBuffer> {
-  const deadline = withDeadline(options.signal, options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+  const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const deadline = withDeadline(options.signal, timeoutMs);
 
   try {
     const response = await fetch(url, { signal: deadline.signal });
     if (!response.ok) throw new HttpError(response.status, `HTTP ${response.status}: ${url}`);
     return await response.arrayBuffer();
+  } catch (error) {
+    if (deadline.timedOut()) {
+      throw new HttpTimeoutError(`Request timed out after ${timeoutMs} ms: ${url}`);
+    }
+    throw error;
   } finally {
     deadline.release();
   }

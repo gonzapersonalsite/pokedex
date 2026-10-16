@@ -24,6 +24,10 @@ const SEARCH_ERROR_COPY: Record<RequestErrorKind, { message: string; hint: strin
     message: 'You appear to be offline. Check your connection and try again.',
     hint: 'Reconnect to the internet and try again.',
   },
+  timeout: {
+    message: 'The request took too long. Check your connection and try again.',
+    hint: SEARCH_RETRY_HINT,
+  },
   notFound: {
     message: 'There is no Pokémon with that name or ID. Try "Pikachu" or "25".',
     hint: SEARCH_RETRY_HINT,

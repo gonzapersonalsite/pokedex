@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { HttpError, classifyRequestError } from './requestError';
+import { HttpError, HttpTimeoutError, classifyRequestError } from './requestError';
 
 describe('classifyRequestError', () => {
   afterEach(() => {
@@ -10,6 +10,14 @@ describe('classifyRequestError', () => {
     expect(classifyRequestError(new HttpError(404, 'There is no Pokémon with that name or ID.'))).toBe(
       'notFound'
     );
+  });
+
+  it('treats a request that outlived its deadline as a timeout', () => {
+    expect(
+      classifyRequestError(
+        new HttpTimeoutError('Request timed out after 10000 ms: https://pokeapi.co/api/v2/type')
+      )
+    ).toBe('timeout');
   });
 
   // The TypeError message each engine's fetch() rejects with when it gets no response.

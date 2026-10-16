@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { HttpError } from '@/shared/utils';
+import { HttpError, HttpTimeoutError } from '@/shared/utils';
 import { requestArrayBuffer, requestJson } from './httpClient';
 
 // The smallest response the client reads: only what it uses, so the test does not grow with Response.
@@ -15,7 +15,7 @@ const fetchUntilAborted = () =>
     (_url: string, init: RequestInit) =>
       new Promise<Response>((_resolve, reject) => {
         init.signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
-      }),
+      })
   );
 
 afterEach(() => {
@@ -47,18 +47,19 @@ describe('requestJson', () => {
     ).rejects.toThrow('There is no Pokémon with that name or ID.');
   });
 
-  it('does_end_a_request_that_outlives_its_deadline', async () => {
+  it('does_throw_an_HttpTimeoutError_when_the_request_outlives_its_deadline', async () => {
     vi.useFakeTimers();
     vi.stubGlobal('fetch', fetchUntilAborted());
 
     const request = requestJson('https://api.test/slow', { timeoutMs: 50 });
-    const failure = expect(request).rejects.toThrow('Aborted');
+    const failure = expect(request).rejects.toBeInstanceOf(HttpTimeoutError);
     await vi.advanceTimersByTimeAsync(60);
 
     await failure;
+    await expect(request).rejects.toThrow(/timed out after 50 ms/);
   });
 
-  it('does_end_the_request_when_the_caller_aborts_it', async () => {
+  it('does_keep_the_cancellation_when_the_caller_aborts_the_request', async () => {
     vi.stubGlobal('fetch', fetchUntilAborted());
     const controller = new AbortController();
 
@@ -67,6 +68,8 @@ describe('requestJson', () => {
     controller.abort();
 
     await failure;
+    await expect(request).rejects.toBeInstanceOf(DOMException);
+    await expect(request).rejects.not.toBeInstanceOf(HttpTimeoutError);
   });
 });
 

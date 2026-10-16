@@ -3,7 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { useQuery } from '@tanstack/react-query';
 import { QueryProvider } from './QueryProvider';
 import { useToastStore } from '@/shared/utils';
-import { HttpError } from '@/shared/utils';
+import { HttpError, HttpTimeoutError } from '@/shared/utils';
 
 function useFailingQuery(key: string, error: Error) {
   return useQuery({
@@ -56,6 +56,25 @@ describe('QueryProvider', () => {
     ]);
   });
 
+  it('shows a single "Request timed out" toast when several queries outlive their deadline', async () => {
+    const { result } = renderHook(
+      () => [
+        useFailingQuery('slow-a', new HttpTimeoutError('Request timed out after 10000 ms: https://pokeapi.co/api/v2/type')),
+        useFailingQuery('slow-b', new HttpTimeoutError('Request timed out after 10000 ms: https://pokeapi.co/api/v2/pokemon/25')),
+      ],
+      { wrapper: QueryProvider }
+    );
+
+    await waitFor(() => expect(result.current.every((q) => q.isError)).toBe(true));
+    expect(useToastStore.getState().toasts).toEqual([
+      expect.objectContaining({
+        variant: 'error',
+        title: 'Request timed out',
+        message: 'The server took too long to answer. Check your connection and try again.',
+      }),
+    ]);
+  });
+
   it('does not show a toast when the Pokémon does not exist', async () => {
     const { result } = renderHook(
       () => useFailingQuery('not-found', new HttpError(404, 'There is no Pokémon with that name or ID.')),
@@ -81,6 +100,17 @@ describe('QueryProvider', () => {
     const queryFn = vi.fn(() => Promise.reject(new HttpError(500, 'HTTP 500: https://pokeapi.co/api/v2/type')));
     const { result } = renderHook(
       () => useQuery({ queryKey: ['test', 'flaky'], queryFn, retryDelay: 0 }),
+      { wrapper: QueryProvider }
+    );
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(queryFn).toHaveBeenCalledTimes(3);
+  });
+
+  it('retries a timed-out request twice before giving up, because a slow server can recover', async () => {
+    const queryFn = vi.fn(() => Promise.reject(new HttpTimeoutError('Request timed out after 10000 ms: https://pokeapi.co/api/v2/type')));
+    const { result } = renderHook(
+      () => useQuery({ queryKey: ['test', 'slow'], queryFn, retryDelay: 0 }),
       { wrapper: QueryProvider }
     );
 

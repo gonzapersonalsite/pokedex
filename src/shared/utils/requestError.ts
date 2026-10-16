@@ -9,7 +9,15 @@ export class HttpError extends Error {
   }
 }
 
-export type RequestErrorKind = 'network' | 'notFound' | 'other';
+/** A request the client aborted because it outlived its deadline: a slow server, not a refusal. */
+export class HttpTimeoutError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'HttpTimeoutError';
+  }
+}
+
+export type RequestErrorKind = 'network' | 'timeout' | 'notFound' | 'other';
 
 /**
  * The Fetch spec only says fetch() rejects with a TypeError when it gets no response
@@ -38,6 +46,7 @@ function isFetchNetworkFailure(error: unknown): boolean {
  */
 export function classifyRequestError(error: unknown): RequestErrorKind {
   if (error instanceof HttpError && error.status === 404) return 'notFound';
+  if (error instanceof HttpTimeoutError) return 'timeout';
   if (isOffline()) return 'network';
   if (isFetchNetworkFailure(error)) return 'network';
   return 'other';

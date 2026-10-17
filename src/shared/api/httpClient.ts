@@ -31,7 +31,9 @@ function withDeadline(signal: AbortSignal | undefined, timeoutMs: number): Deadl
     controller.abort();
   }, timeoutMs);
   const forwardAbort = () => controller.abort();
-  signal?.addEventListener('abort', forwardAbort);
+  // An abort event fires once: a signal that is already aborted never fires it again.
+  if (signal?.aborted) forwardAbort();
+  else signal?.addEventListener('abort', forwardAbort);
 
   return {
     signal: controller.signal,

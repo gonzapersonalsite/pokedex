@@ -19,6 +19,10 @@ const { paths } = JSON.parse(readFileSync(new URL('tsconfig.json', import.meta.u
 const SRC_ALIAS = Object.keys(paths)
   .find((alias) => paths[alias].includes('./src/*'))
   ?.replace('*', '')
+// fsd-lint reads '@' as its alias by default, so a scoped package like '@app/tokens' would
+// be taken for the app layer: with the slash, only '@/...', what tsconfig.json declares,
+// is the alias and everything else is a package.
+const FSD_ALIAS = { value: SRC_ALIAS.replace(/\/$/, ''), withSlash: true }
 // The segments that hold logic and no UI.
 const LOGIC_SEGMENTS = 'src/**/{model,api,lib}/**'
 const TESTS = '**/*.test.{ts,tsx}'
@@ -71,10 +75,13 @@ export default defineConfig([
     files: ['src/**/*.{ts,tsx}'],
     plugins: { fsd },
     rules: {
-      'fsd/forbidden-imports': 'error',
-      'fsd/no-cross-slice-dependency': 'error',
-      'fsd/no-relative-imports': 'error',
-      'fsd/no-public-api-sidestep': ['error', { layers: SLICED_LAYERS, publicApi: { allowSegmentImports: false } }],
+      'fsd/forbidden-imports': ['error', { alias: FSD_ALIAS }],
+      'fsd/no-cross-slice-dependency': ['error', { alias: FSD_ALIAS }],
+      'fsd/no-relative-imports': ['error', { alias: FSD_ALIAS }],
+      'fsd/no-public-api-sidestep': [
+        'error',
+        { alias: FSD_ALIAS, layers: SLICED_LAYERS, publicApi: { allowSegmentImports: false } },
+      ],
     },
   },
   {

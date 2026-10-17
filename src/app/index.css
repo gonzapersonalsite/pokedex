@@ -2,6 +2,14 @@
 @config "../../tailwind.config.js";
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Tailwind 4's preflight no longer gives buttons the pointer cursor that version 3 did. */
+@layer base {
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
 * {
   box-sizing: border-box;
 }

@@ -139,6 +139,13 @@ describe('the layers of Feature-Sliced Design', () => {
     expect(await reportsOn('src/pages/home/ui/Board.tsx', code)).toEqual([])
   })
 
+  it('accepts a scoped package whose name starts like a layer, which is not the alias', async () => {
+    // Only '@/...' is the alias; '@app/tokens' is a package, not the app layer.
+    const code = "import { tokens } from '@app/tokens'\nexport const theme = tokens\n"
+
+    expect(await reportsOn('src/entities/task/model/rank.ts', code)).toEqual([])
+  })
+
   it('leaves a test free of the import rules of the layers', async () => {
     // A layer above, a sibling slice, a deep import and a relative path out of the slice,
     // imported, re-exported and imported dynamically.

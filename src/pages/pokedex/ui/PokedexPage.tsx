@@ -82,9 +82,9 @@ export function PokedexPage() {
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans">
       {/* Header tipo Pokédex: barra superior clara */}
-      <header id="top" className="sticky top-0 z-20 border-b-4 border-slate-800 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
+      <header id="top" className="sticky top-0 z-20 border-b-4 border-slate-800 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xs">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4">
-          <div className="grid grid-cols-[auto,1fr,auto] grid-rows-[auto,auto] gap-3 lg:grid-rows-1 lg:items-center">
+          <div className="grid grid-cols-[auto_1fr_auto] grid-rows-[auto_auto] gap-3 lg:grid-rows-1 lg:items-center">
             <div className="flex min-w-0 items-center gap-3 col-span-2 row-start-1 lg:col-span-1 lg:col-start-1 lg:row-start-1 lg:justify-self-start">
               <PokeballIcon size={40} className="shrink-0" />
               <h1 className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100">
@@ -370,7 +370,7 @@ function SearchBar({
             }
           }}
           placeholder="Search by name or ID..."
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           aria-label="Search Pokémon"
           aria-autocomplete="list"
           aria-controls="search-suggestions"
@@ -479,7 +479,7 @@ function SearchResult({
       <button
         type="button"
         onClick={() => onSelect(data.id)}
-        className="w-full rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 p-4 hover:border-primary-500 dark:hover:border-primary-500 transition text-left shadow-sm"
+        className="w-full rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 p-4 hover:border-primary-500 dark:hover:border-primary-500 transition text-left shadow-xs"
       >
         <span className="font-semibold capitalize text-slate-800 dark:text-slate-100">
           {capitalized}

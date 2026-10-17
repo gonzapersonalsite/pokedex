@@ -33,7 +33,7 @@ export function PokemonCard({
       <div className="relative">
         <button
           type="button"
-          className="w-full text-left focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-inset rounded-2xl"
+          className="w-full text-left focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-inset rounded-2xl"
           onClick={() => onClick?.(pokemon.id)}
           aria-label={`View details of ${displayName}`}
         >

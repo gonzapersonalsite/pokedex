@@ -9,12 +9,15 @@ const failure = (status: number): Response => ({ ok: false, status }) as unknown
 const okBytes = (bytes: Uint8Array): Response =>
   ({ ok: true, status: 200, arrayBuffer: () => Promise.resolve(bytes.buffer) }) as unknown as Response;
 
-// A fetch that never answers on its own: it ends when the signal it was given aborts.
+// A fetch that never answers on its own: it ends when the signal it was given aborts, at once
+// when that signal is already aborted, as the real fetch does.
 const fetchUntilAborted = () =>
   vi.fn(
     (_url: string, init: RequestInit) =>
       new Promise<Response>((_resolve, reject) => {
-        init.signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
+        const abort = () => reject(new DOMException('Aborted', 'AbortError'));
+        if (init.signal?.aborted) abort();
+        else init.signal?.addEventListener('abort', abort);
       })
   );
 
@@ -69,6 +72,20 @@ describe('requestJson', () => {
 
     await failure;
     await expect(request).rejects.toBeInstanceOf(DOMException);
+    await expect(request).rejects.not.toBeInstanceOf(HttpTimeoutError);
+  });
+
+  it('does_keep_the_cancellation_when_the_caller_aborted_before_the_request', async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('fetch', fetchUntilAborted());
+    const controller = new AbortController();
+    controller.abort();
+
+    const request = requestJson('https://api.test/slow', { signal: controller.signal, timeoutMs: 50 });
+    const failure = expect(request).rejects.toThrow('Aborted');
+    await vi.advanceTimersByTimeAsync(60);
+
+    await failure;
     await expect(request).rejects.not.toBeInstanceOf(HttpTimeoutError);
   });
 });

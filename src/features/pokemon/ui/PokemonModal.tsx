@@ -16,6 +16,7 @@ import { Button, Loader } from '@/shared/ui';
 import type { EvolutionNode } from '@/entities/pokemon';
 import { cn, getTypeBadgeClass, scrollToTop, toast, useAudio } from '@/shared/utils';
 import { loadErrorMessage } from './loadErrorMessage';
+import { useScreenScan } from './useScreenScan';
 import { pokemonApi } from '../api/pokemonApi';
 
 export interface PokemonModalProps {
@@ -31,7 +32,7 @@ export function PokemonModal({
   onClose,
   onNavigate,
 }: PokemonModalProps) {
-  const [scanRun, setScanRun] = useState<{ target: string; length: number } | null>(null);
+  const scan = useScreenScan(open, pokemonIdOrName);
   const [blinkBlue, setBlinkBlue] = useState(false);
   const [blinkGreen, setBlinkGreen] = useState(false);
   const { playSound, loadSounds } = useAudio();
@@ -55,20 +56,6 @@ export function PokemonModal({
       playSound('pokedex-on');
     })();
   }, [open, loadSounds, playSound]);
-  // The screen scans while its animation lasts — the long one when it follows a different
-  // Pokémon, the short one when it just opens — and the adjustment happens during render, so
-  // the effect only schedules when the run ends.
-  const scanTarget = !open ? 'closed' : `open:${String(pokemonIdOrName ?? '')}`;
-  if ((scanRun?.target ?? 'closed') !== scanTarget) {
-    const closedBefore = (scanRun?.target ?? 'closed') === 'closed';
-    setScanRun(scanTarget === 'closed' ? null : { target: scanTarget, length: closedBefore ? 1400 : 1600 });
-  }
-  useEffect(() => {
-    if (!scanRun) return;
-    const timer = setTimeout(() => setScanRun(null), scanRun.length);
-    return () => clearTimeout(timer);
-  }, [scanRun]);
-  const scan = scanRun !== null;
   const closeWithSound = () => {
     playSound('pokedex-off');
     onClose();
@@ -175,7 +162,7 @@ export function PokemonModal({
                     className="relative mx-auto w-full flex-1 min-h-0 max-h-[58svh] sm:max-h-safe overflow-y-auto overscroll-contain rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border-2 border-black/20 shadow-[inset_0_0_20px_rgba(0,0,0,0.6)]"
                   >
                     {scan && (
-                      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                      <div key={scan.run} className="pointer-events-none absolute inset-0 overflow-hidden">
                         <div className="animate-scan absolute left-0 right-0 top-0 h-[45%] bg-gradient-to-b from-emerald-300/0 via-emerald-300/60 to-emerald-300/0 mix-blend-screen blur-[2px]" />
                       </div>
                     )}
@@ -392,16 +379,16 @@ export function PokemonModal({
                     aria-label="Close"
                   />
                   <div className="flex gap-3">
-                    <div className={cn('w-14 h-3 bg-blue-900 rounded-sm border border-black/40 shadow-inner', blinkBlue && 'led-blink-blue')} />
-                    <div className={cn('w-14 h-3 bg-green-900 rounded-sm border border-black/40 shadow-inner', blinkGreen && 'led-blink-green')} />
+                    <div className={cn('w-14 h-3 bg-blue-900 rounded-xs border border-black/40 shadow-inner', blinkBlue && 'led-blink-blue')} />
+                    <div className={cn('w-14 h-3 bg-green-900 rounded-xs border border-black/40 shadow-inner', blinkGreen && 'led-blink-green')} />
                   </div>
                   <div
                     className={cn('relative w-16 h-16 cursor-pointer hint-loop select-none touch-none')}
                     onPointerDown={(e) => e.stopPropagation()}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <div className="absolute top-1/2 left-0 w-16 h-5 -translate-y-1/2 bg-slate-800 rounded-sm border-b-2 border-black transition hover:ring-2 hover:ring-emerald-400/40" />
-                    <div className="absolute left-1/2 top-0 w-5 h-16 -translate-x-1/2 bg-slate-800 rounded-sm border-r-2 border-black transition hover:ring-2 hover:ring-emerald-400/40" />
+                    <div className="absolute top-1/2 left-0 w-16 h-5 -translate-y-1/2 bg-slate-800 rounded-xs border-b-2 border-black transition hover:ring-2 hover:ring-emerald-400/40" />
+                    <div className="absolute left-1/2 top-0 w-5 h-16 -translate-x-1/2 bg-slate-800 rounded-xs border-r-2 border-black transition hover:ring-2 hover:ring-emerald-400/40" />
                     <button
                       type="button"
                       aria-label="Previous"

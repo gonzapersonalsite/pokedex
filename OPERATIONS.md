@@ -24,7 +24,7 @@ Covers local development, build, testing, PWA behavior, and deployment for the P
   - `pnpm test` (single run)
   - `pnpm test:watch` (local watch mode)
 - Lint: `pnpm lint` (ESLint, no warning allowed)
-- Pre-push hook: `git config core.hooksPath .githooks` (runs `pnpm lint`, `pnpm test`, and `pnpm build` on a clean working tree before pushing)
+- Pre-push hook: `git config core.hooksPath .githooks` (refuses to push anything but HEAD, or with uncommitted or untracked files; then restores the dependencies from the lockfile, runs `pnpm lint`, `pnpm test` and `pnpm build`, and checks the tree again)
 
 ## 🧪 Testing
 - Vitest + Testing Library

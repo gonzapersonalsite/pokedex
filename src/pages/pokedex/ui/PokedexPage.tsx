@@ -3,6 +3,7 @@ import { PokemonList, PokemonModal, usePokemonSearch, usePokemonNames, useTypes 
 import { Button, Loader, PokeballIcon } from '@/shared/ui'
 import { classifyRequestError, cn, getTypeBadgeClass, toast, useTheme, type RequestErrorKind } from '@/shared/utils'
 import { SunIcon, MoonIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import { ReturnToTop } from './ReturnToTop'
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void> | void
@@ -192,6 +193,8 @@ export function PokedexPage() {
           </>
         )}
       </main>
+
+      <ReturnToTop />
 
       <PokemonModal
         pokemonIdOrName={selectedId}

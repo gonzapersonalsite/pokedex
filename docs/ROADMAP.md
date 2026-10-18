@@ -11,7 +11,7 @@ por identidad).
 - **El orden de trabajo, en una línea.** Los números son IDENTIDAD, no
   secuencia; aquí solo entran fases con número:
 
-  **F0 ✔**
+  **F0 ✔ → F1 (IN PROGRESS)**
 
   Esta línea es la única que enuncia la secuencia y lleva el cursor: en negrita,
   las fases unidas por `→` (o por `·`, que separa igual), y nada que no sea una
@@ -48,3 +48,14 @@ por identidad).
 ## F0 — Línea base de la aplicación Pokédex (DONE)
 
 - Cuerpo y entregas archivados en `archive/ROADMAP.md`.
+
+## F1 — Navegar una lista larga (IN PROGRESS)
+
+- **Alcance:** que recorrer el scroll infinito no castigue volver atrás.
+- **F1.1 Volver arriba — DONE.** Enlace fijo que aparece al bajar y lleva al
+  principio de la página; forma y cifra en
+  `#return-to-top-is-a-link-to-root-shown-past-400px`. Entrega:
+  `#2026-10-19-return-to-top-link`.
+- **Lo que sigue es del dueño:** si entra el enlace para saltar al contenido
+  (`#skip-to-content-link-is-missing`). Los textos de la interfaz van en inglés
+  (`#product-ui-text-is-english`).

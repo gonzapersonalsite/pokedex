@@ -1,31 +1,32 @@
 ---
-title: Adopt agentic-scaffold, react-vite layer and react-fsd stack
+title: Adopción de agentic-scaffold, la capa react-vite y el stack react-fsd
 date: 2026-10-18
 phase: H0
 ---
-**Adopt agentic-scaffold, react-vite layer and react-fsd stack.**
-Unifies `pokedex` onto the canonical `agentic-scaffold` engine,
-`layer:react-vite`, and `stack:react-fsd` from `templates` commit
-`39bead6c761666ac5f5648e83bf89a4265d07aaf`, following
+**Adopción de agentic-scaffold, la capa react-vite y el stack react-fsd.**
+Unifica `pokedex` sobre el motor canónico de `agentic-scaffold`,
+`layer:react-vite` y `stack:react-fsd` desde el commit
+`39bead6c761666ac5f5648e83bf89a4265d07aaf` de `templates`, siguiendo
 `#this-repository-uses-the-agentic-scaffold`.
 
-- **Scaffold and hooks:** instantiated `agentic-scaffold` and `layer:react-vite`,
-  replacing the legacy `.githooks/pre-push` script with `.githooks/commit-msg`
-  (`tools/board/commit_message.py`) and `.githooks/pre-push`
-  (`tools/board/pre_push.py`). Per-clone hook activation remains
-  `#hook-activation-is-a-per-clone-step`.
-- **Formatting and gates:** added `prettier` (`3.9.10`), `.prettierrc.json`, and
-  `.prettierignore`, and added the `typecheck`, `format`, and `format:check`
-  scripts so all nine gates in `gates.txt` (`board: tests`, `board: build`,
+- **Andamio y hooks:** se instanció `agentic-scaffold` y `layer:react-vite`,
+  sustituyendo el script antiguo de `.githooks/pre-push` por
+  `.githooks/commit-msg` (`tools/board/commit_message.py`) y
+  `.githooks/pre-push` (`tools/board/pre_push.py`). La activación por clon se
+  rige por `#hook-activation-is-a-per-clone-step`.
+- **Formato y puertas:** se añadieron `prettier` (`3.9.10`), `.prettierrc.json` y
+  `.prettierignore`, y los scripts `typecheck`, `format` y `format:check` para
+  que las nueve puertas de `gates.txt` (`board: tests`, `board: build`,
   `board: documents`, `dependencies`, `format`, `lint`, `typecheck`, `tests`,
-  `build`) run under `python verify.py`.
-- **Stack adoption (`stack:react-fsd`):** synced `eslint.config.js`,
-  `eslint-fsd-gaps.js`, `eslint.config.test.ts`, and `tooling/agent-files/*`
-  (`generate.ts`, `llmsTxt.ts`, `robotsTxt.ts`, `sitemap.ts` with XML escaping,
-  `vitePlugin.ts`, and their tests), forwarded caller abort reasons in
-  `src/shared/api/httpClient.ts`, and recorded `stack:react-fsd` in
-  `tools/board/components.txt` with product-owned pieces marked `kept`
-  (`src/shared/api/httpClient.ts`, `src/shared/api/httpClient.test.ts`,
-  `vitest.setup.ts`).
-- **Verification:** `python -I verify.py` passes all 9 gates (`0 en rojo`), and
-  `upgrade.py` reports 0 pending changes against `templates` `39bead6`.
+  `build`) corran bajo `python verify.py`.
+- **Adopción del stack (`stack:react-fsd`):** se sincronizaron `eslint.config.js`,
+  `eslint-fsd-gaps.js`, `eslint.config.test.ts` y `tooling/agent-files/*`
+  (`generate.ts`, `llmsTxt.ts`, `robotsTxt.ts`, `sitemap.ts` con escapado XML,
+  `shell.ts`, `vitePlugin.ts` y sus tests), se propagó el motivo de cancelación
+  del llamante en `src/shared/api/httpClient.ts` y se registró `stack:react-fsd`
+  en `tools/board/components.txt` con las piezas propias del producto marcadas
+  como `kept` (`src/shared/api/httpClient.ts`,
+  `src/shared/api/httpClient.test.ts`, `vitest.setup.ts`).
+- **Verificación:** `python -I verify.py` pasa las 9 puertas (`0 en rojo`), y
+  `upgrade.py` informa 0 cambios pendientes frente al commit `39bead6` de
+  `templates`.

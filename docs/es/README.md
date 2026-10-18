@@ -26,9 +26,13 @@ Pokédex moderna construida con React + Vite + TypeScript. Usa Diseño Feature-S
 
 ## Inicio rápido
 - Instalar: `pnpm install --frozen-lockfile --ignore-scripts`
+- Hooks: `git config core.hooksPath .githooks`
+- Puertas: `python verify.py`
 - Desarrollo: `pnpm dev`
 - Tests: `pnpm test`
 - Lint: `pnpm lint`
+- Typecheck: `pnpm run typecheck`
+- Comprobación de formato: `pnpm run format:check`
 - Compilar: `pnpm build`
 - Previsualizar: `pnpm preview`
 
@@ -39,6 +43,7 @@ Pokédex moderna construida con React + Vite + TypeScript. Usa Diseño Feature-S
 - ESLint con las reglas de Feature-Sliced Design y un caso por regla
 
 ## Documentación
+- [Contrato de Arquitectura Feature-Sliced Design](../ARCHITECTURE.md)
 - [Guía de Arquitectura](./ARCHITECTURE.md)
 - [Guía de Operaciones](./OPERATIONS.md)
 

@@ -24,7 +24,10 @@ Covers local development, build, testing, PWA behavior, and deployment for the P
   - `pnpm test` (single run)
   - `pnpm test:watch` (local watch mode)
 - Lint: `pnpm lint` (ESLint, no warning allowed)
-- Pre-push hook: `git config core.hooksPath .githooks` (refuses to push anything but HEAD, or with uncommitted or untracked files; then restores the dependencies from the lockfile, runs `pnpm lint`, `pnpm test` and `pnpm build`, and checks the tree again)
+- Typecheck: `pnpm run typecheck`
+- Format check: `pnpm run format:check`
+- Canonical gates: `python verify.py` (runs all 9 repository and product gates declared in `gates.txt`)
+- Git hooks: `git config core.hooksPath .githooks` (`commit-msg` validates commit messages and `pre-push` refuses to push anything but HEAD or with uncommitted/untracked files and runs `python -I verify.py`)
 
 ## 🧪 Testing
 - Vitest + Testing Library

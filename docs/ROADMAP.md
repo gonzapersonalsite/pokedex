@@ -45,6 +45,6 @@ por identidad).
   registro con `phase: none` y el motivo, y el tablero lo lista aparte (regla
   dura 5 de `../AGENTS.md`).
 
-## F0 — Existing Pokédex application baseline (DONE)
+## F0 — Línea base de la aplicación Pokédex (DONE)
 
-- Body and delivery references archived in `archive/ROADMAP.md`.
+- Cuerpo y entregas archivados en `archive/ROADMAP.md`.

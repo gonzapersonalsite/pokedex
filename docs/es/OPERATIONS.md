@@ -24,7 +24,10 @@ Guía de desarrollo local, build, tests, comportamiento PWA y despliegue del pro
   - `pnpm test` (ejecución única)
   - `pnpm test:watch` (modo watch local)
 - Lint: `pnpm lint` (ESLint, sin avisos permitidos)
-- Hook de pre-push: `git config core.hooksPath .githooks` (rechaza empujar algo que no sea HEAD, o con cambios sin commitear o ficheros sin versionar; después restaura las dependencias desde el lockfile, ejecuta `pnpm lint`, `pnpm test` y `pnpm build` y vuelve a comprobar el árbol)
+- Typecheck: `pnpm run typecheck`
+- Comprobación de formato: `pnpm run format:check`
+- Puertas canónicas: `python verify.py` (ejecuta las 9 puertas del repositorio y del producto declaradas en `gates.txt`)
+- Hooks de Git: `git config core.hooksPath .githooks` (`commit-msg` comprueba el mensaje de commit y `pre-push` rechaza empujar algo que no sea HEAD o con cambios sin commitear o ficheros sin versionar y ejecuta `python -I verify.py`)
 
 ## 🧪 Tests
 - Vitest + Testing Library

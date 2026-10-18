@@ -11,7 +11,7 @@ por identidad).
 - **El orden de trabajo, en una línea.** Los números son IDENTIDAD, no
   secuencia; aquí solo entran fases con número:
 
-  **F0 ✔ → F1 (IN PROGRESS)**
+  **F0 ✔ → F1 ✔**
 
   Esta línea es la única que enuncia la secuencia y lleva el cursor: en negrita,
   las fases unidas por `→` (o por `·`, que separa igual), y nada que no sea una
@@ -49,16 +49,6 @@ por identidad).
 
 - Cuerpo y entregas archivados en `archive/ROADMAP.md`.
 
-## F1 — Navegar una lista larga (IN PROGRESS)
+## F1 — Navegar una lista larga (DONE)
 
-- **Alcance:** que recorrer el scroll infinito no castigue volver atrás.
-- **F1.1 Volver arriba — DONE.** Enlace fijo que aparece al bajar y lleva al
-  principio de la página; forma y cifra en
-  `#return-to-top-is-a-link-to-root-shown-past-400px`. Entrega:
-  `#2026-10-19-return-to-top-link`.
-- **F1.2 Saltar al contenido — DONE.** Enlace que aparece con el primer Tab y
-  lleva el foco a la lista sin cruzar la cabecera; forma y cifra en
-  `#skip-link-focuses-main-clear-of-the-sticky-header`. Entrega:
-  `#2026-10-19-skip-to-content-link`.
-- **Lo que sigue es del dueño:** ninguna parte más decidida. Los textos de la
-  interfaz van en inglés (`#product-ui-text-is-english`).
+- Cuerpo y entregas archivados en `archive/ROADMAP.md`.

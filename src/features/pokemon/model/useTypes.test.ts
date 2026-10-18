@@ -1,19 +1,19 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createElement } from 'react';
-import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useTypes } from './useTypes';
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { createElement } from 'react'
+import { renderHook, waitFor } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { useTypes } from './useTypes'
 
 function createWrapper() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
-  });
+  })
   return function Wrapper(props: { children: React.ReactNode }) {
-    return createElement(QueryClientProvider, { client: queryClient }, props.children);
-  };
+    return createElement(QueryClientProvider, { client: queryClient }, props.children)
+  }
 }
 
-const BASE = 'https://pokeapi.co/api/v2';
+const BASE = 'https://pokeapi.co/api/v2'
 
 const typeDetails: Record<string, { id: number; pokemonNames: string[] }> = {
   fire: { id: 10, pokemonNames: ['charmander', 'vulpix'] },
@@ -21,10 +21,10 @@ const typeDetails: Record<string, { id: number; pokemonNames: string[] }> = {
   stellar: { id: 19, pokemonNames: [] },
   unknown: { id: 10001, pokemonNames: [] },
   shadow: { id: 10002, pokemonNames: [] },
-};
+}
 
 function jsonResponse(body: unknown) {
-  return { ok: true, json: () => Promise.resolve(body) } as Response;
+  return { ok: true, json: () => Promise.resolve(body) } as Response
 }
 
 function mockPokeApi(url: string) {
@@ -34,10 +34,10 @@ function mockPokeApi(url: string) {
       next: null,
       previous: null,
       results: Object.keys(typeDetails).map((name) => ({ name, url: `${BASE}/type/${name}/` })),
-    });
+    })
   }
-  const name = url.replace(`${BASE}/type/`, '');
-  const detail = typeDetails[name];
+  const name = url.replace(`${BASE}/type/`, '')
+  const detail = typeDetails[name]
   return jsonResponse({
     id: detail.id,
     name,
@@ -45,25 +45,25 @@ function mockPokeApi(url: string) {
       slot: 1,
       pokemon: { name: pokemonName, url: `${BASE}/pokemon/${i + 1}/` },
     })),
-  });
+  })
 }
 
 describe('useTypes', () => {
   beforeEach(() => {
     vi.stubGlobal(
       'fetch',
-      vi.fn((url: string) => Promise.resolve(mockPokeApi(url)))
-    );
-  });
+      vi.fn((url: string) => Promise.resolve(mockPokeApi(url))),
+    )
+  })
 
   it('only lists types that have at least one Pokémon', async () => {
-    const { result } = renderHook(() => useTypes(), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useTypes(), { wrapper: createWrapper() })
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
     expect(result.current.data).toEqual([
       { id: 10, name: 'fire' },
       { id: 11, name: 'water' },
-    ]);
-  });
-});
+    ])
+  })
+})

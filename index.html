@@ -1,46 +1,61 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <!-- Charset y Viewport -->
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <!-- Core App Tags -->
-  <title>Pokédex</title>
-  
-  <!-- SEO Meta Tags -->
-  <meta name="description" content="Modern Pokédex built with React, TypeScript and Vite: search Pokémon by name or ID, filter by type, browse evolutions and keep favorites locally in your browser." />
-  <meta name="keywords" content="Pokédex, Pokémon, React, portfolio, Gonzalo Martínez García" />
-  <meta name="author" content="Gonzalo Martínez García" />
-  <meta name="copyright" content="© 2026 Gonzalo Martínez García. All rights reserved." />
-  
-  <!-- Social preview: the build writes the absolute site addresses from tooling/agent-files/site.ts.
-       The values here only serve the dev server. Image paths are root-relative. -->
-  <meta property="og:title" content="Pokédex" />
-  <meta property="og:description" content="Modern Pokédex built with React, TypeScript and Vite: search Pokémon by name or ID, filter by type, browse evolutions and keep favorites locally in your browser." />
-  <meta property="og:url" content="/" />
-  <meta property="og:site_name" content="Pokédex" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:image" content="/og-cover.png" />
-  <meta property="og:image:type" content="image/png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Pokédex: the app name, the tagline “Search Pokémon, types and evolutions” and its stack, React, TypeScript, TanStack Query, Zustand and PWA, over a red and dark interface inspired by a Pokédex." />
-  <meta property="og:type" content="website" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Pokédex" />
-  <meta name="twitter:description" content="Modern Pokédex built with React, TypeScript and Vite: search Pokémon by name or ID, filter by type, browse evolutions and keep favorites locally in your browser." />
-  <meta name="twitter:image" content="/og-cover.png" />
-  <meta name="twitter:image:alt" content="Pokédex: the app name, the tagline “Search Pokémon, types and evolutions” and its stack, React, TypeScript, TanStack Query, Zustand and PWA, over a red and dark interface inspired by a Pokédex." />
+  <head>
+    <!-- Charset y Viewport -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
-</head>
+    <!-- Core App Tags -->
+    <title>Pokédex</title>
+
+    <!-- SEO Meta Tags -->
+    <meta
+      name="description"
+      content="Modern Pokédex built with React, TypeScript and Vite: search Pokémon by name or ID, filter by type, browse evolutions and keep favorites locally in your browser."
+    />
+    <meta name="keywords" content="Pokédex, Pokémon, React, portfolio, Gonzalo Martínez García" />
+    <meta name="author" content="Gonzalo Martínez García" />
+    <meta name="copyright" content="© 2026 Gonzalo Martínez García. All rights reserved." />
+
+    <!-- Social preview: the build writes the absolute site addresses from tooling/agent-files/site.ts.
+       The values here only serve the dev server. Image paths are root-relative. -->
+    <meta property="og:title" content="Pokédex" />
+    <meta
+      property="og:description"
+      content="Modern Pokédex built with React, TypeScript and Vite: search Pokémon by name or ID, filter by type, browse evolutions and keep favorites locally in your browser."
+    />
+    <meta property="og:url" content="/" />
+    <meta property="og:site_name" content="Pokédex" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content="/og-cover.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Pokédex: the app name, the tagline “Search Pokémon, types and evolutions” and its stack, React, TypeScript, TanStack Query, Zustand and PWA, over a red and dark interface inspired by a Pokédex."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Pokédex" />
+    <meta
+      name="twitter:description"
+      content="Modern Pokédex built with React, TypeScript and Vite: search Pokémon by name or ID, filter by type, browse evolutions and keep favorites locally in your browser."
+    />
+    <meta name="twitter:image" content="/og-cover.png" />
+    <meta
+      name="twitter:image:alt"
+      content="Pokédex: the app name, the tagline “Search Pokémon, types and evolutions” and its stack, React, TypeScript, TanStack Query, Zustand and PWA, over a red and dark interface inspired by a Pokédex."
+    />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  </head>
 
   <body>
     <div id="root"></div>

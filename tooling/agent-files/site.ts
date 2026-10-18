@@ -12,4 +12,14 @@ export const COVER_PATH = '/og-cover.png'
 export const COVER_ALT =
   'Pokédex: the app name, the tagline “Search Pokémon, types and evolutions” and its stack, React, TypeScript, TanStack Query, Zustand and PWA, over a red and dark interface inspired by a Pokédex.'
 
+export const REPOSITORY_URL = 'https://github.com/gonzapersonalsite/pokedex'
+
+// Public routes the sitemap lists.
+export const ROUTES = ['/'] as const
+
+export const DOCUMENTS = [
+  ['README.md', 'what the app does, its stack and how to run it.'],
+  ['docs/ARCHITECTURE.md', 'Feature-Sliced Design layers, slices, segments and rules.'],
+] as const
+
 export const absoluteUrl = (path: string): string => `${SITE_URL}${path}`

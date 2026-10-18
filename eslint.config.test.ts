@@ -532,7 +532,7 @@ describe('no UI in the model, api and lib segments', () => {
 
   it('leaves the tests of those segments free to render', async () => {
     const code =
-      "import { render } from '@testing-library/react'\nimport { TaskItem } from '../ui/TaskItem'\nexport const draw = () => render(<TaskItem task={{ id: '1', title: 't', done: false }} onToggle={() => {}} />)\n"
+      "import { render } from '@testing-library/react'\nimport { TaskItem } from '../ui/TaskItem'\nexport const draw = () => render(<TaskItem task={{ id: '1', title: 't', done: false }} onToggle={() => {}} onRemove={() => {}} />)\n"
 
     expect(await reportsOn('src/entities/task/model/task.view.test.tsx', code)).toEqual([])
   })

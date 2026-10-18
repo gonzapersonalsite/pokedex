@@ -1,5 +1,5 @@
-import { PokeballLoader } from './PokeballLoader';
+import { PokeballLoader } from './PokeballLoader'
 
 export function Loader({ className = '' }: { className?: string }) {
-  return <PokeballLoader className={className} />;
+  return <PokeballLoader className={className} />
 }

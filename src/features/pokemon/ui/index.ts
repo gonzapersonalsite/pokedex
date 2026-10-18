@@ -1,3 +1,3 @@
-export { PokemonCard } from './PokemonCard';
-export { PokemonList } from './PokemonList';
-export { PokemonModal } from './PokemonModal';
+export { PokemonCard } from './PokemonCard'
+export { PokemonList } from './PokemonList'
+export { PokemonModal } from './PokemonModal'

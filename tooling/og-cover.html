@@ -26,7 +26,7 @@
         width: 1200px;
         height: 630px;
         overflow: hidden;
-        font-family: Outfit, "Segoe UI", system-ui, sans-serif;
+        font-family: Outfit, 'Segoe UI', system-ui, sans-serif;
         background:
           radial-gradient(circle at 50% -20%, rgba(37, 99, 235, 0.18), transparent 30%),
           linear-gradient(180deg, #020617 0%, #020617 100%);
@@ -82,7 +82,7 @@
       }
 
       .pokeball::before {
-        content: "";
+        content: '';
         position: absolute;
         inset: 0 0 50% 0;
         background: #dd2120;
@@ -146,7 +146,7 @@
       }
 
       .search__icon::after {
-        content: "";
+        content: '';
         position: absolute;
         width: 8px;
         height: 2px;
@@ -226,25 +226,67 @@
         box-shadow: 0 0 0 2px #f87171;
       }
 
-      .chip--favorites { background: #475569; }
-      .chip--normal { background: #94a3b8; color: #111827; }
-      .chip--fighting { background: #dc2626; }
-      .chip--flying { background: #818cf8; }
-      .chip--poison { background: #9333ea; }
-      .chip--ground { background: #b45309; }
-      .chip--rock { background: #92400e; }
-      .chip--bug { background: #65a30d; }
-      .chip--ghost { background: #4338ca; }
-      .chip--steel { background: #64748b; }
-      .chip--fire { background: #f97316; }
-      .chip--water { background: #3b82f6; }
-      .chip--grass { background: #22c55e; }
-      .chip--electric { background: #eab308; color: #111827; }
-      .chip--psychic { background: #ec4899; }
-      .chip--ice { background: #06b6d4; color: #082f49; }
-      .chip--dragon { background: #6d28d9; }
-      .chip--dark { background: #0f172a; }
-      .chip--fairy { background: #f9a8d4; color: #111827; }
+      .chip--favorites {
+        background: #475569;
+      }
+      .chip--normal {
+        background: #94a3b8;
+        color: #111827;
+      }
+      .chip--fighting {
+        background: #dc2626;
+      }
+      .chip--flying {
+        background: #818cf8;
+      }
+      .chip--poison {
+        background: #9333ea;
+      }
+      .chip--ground {
+        background: #b45309;
+      }
+      .chip--rock {
+        background: #92400e;
+      }
+      .chip--bug {
+        background: #65a30d;
+      }
+      .chip--ghost {
+        background: #4338ca;
+      }
+      .chip--steel {
+        background: #64748b;
+      }
+      .chip--fire {
+        background: #f97316;
+      }
+      .chip--water {
+        background: #3b82f6;
+      }
+      .chip--grass {
+        background: #22c55e;
+      }
+      .chip--electric {
+        background: #eab308;
+        color: #111827;
+      }
+      .chip--psychic {
+        background: #ec4899;
+      }
+      .chip--ice {
+        background: #06b6d4;
+        color: #082f49;
+      }
+      .chip--dragon {
+        background: #6d28d9;
+      }
+      .chip--dark {
+        background: #0f172a;
+      }
+      .chip--fairy {
+        background: #f9a8d4;
+        color: #111827;
+      }
 
       .grid {
         margin-top: 18px;
@@ -333,9 +375,18 @@
         line-height: 1;
       }
 
-      .type--grass { background: rgba(34, 197, 94, 0.95); color: #ffffff; }
-      .type--poison { background: rgba(147, 51, 234, 0.95); color: #ffffff; }
-      .type--fire { background: rgba(249, 115, 22, 0.95); color: #ffffff; }
+      .type--grass {
+        background: rgba(34, 197, 94, 0.95);
+        color: #ffffff;
+      }
+      .type--poison {
+        background: rgba(147, 51, 234, 0.95);
+        color: #ffffff;
+      }
+      .type--fire {
+        background: rgba(249, 115, 22, 0.95);
+        color: #ffffff;
+      }
 
       .page-fade {
         position: absolute;
@@ -402,10 +453,15 @@
             <div class="card__media">
               <div class="favorite" aria-hidden="true">
                 <svg viewBox="0 0 24 24">
-                  <path d="M12 20.364l-7.682-7.682a4.5 4.5 0 116.364-6.364L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364z" />
+                  <path
+                    d="M12 20.364l-7.682-7.682a4.5 4.5 0 116.364-6.364L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364z"
+                  />
                 </svg>
               </div>
-              <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png" alt="Bulbasaur" />
+              <img
+                src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png"
+                alt="Bulbasaur"
+              />
             </div>
             <div class="card__body">
               <div class="card__number">#001</div>
@@ -421,10 +477,15 @@
             <div class="card__media">
               <div class="favorite" aria-hidden="true">
                 <svg viewBox="0 0 24 24">
-                  <path d="M12 20.364l-7.682-7.682a4.5 4.5 0 116.364-6.364L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364z" />
+                  <path
+                    d="M12 20.364l-7.682-7.682a4.5 4.5 0 116.364-6.364L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364z"
+                  />
                 </svg>
               </div>
-              <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/2.png" alt="Ivysaur" />
+              <img
+                src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/2.png"
+                alt="Ivysaur"
+              />
             </div>
             <div class="card__body">
               <div class="card__number">#002</div>
@@ -440,10 +501,15 @@
             <div class="card__media">
               <div class="favorite" aria-hidden="true">
                 <svg viewBox="0 0 24 24">
-                  <path d="M12 20.364l-7.682-7.682a4.5 4.5 0 116.364-6.364L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364z" />
+                  <path
+                    d="M12 20.364l-7.682-7.682a4.5 4.5 0 116.364-6.364L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364z"
+                  />
                 </svg>
               </div>
-              <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/3.png" alt="Venusaur" />
+              <img
+                src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/3.png"
+                alt="Venusaur"
+              />
             </div>
             <div class="card__body">
               <div class="card__number">#003</div>
@@ -459,10 +525,15 @@
             <div class="card__media">
               <div class="favorite" aria-hidden="true">
                 <svg viewBox="0 0 24 24">
-                  <path d="M12 20.364l-7.682-7.682a4.5 4.5 0 116.364-6.364L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364z" />
+                  <path
+                    d="M12 20.364l-7.682-7.682a4.5 4.5 0 116.364-6.364L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364z"
+                  />
                 </svg>
               </div>
-              <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png" alt="Charmander" />
+              <img
+                src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png"
+                alt="Charmander"
+              />
             </div>
             <div class="card__body">
               <div class="card__number">#004</div>

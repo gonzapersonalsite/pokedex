@@ -19,6 +19,6 @@ export function getTypeBadgeClass(type: string): string {
     dark: 'bg-slate-800 text-white',
     steel: 'bg-slate-500/90 text-white',
     fairy: 'bg-pink-300/90 text-slate-900',
-  };
-  return map[type] ?? 'bg-slate-500/90 text-white';
+  }
+  return map[type] ?? 'bg-slate-500/90 text-white'
 }

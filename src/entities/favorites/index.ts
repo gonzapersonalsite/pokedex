@@ -1,1 +1,1 @@
-export { useFavoritesStore } from './model';
+export { useFavoritesStore } from './model'

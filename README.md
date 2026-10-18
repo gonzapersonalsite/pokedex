@@ -26,9 +26,13 @@ Modern Pokédex built with React + Vite + TypeScript. It uses Feature-Sliced Des
 
 ## Getting Started
 - Install: `pnpm install --frozen-lockfile --ignore-scripts`
+- Hooks: `git config core.hooksPath .githooks`
+- Gates: `python verify.py`
 - Dev: `pnpm dev`
 - Test: `pnpm test`
 - Lint: `pnpm lint`
+- Typecheck: `pnpm run typecheck`
+- Format check: `pnpm run format:check`
 - Build: `pnpm build`
 - Preview: `pnpm preview`
 
@@ -39,13 +43,14 @@ Modern Pokédex built with React + Vite + TypeScript. It uses Feature-Sliced Des
 - ESLint with the Feature-Sliced Design rules, and a test per rule
 
 ## Documentation
+- [Feature-Sliced Design Architecture Contract](docs/ARCHITECTURE.md)
 - [Architecture Guide](ARCHITECTURE.md)
 - [Operations Guide](OPERATIONS.md)
 
 ## Social Preview & Agent Files
 - Static Open Graph and Twitter tags are written into `index.html` by the build tooling in `tooling/agent-files/`.
 - `public/og-cover.png` is the social preview image (1200×630 PNG), rendered from `tooling/og-cover.html`.
-- The build also emits `llms.txt`, `robots.txt` and `sitemap.xml` for the production site.
+- The build also emits llms.txt, robots.txt and sitemap.xml for the production site.
 
 ## API Endpoints (PokeAPI)
 - `GET https://pokeapi.co/api/v2/pokemon?offset=&limit=`

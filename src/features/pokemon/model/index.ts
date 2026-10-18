@@ -1,7 +1,7 @@
-export { usePokemonList } from './usePokemonList';
-export { usePokemonListByType, useTypeRefs } from './usePokemonListByType';
-export { usePokemonDetails } from './usePokemonDetails';
-export { usePokemonSearch } from './usePokemonSearch';
-export { usePokemonNames } from './usePokemonNames';
-export { useEvolutionTree } from './useEvolutionTree';
-export { useTypes } from './useTypes';
+export { usePokemonList } from './usePokemonList'
+export { usePokemonListByType, useTypeRefs } from './usePokemonListByType'
+export { usePokemonDetails } from './usePokemonDetails'
+export { usePokemonSearch } from './usePokemonSearch'
+export { usePokemonNames } from './usePokemonNames'
+export { useEvolutionTree } from './useEvolutionTree'
+export { useTypes } from './useTypes'

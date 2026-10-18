@@ -1,7 +1,7 @@
-import { QueryProvider, ThemeProvider } from './providers';
-import { ErrorBoundary } from './ErrorBoundary';
-import { PokedexPage } from '@/pages/pokedex';
-import { ToastViewport } from '@/shared/ui';
+import { QueryProvider, ThemeProvider } from './providers'
+import { ErrorBoundary } from './ErrorBoundary'
+import { PokedexPage } from '@/pages/pokedex'
+import { ToastViewport } from '@/shared/ui'
 
 export function App() {
   return (
@@ -13,5 +13,5 @@ export function App() {
         </ThemeProvider>
       </QueryProvider>
     </ErrorBoundary>
-  );
+  )
 }

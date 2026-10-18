@@ -6,71 +6,66 @@ import {
   Disclosure,
   DisclosureButton,
   DisclosurePanel,
-} from '@headlessui/react';
-import { Fragment, useEffect, useRef, useState } from 'react';
-import { useQueries } from '@tanstack/react-query';
-import { XMarkIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
-import { usePokemonDetails, useEvolutionTree } from '../model';
-import { useFavoritesStore } from '@/entities/favorites';
-import { Button, Loader } from '@/shared/ui';
-import type { EvolutionNode } from '@/entities/pokemon';
-import { cn, getTypeBadgeClass, scrollToTop, toast, useAudio } from '@/shared/utils';
-import { loadErrorMessage } from './loadErrorMessage';
-import { useScreenScan } from './useScreenScan';
-import { pokemonApi } from '../api/pokemonApi';
+} from '@headlessui/react'
+import { Fragment, useEffect, useRef, useState } from 'react'
+import { useQueries } from '@tanstack/react-query'
+import { XMarkIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
+import { usePokemonDetails, useEvolutionTree } from '../model'
+import { useFavoritesStore } from '@/entities/favorites'
+import { Button, Loader } from '@/shared/ui'
+import type { EvolutionNode } from '@/entities/pokemon'
+import { cn, getTypeBadgeClass, scrollToTop, toast, useAudio } from '@/shared/utils'
+import { loadErrorMessage } from './loadErrorMessage'
+import { useScreenScan } from './useScreenScan'
+import { pokemonApi } from '../api/pokemonApi'
 
 export interface PokemonModalProps {
-  pokemonIdOrName: number | string | null;
-  open: boolean;
-  onClose: () => void;
-  onNavigate?: (idOrName: number | string) => void;
+  pokemonIdOrName: number | string | null
+  open: boolean
+  onClose: () => void
+  onNavigate?: (idOrName: number | string) => void
 }
 
-export function PokemonModal({
-  pokemonIdOrName,
-  open,
-  onClose,
-  onNavigate,
-}: PokemonModalProps) {
-  const scan = useScreenScan(open, pokemonIdOrName);
-  const [blinkBlue, setBlinkBlue] = useState(false);
-  const [blinkGreen, setBlinkGreen] = useState(false);
-  const { playSound, loadSounds } = useAudio();
-  const skipNextClickRef = useRef(false);
+export function PokemonModal({ pokemonIdOrName, open, onClose, onNavigate }: PokemonModalProps) {
+  const scan = useScreenScan(open, pokemonIdOrName)
+  const [blinkBlue, setBlinkBlue] = useState(false)
+  const [blinkGreen, setBlinkGreen] = useState(false)
+  const { playSound, loadSounds } = useAudio()
+  const skipNextClickRef = useRef(false)
   const triggerBlue = () => {
-    setBlinkBlue(true);
-    setTimeout(() => setBlinkBlue(false), 260);
-  };
+    setBlinkBlue(true)
+    setTimeout(() => setBlinkBlue(false), 260)
+  }
   const triggerGreen = () => {
-    setBlinkGreen(true);
-    setTimeout(() => setBlinkGreen(false), 260);
-  };
+    setBlinkGreen(true)
+    setTimeout(() => setBlinkGreen(false), 260)
+  }
   useEffect(() => {
-    if (!open) return;
-    (async () => {
+    if (!open) return
+    ;(async () => {
       await loadSounds({
         'pokedex-move': '/sounds/pokedexMoveButton.mp3',
         'pokedex-on': '/sounds/pokedexOn.wav',
         'pokedex-off': '/sounds/pokedexOff.wav',
-      });
-      playSound('pokedex-on');
-    })();
-  }, [open, loadSounds, playSound]);
+      })
+      playSound('pokedex-on')
+    })()
+  }, [open, loadSounds, playSound])
   const closeWithSound = () => {
-    playSound('pokedex-off');
-    onClose();
-  };
-  const { data: pokemon, status, error, isFetching } = usePokemonDetails(pokemonIdOrName);
-  const { data: evolutionTree } = useEvolutionTree(pokemonIdOrName);
-  const { favorites, toggle } = useFavoritesStore();
-  const screenRef = useRef<HTMLDivElement | null>(null);
+    playSound('pokedex-off')
+    onClose()
+  }
+  const { data: pokemon, status, error, isFetching } = usePokemonDetails(pokemonIdOrName)
+  const { data: evolutionTree } = useEvolutionTree(pokemonIdOrName)
+  const { favorites, toggle } = useFavoritesStore()
+  const screenRef = useRef<HTMLDivElement | null>(null)
   const navigateTo = (idOrName: number | string) => {
-    scrollToTop(screenRef.current, 'smooth');
-    playSound('pokedex-move');
-    onNavigate?.(idOrName);
-  };
+    scrollToTop(screenRef.current, 'smooth')
+    playSound('pokedex-move')
+    onNavigate?.(idOrName)
+  }
 
-  const isFavorite = pokemon ? favorites.includes(pokemon.id) : false;
+  const isFavorite = pokemon ? favorites.includes(pokemon.id) : false
 
   const typeQueries = useQueries({
     queries:
@@ -80,37 +75,37 @@ export function PokemonModal({
         enabled: !!pokemon,
         staleTime: 1000 * 60 * 60,
       })) ?? [],
-  });
+  })
 
   const weaknesses = (() => {
     const details = typeQueries.map((q) => q.data).filter(Boolean) as Array<{
-      name: string;
+      name: string
       damage_relations?: {
-        double_damage_from: Array<{ name: string }>;
-        half_damage_from: Array<{ name: string }>;
-        no_damage_from: Array<{ name: string }>;
-      };
-    }>;
-    if (!details.length) return [];
-    const mult = new Map<string, number>();
+        double_damage_from: Array<{ name: string }>
+        half_damage_from: Array<{ name: string }>
+        no_damage_from: Array<{ name: string }>
+      }
+    }>
+    if (!details.length) return []
+    const mult = new Map<string, number>()
     for (const d of details) {
-      const dr = d.damage_relations;
-      if (!dr) continue;
+      const dr = d.damage_relations
+      if (!dr) continue
       for (const it of dr.double_damage_from) {
-        mult.set(it.name, (mult.get(it.name) ?? 1) * 2);
+        mult.set(it.name, (mult.get(it.name) ?? 1) * 2)
       }
       for (const it of dr.half_damage_from) {
-        mult.set(it.name, (mult.get(it.name) ?? 1) * 0.5);
+        mult.set(it.name, (mult.get(it.name) ?? 1) * 0.5)
       }
       for (const it of dr.no_damage_from) {
-        mult.set(it.name, 0);
+        mult.set(it.name, 0)
       }
     }
     const result = Array.from(mult.entries())
       .filter(([, v]) => v > 1)
-      .sort((a, b) => b[1] - a[1]);
-    return result;
-  })();
+      .sort((a, b) => b[1] - a[1])
+    return result
+  })()
 
   return (
     <Transition show={open} as={Fragment}>
@@ -175,18 +170,18 @@ export function PokemonModal({
                           title="Previous Pokémon"
                           disabled={isFetching || pokemon.id <= 1}
                           onPointerDown={() => {
-                            skipNextClickRef.current = true;
-                            triggerBlue();
-                            const prevId = Math.max(1, pokemon.id - 1);
-                            navigateTo(prevId);
+                            skipNextClickRef.current = true
+                            triggerBlue()
+                            const prevId = Math.max(1, pokemon.id - 1)
+                            navigateTo(prevId)
                           }}
                           onClick={() => {
                             if (skipNextClickRef.current) {
-                              skipNextClickRef.current = false;
-                              return;
+                              skipNextClickRef.current = false
+                              return
                             }
-                            const prevId = Math.max(1, pokemon.id - 1);
-                            navigateTo(prevId);
+                            const prevId = Math.max(1, pokemon.id - 1)
+                            navigateTo(prevId)
                           }}
                           className="flex items-center justify-center absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow hover:bg-white dark:hover:bg-slate-700 transition disabled:opacity-50 hint-loop"
                         >
@@ -198,37 +193,30 @@ export function PokemonModal({
                           title="Next Pokémon"
                           disabled={isFetching}
                           onPointerDown={() => {
-                            skipNextClickRef.current = true;
-                            triggerGreen();
-                            navigateTo(pokemon.id + 1);
+                            skipNextClickRef.current = true
+                            triggerGreen()
+                            navigateTo(pokemon.id + 1)
                           }}
                           onClick={() => {
                             if (skipNextClickRef.current) {
-                              skipNextClickRef.current = false;
-                              return;
+                              skipNextClickRef.current = false
+                              return
                             }
-                            navigateTo(pokemon.id + 1);
+                            navigateTo(pokemon.id + 1)
                           }}
-                    className="flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow hover:bg-white dark:hover:bg-slate-700 transition disabled:opacity-50 hint-loop"
+                          className="flex items-center justify-center absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 dark:bg-slate-800/80 shadow hover:bg-white dark:hover:bg-slate-700 transition disabled:opacity-50 hint-loop"
                         >
                           <ChevronRightIcon className="w-6 h-6" />
                         </button>
                       </>
                     )}
                     <div className="sticky top-0 flex justify-end p-2 bg-white/90 dark:bg-slate-900/90 z-10">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={closeWithSound}
-                        aria-label="Close"
-                      >
+                      <Button variant="ghost" size="sm" onClick={closeWithSound} aria-label="Close">
                         <XMarkIcon className="w-6 h-6" />
                       </Button>
                     </div>
                     <div className="p-4 pt-0">
-                      {status === 'pending' && !pokemon && (
-                        <Loader className="min-h-[200px]" />
-                      )}
+                      {status === 'pending' && !pokemon && <Loader className="min-h-[200px]" />}
                       {status === 'error' && (
                         <p className="text-red-600 dark:text-red-400 py-6">
                           {loadErrorMessage(error, 'Error loading.')}
@@ -254,7 +242,7 @@ export function PokemonModal({
                                   key={t}
                                   className={cn(
                                     'text-sm font-medium px-3 py-1 rounded-full capitalize',
-                                    getTypeBadgeClass(t)
+                                    getTypeBadgeClass(t),
                                   )}
                                 >
                                   {t}
@@ -280,16 +268,14 @@ export function PokemonModal({
                             </div>
                             {weaknesses.length > 0 && (
                               <div className="mt-6 text-left">
-                                <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-2">
-                                  Weaknesses
-                                </h3>
+                                <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-2">Weaknesses</h3>
                                 <div className="flex flex-wrap gap-2">
                                   {weaknesses.map(([type, factor]) => (
                                     <span
                                       key={type}
                                       className={cn(
                                         'text-sm font-medium px-3 py-1 rounded-full capitalize',
-                                        getTypeBadgeClass(type)
+                                        getTypeBadgeClass(type),
                                       )}
                                       title={`x${factor.toFixed(1)}`}
                                     >
@@ -306,10 +292,7 @@ export function PokemonModal({
                                     <DisclosureButton className="w-full flex items-center justify-between rounded-lg bg-slate-100 dark:bg-slate-800 px-4 py-2 text-left font-semibold text-slate-800 dark:text-slate-100">
                                       <span>Moves</span>
                                       <ChevronDownIcon
-                                        className={cn(
-                                          'w-5 h-5 transition-transform',
-                                          open ? 'rotate-180' : ''
-                                        )}
+                                        className={cn('w-5 h-5 transition-transform', open ? 'rotate-180' : '')}
                                       />
                                     </DisclosureButton>
                                     <DisclosurePanel>
@@ -333,16 +316,16 @@ export function PokemonModal({
                               size="sm"
                               className="mt-4"
                               onClick={() => {
-                                const wasFavorite = isFavorite;
-                                toggle(pokemon.id);
-                                const displayName = pokemon.name.replace(/-/g, ' ');
+                                const wasFavorite = isFavorite
+                                toggle(pokemon.id)
+                                const displayName = pokemon.name.replace(/-/g, ' ')
                                 toast({
                                   variant: wasFavorite ? 'info' : 'success',
                                   title: wasFavorite ? 'Removed from favorites' : 'Added to favorites',
                                   message: wasFavorite
                                     ? `${displayName} was removed from your favorites.`
                                     : `${displayName} was added to your favorites.`,
-                                });
+                                })
                               }}
                             >
                               {isFavorite ? 'Remove from favorites' : 'Add to favorites'}
@@ -350,10 +333,8 @@ export function PokemonModal({
                           </div>
                           {evolutionTree && (
                             <div className="mt-8 border-t border-slate-200 dark:border-slate-700 pt-6">
-                              <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-4">
-                                Evolution chain
-                              </h3>
-                          <EvolutionChain chain={evolutionTree} onNavigate={navigateTo} />
+                              <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-4">Evolution chain</h3>
+                              <EvolutionChain chain={evolutionTree} onNavigate={navigateTo} />
                             </div>
                           )}
                         </>
@@ -372,15 +353,25 @@ export function PokemonModal({
                   <button
                     type="button"
                     onPointerDown={(e) => {
-                      e.stopPropagation();
-                      closeWithSound();
+                      e.stopPropagation()
+                      closeWithSound()
                     }}
                     className="w-12 h-12 bg-slate-800 rounded-full border-b-4 border-black shadow-lg active:translate-y-1 transition-all hint-loop"
                     aria-label="Close"
                   />
                   <div className="flex gap-3">
-                    <div className={cn('w-14 h-3 bg-blue-900 rounded-xs border border-black/40 shadow-inner', blinkBlue && 'led-blink-blue')} />
-                    <div className={cn('w-14 h-3 bg-green-900 rounded-xs border border-black/40 shadow-inner', blinkGreen && 'led-blink-green')} />
+                    <div
+                      className={cn(
+                        'w-14 h-3 bg-blue-900 rounded-xs border border-black/40 shadow-inner',
+                        blinkBlue && 'led-blink-blue',
+                      )}
+                    />
+                    <div
+                      className={cn(
+                        'w-14 h-3 bg-green-900 rounded-xs border border-black/40 shadow-inner',
+                        blinkGreen && 'led-blink-green',
+                      )}
+                    />
                   </div>
                   <div
                     className={cn('relative w-16 h-16 cursor-pointer hint-loop select-none touch-none')}
@@ -394,22 +385,22 @@ export function PokemonModal({
                       aria-label="Previous"
                       disabled={isFetching || !pokemon || (pokemon && pokemon.id <= 1) || !onNavigate}
                       onPointerDown={(e) => {
-                        e.preventDefault();
-                        skipNextClickRef.current = true;
-                        triggerBlue();
-                        if (!pokemon || !onNavigate) return;
-                        const prevId = Math.max(1, pokemon.id - 1);
-                        navigateTo(prevId);
+                        e.preventDefault()
+                        skipNextClickRef.current = true
+                        triggerBlue()
+                        if (!pokemon || !onNavigate) return
+                        const prevId = Math.max(1, pokemon.id - 1)
+                        navigateTo(prevId)
                       }}
                       onClick={() => {
                         if (skipNextClickRef.current) {
-                          skipNextClickRef.current = false;
-                          return;
+                          skipNextClickRef.current = false
+                          return
                         }
-                        triggerBlue();
-                        if (!pokemon || !onNavigate) return;
-                        const prevId = Math.max(1, pokemon.id - 1);
-                        navigateTo(prevId);
+                        triggerBlue()
+                        if (!pokemon || !onNavigate) return
+                        const prevId = Math.max(1, pokemon.id - 1)
+                        navigateTo(prevId)
                       }}
                       className="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10"
                     />
@@ -418,20 +409,20 @@ export function PokemonModal({
                       aria-label="Next"
                       disabled={isFetching || !pokemon || !onNavigate}
                       onPointerDown={(e) => {
-                        e.preventDefault();
-                        skipNextClickRef.current = true;
-                        triggerGreen();
-                        if (!pokemon || !onNavigate) return;
-                        navigateTo(pokemon.id + 1);
+                        e.preventDefault()
+                        skipNextClickRef.current = true
+                        triggerGreen()
+                        if (!pokemon || !onNavigate) return
+                        navigateTo(pokemon.id + 1)
                       }}
                       onClick={() => {
                         if (skipNextClickRef.current) {
-                          skipNextClickRef.current = false;
-                          return;
+                          skipNextClickRef.current = false
+                          return
                         }
-                        triggerGreen();
-                        if (!pokemon || !onNavigate) return;
-                        navigateTo(pokemon.id + 1);
+                        triggerGreen()
+                        if (!pokemon || !onNavigate) return
+                        navigateTo(pokemon.id + 1)
                       }}
                       className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10"
                     />
@@ -439,16 +430,16 @@ export function PokemonModal({
                       type="button"
                       aria-label="Up"
                       onPointerDown={(e) => {
-                        e.preventDefault();
-                        skipNextClickRef.current = true;
-                        screenRef.current?.scrollBy({ top: -120, behavior: 'smooth' });
+                        e.preventDefault()
+                        skipNextClickRef.current = true
+                        screenRef.current?.scrollBy({ top: -120, behavior: 'smooth' })
                       }}
                       onClick={() => {
                         if (skipNextClickRef.current) {
-                          skipNextClickRef.current = false;
-                          return;
+                          skipNextClickRef.current = false
+                          return
                         }
-                        screenRef.current?.scrollBy({ top: -120, behavior: 'smooth' });
+                        screenRef.current?.scrollBy({ top: -120, behavior: 'smooth' })
                       }}
                       className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-10"
                     />
@@ -456,16 +447,16 @@ export function PokemonModal({
                       type="button"
                       aria-label="Down"
                       onPointerDown={(e) => {
-                        e.preventDefault();
-                        skipNextClickRef.current = true;
-                        screenRef.current?.scrollBy({ top: 120, behavior: 'smooth' });
+                        e.preventDefault()
+                        skipNextClickRef.current = true
+                        screenRef.current?.scrollBy({ top: 120, behavior: 'smooth' })
                       }}
                       onClick={() => {
                         if (skipNextClickRef.current) {
-                          skipNextClickRef.current = false;
-                          return;
+                          skipNextClickRef.current = false
+                          return
                         }
-                        screenRef.current?.scrollBy({ top: 120, behavior: 'smooth' });
+                        screenRef.current?.scrollBy({ top: 120, behavior: 'smooth' })
                       }}
                       className="absolute bottom-0 left-1/2 -translate-x-1/2 w-10 h-10"
                     />
@@ -477,28 +468,22 @@ export function PokemonModal({
         </div>
       </Dialog>
     </Transition>
-  );
+  )
 }
 
 /** Convierte la cadena en lista lineal cuando es A → B → C (sin ramas). */
 function flattenLinearChain(node: EvolutionNode): EvolutionNode[] {
-  const steps: EvolutionNode[] = [node];
+  const steps: EvolutionNode[] = [node]
   if (node.children.length === 1) {
-    steps.push(...flattenLinearChain(node.children[0]));
+    steps.push(...flattenLinearChain(node.children[0]))
   }
-  return steps;
+  return steps
 }
 
 /** Muestra la cadena en horizontal: [A] → [B] → [C]. Si hay ramas (ej. Eevee), las muestra debajo. */
-function EvolutionChain({
-  chain,
-  onNavigate,
-}: {
-  chain: EvolutionNode;
-  onNavigate?: (id: number | string) => void;
-}) {
-  const isLinear = chain.children.length <= 1;
-  const steps = isLinear ? flattenLinearChain(chain) : [chain];
+function EvolutionChain({ chain, onNavigate }: { chain: EvolutionNode; onNavigate?: (id: number | string) => void }) {
+  const isLinear = chain.children.length <= 1
+  const steps = isLinear ? flattenLinearChain(chain) : [chain]
 
   if (steps.length > 1) {
     return (
@@ -514,7 +499,7 @@ function EvolutionChain({
           </span>
         ))}
       </div>
-    );
+    )
   }
 
   if (chain.children.length > 1) {
@@ -530,22 +515,14 @@ function EvolutionChain({
           ))}
         </div>
       </div>
-    );
+    )
   }
 
-  return <EvolutionChip id={chain.id} name={chain.name} onClick={onNavigate} />;
+  return <EvolutionChip id={chain.id} name={chain.name} onClick={onNavigate} />
 }
 
-function EvolutionChip({
-  id,
-  name,
-  onClick,
-}: {
-  id: number;
-  name: string;
-  onClick?: (id: number | string) => void;
-}) {
-  const displayName = name.replace(/-/g, ' ').replace(/^\w/, (c) => c.toUpperCase());
+function EvolutionChip({ id, name, onClick }: { id: number; name: string; onClick?: (id: number | string) => void }) {
+  const displayName = name.replace(/-/g, ' ').replace(/^\w/, (c) => c.toUpperCase())
   return (
     <button
       type="button"
@@ -556,5 +533,5 @@ function EvolutionChip({
     >
       {displayName}
     </button>
-  );
+  )
 }

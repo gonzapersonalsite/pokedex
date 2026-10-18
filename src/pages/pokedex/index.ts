@@ -1,1 +1,1 @@
-export { PokedexPage } from './ui/PokedexPage';
+export { PokedexPage } from './ui/PokedexPage'

@@ -47,3 +47,12 @@ dev-dist/
 sw.js
 workbox-*.js
 precache-manifest.*.js
+
+# From the agentic scaffold
+__pycache__/
+*.pyc
+.venv/
+*.tmp
+
+# From the agentic scaffold
+reports/

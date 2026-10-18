@@ -1,20 +1,20 @@
-import { useRef, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { usePokemonList, useTypeRefs, usePokemonListByType } from '../model';
-import { useFavoritesStore } from '@/entities/favorites';
-import { PokemonCard } from './PokemonCard';
-import { loadErrorMessage } from './loadErrorMessage';
-import { Loader } from '@/shared/ui';
-import { toast } from '@/shared/utils';
-import { pokemonApi } from '../api/pokemonApi';
-import { mapPokemonFromApi } from '@/entities/pokemon';
+import { useRef, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { usePokemonList, useTypeRefs, usePokemonListByType } from '../model'
+import { useFavoritesStore } from '@/entities/favorites'
+import { PokemonCard } from './PokemonCard'
+import { loadErrorMessage } from './loadErrorMessage'
+import { Loader } from '@/shared/ui'
+import { toast } from '@/shared/utils'
+import { pokemonApi } from '../api/pokemonApi'
+import { mapPokemonFromApi } from '@/entities/pokemon'
 
 export interface PokemonListProps {
-  onSelectPokemon?: (id: number) => void;
+  onSelectPokemon?: (id: number) => void
   /** Si está definido, filtra la lista por este tipo (nombre, ej. "grass"). */
-  typeFilter?: string | null;
+  typeFilter?: string | null
   /** Si true, muestra solo los favoritos (ignora typeFilter). */
-  favoritesOnly?: boolean;
+  favoritesOnly?: boolean
 }
 
 /**
@@ -23,19 +23,18 @@ export interface PokemonListProps {
  * Si typeFilter está definido, muestra solo Pokémon de ese tipo.
  */
 export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false }: PokemonListProps) {
-  const defaultList = usePokemonList();
-  const { data: typeRefs = [], isPending: isRefsPending } = useTypeRefs(typeFilter ?? null);
-  const byTypeList = usePokemonListByType(typeFilter ?? null, typeRefs);
+  const defaultList = usePokemonList()
+  const { data: typeRefs = [], isPending: isRefsPending } = useTypeRefs(typeFilter ?? null)
+  const byTypeList = usePokemonListByType(typeFilter ?? null, typeRefs)
 
-  const useFiltered = !favoritesOnly && !!typeFilter && typeFilter.length > 0;
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status, error } =
-    useFiltered ? byTypeList : defaultList;
+  const useFiltered = !favoritesOnly && !!typeFilter && typeFilter.length > 0
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status, error } = useFiltered ? byTypeList : defaultList
 
-  const list = data?.pages.flatMap((p) => p.list) ?? [];
-  const { favorites, toggle } = useFavoritesStore();
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  const list = data?.pages.flatMap((p) => p.list) ?? []
+  const { favorites, toggle } = useFavoritesStore()
+  const sentinelRef = useRef<HTMLDivElement>(null)
 
-  const isLoadingRefs = useFiltered && isRefsPending;
+  const isLoadingRefs = useFiltered && isRefsPending
 
   const {
     data: favList = [],
@@ -44,37 +43,37 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
   } = useQuery({
     queryKey: ['pokemon', 'favorites', favorites],
     queryFn: async () => {
-      const details = await Promise.all(favorites.map((id) => pokemonApi.byIdOrName(id)));
-      return details.map(mapPokemonFromApi);
+      const details = await Promise.all(favorites.map((id) => pokemonApi.byIdOrName(id)))
+      return details.map(mapPokemonFromApi)
     },
     enabled: favoritesOnly && favorites.length > 0,
-  });
+  })
 
   useEffect(() => {
-    if (favoritesOnly) return;
-    if (!hasNextPage || isFetchingNextPage || list.length === 0) return;
-    const el = sentinelRef.current;
-    if (!el) return;
+    if (favoritesOnly) return
+    if (!hasNextPage || isFetchingNextPage || list.length === 0) return
+    const el = sentinelRef.current
+    if (!el) return
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0]?.isIntersecting) fetchNextPage();
+        if (entries[0]?.isIntersecting) fetchNextPage()
       },
-      { rootMargin: '200px', threshold: 0 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [favoritesOnly, hasNextPage, isFetchingNextPage, fetchNextPage, list.length]);
+      { rootMargin: '200px', threshold: 0 },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [favoritesOnly, hasNextPage, isFetchingNextPage, fetchNextPage, list.length])
 
   if (!favoritesOnly && useFiltered && !isLoadingRefs && typeRefs.length === 0) {
     return (
       <div className="py-12 text-center text-slate-500 dark:text-slate-400">
         There are no Pokémon for the selected type.
       </div>
-    );
+    )
   }
 
   if (!favoritesOnly && (status === 'pending' || isLoadingRefs)) {
-    return <Loader className="min-h-[300px]" />;
+    return <Loader className="min-h-[300px]" />
   }
 
   if (!favoritesOnly && status === 'error') {
@@ -85,27 +84,21 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
       >
         {`Error: ${loadErrorMessage(error, 'Could not load the list.')}`}
       </div>
-    );
+    )
   }
 
   if (!favoritesOnly && list.length === 0) {
-    return (
-      <div className="py-12 text-center text-slate-500 dark:text-slate-400">
-        There are no Pokémon to display.
-      </div>
-    );
+    return <div className="py-12 text-center text-slate-500 dark:text-slate-400">There are no Pokémon to display.</div>
   }
 
   if (favoritesOnly) {
     if (favorites.length === 0) {
       return (
-        <div className="py-12 text-center text-slate-500 dark:text-slate-400">
-          You haven’t added any favorites yet.
-        </div>
-      );
+        <div className="py-12 text-center text-slate-500 dark:text-slate-400">You haven’t added any favorites yet.</div>
+      )
     }
     if (favStatus === 'pending') {
-      return <Loader className="min-h-[300px]" />;
+      return <Loader className="min-h-[300px]" />
     }
     if (favStatus === 'error') {
       return (
@@ -113,9 +106,9 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
           className="py-12 text-center text-red-600 dark:text-red-400 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900"
           role="alert"
         >
-        {`Error: ${loadErrorMessage(favError, 'Could not load favorites.')}`}
+          {`Error: ${loadErrorMessage(favError, 'Could not load favorites.')}`}
         </div>
-      );
+      )
     }
   }
 
@@ -132,16 +125,16 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
               pokemon={pokemon}
               isFavorite={favorites.includes(pokemon.id)}
               onToggleFavorite={(id) => {
-                const wasFavorite = favorites.includes(id);
-                toggle(id);
-                const displayName = pokemon.name.replace(/-/g, ' ');
+                const wasFavorite = favorites.includes(id)
+                toggle(id)
+                const displayName = pokemon.name.replace(/-/g, ' ')
                 toast({
                   variant: wasFavorite ? 'info' : 'success',
                   title: wasFavorite ? 'Removed from favorites' : 'Added to favorites',
                   message: wasFavorite
                     ? `${displayName} was removed from your favorites.`
                     : `${displayName} was added to your favorites.`,
-                });
+                })
               }}
               onClick={onSelectPokemon}
             />
@@ -157,5 +150,5 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
         </div>
       )}
     </div>
-  );
+  )
 }

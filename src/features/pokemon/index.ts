@@ -1,2 +1,2 @@
-export { PokemonList, PokemonModal } from './ui';
-export { usePokemonSearch, usePokemonNames, useTypes } from './model';
+export { PokemonList, PokemonModal } from './ui'
+export { usePokemonSearch, usePokemonNames, useTypes } from './model'

@@ -1,32 +1,32 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createElement } from 'react';
-import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useEvolutionTree } from './useEvolutionTree';
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { createElement } from 'react'
+import { renderHook, waitFor } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { useEvolutionTree } from './useEvolutionTree'
 
 function createWrapper() {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
-  });
+  })
   return function Wrapper(props: { children: React.ReactNode }) {
-    return createElement(QueryClientProvider, { client: queryClient }, props.children);
-  };
+    return createElement(QueryClientProvider, { client: queryClient }, props.children)
+  }
 }
 
 describe('useEvolutionTree', () => {
   beforeEach(() => {
-    vi.stubGlobal('fetch', vi.fn());
-  });
+    vi.stubGlobal('fetch', vi.fn())
+  })
 
   it('does not fetch when pokemonIdOrName is null', async () => {
-    const fetchMock = vi.mocked(fetch);
-    renderHook(() => useEvolutionTree(null), { wrapper: createWrapper() });
-    await waitFor(() => {});
-    expect(fetchMock).not.toHaveBeenCalled();
-  });
+    const fetchMock = vi.mocked(fetch)
+    renderHook(() => useEvolutionTree(null), { wrapper: createWrapper() })
+    await waitFor(() => {})
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
 
   it('fetches species then evolution chain and returns tree', async () => {
-    const fetchMock = vi.mocked(fetch);
+    const fetchMock = vi.mocked(fetch)
     fetchMock
       .mockResolvedValueOnce({
         ok: true,
@@ -66,13 +66,13 @@ describe('useEvolutionTree', () => {
               ],
             },
           }),
-      } as Response);
+      } as Response)
 
     const { result } = renderHook(() => useEvolutionTree('pikachu'), {
       wrapper: createWrapper(),
-    });
+    })
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
 
     expect(result.current.data).toEqual({
       id: 172,
@@ -90,6 +90,6 @@ describe('useEvolutionTree', () => {
           ],
         },
       ],
-    });
-  });
-});
+    })
+  })
+})

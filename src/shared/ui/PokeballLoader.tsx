@@ -1,4 +1,4 @@
-import { PokeballIcon } from './PokeballIcon';
+import { PokeballIcon } from './PokeballIcon'
 
 /**
  * Loader con forma de Pokéball que se balancea (adaptado del CodePen).
@@ -18,5 +18,5 @@ export function PokeballLoader({ className = '' }: { className?: string }) {
       </div>
       <span className="text-sm text-slate-500 dark:text-slate-400">Loading…</span>
     </div>
-  );
+  )
 }

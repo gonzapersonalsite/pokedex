@@ -48,4 +48,18 @@ describe('PokedexPage', () => {
     expect(searchCalls).toHaveLength(1)
     expect(useToastStore.getState().toasts).toEqual([])
   })
+
+  it('opens_with_a_skip_link_that_moves_the_focus_into_the_main_content', () => {
+    const { container } = render(createElement(PokedexPage), { wrapper: Providers })
+
+    const firstFocusable = container.querySelector<HTMLElement>(
+      'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])',
+    )
+    expect(firstFocusable).toBe(screen.getByRole('link', { name: 'Skip to content' }))
+
+    const target = document.querySelector<HTMLElement>(firstFocusable?.getAttribute('href') ?? '')
+    expect(target?.tagName).toBe('MAIN')
+    target?.focus()
+    expect(target).toHaveFocus()
+  })
 })

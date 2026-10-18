@@ -4,6 +4,7 @@ import { Button, Loader, PokeballIcon } from '@/shared/ui'
 import { classifyRequestError, cn, getTypeBadgeClass, toast, useTheme, type RequestErrorKind } from '@/shared/utils'
 import { SunIcon, MoonIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { ReturnToTop } from './ReturnToTop'
+import { SkipToContent } from './SkipToContent'
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void> | void
@@ -17,6 +18,8 @@ declare global {
 }
 
 const SUGGESTIONS_MAX = 8
+
+const MAIN_CONTENT_ID = 'main-content'
 
 const SEARCH_RETRY_HINT = 'Type a name or number in the search or pick a suggestion.'
 
@@ -81,6 +84,7 @@ export function PokedexPage() {
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans">
+      <SkipToContent targetId={MAIN_CONTENT_ID} />
       {/* Pokédex-style top header bar */}
       <header
         id="top"
@@ -155,8 +159,14 @@ export function PokedexPage() {
         </div>
       </header>
 
-      {/* Full-width main content with full-page scroll */}
-      <main id="main-content" className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 pb-12">
+      {/* Full-width main content with full-page scroll.
+          tabIndex -1: the skip link must move the focus here, not only the scroll.
+          scroll-mt-40 clears the sticky header, which grows to two rows on phones. */}
+      <main
+        id={MAIN_CONTENT_ID}
+        tabIndex={-1}
+        className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 pb-12 scroll-mt-40 outline-hidden"
+      >
         {searchSubmitted ? (
           <Suspense
             fallback={

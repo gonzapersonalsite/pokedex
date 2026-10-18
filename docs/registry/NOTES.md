@@ -1,7 +1,7 @@
 # Notas de desarrollo (índice)
 
 GENERADO por tools/board desde `docs/registry/deliveries/` y `docs/registry/lessons/`. No editar a mano: se reescribe.
-board-fingerprint:6c979516b8095d0f — su contenido cambió por última vez el 2026-10-19.
+board-fingerprint:6f4c7e018911e80f — su contenido cambió por última vez el 2026-10-19.
 
 Cada entrega es un fichero `docs/registry/deliveries/<fecha>-<tema>.md` con lo que se hizo, cómo se
 verificó y qué costó; cada lección es un fichero `docs/registry/lessons/<identidad>.md` y se cita como
@@ -9,9 +9,10 @@ verificó y qué costó; cada lección es un fichero `docs/registry/lessons/<ide
 entregas dicen cómo llegó a estar así. Aquí van las más recientes de cada clase; todas,
 mes a mes, en su índice del mes.
 
-## Entregas (2; aquí las 2 más recientes)
+## Entregas (3; aquí las 3 más recientes)
 
 - 2026-10-19 `#2026-10-19-return-to-top-link` Enlace para volver arriba en la lista de la Pokédex
+- 2026-10-19 `#2026-10-19-skip-to-content-link` Enlace para saltar al contenido en la Pokédex
 - 2026-10-18 `#2026-10-18-adopt-agentic-scaffold-and-react-fsd` Adopción de agentic-scaffold, la capa react-vite y el stack react-fsd
 
 ## Lecciones (7; aquí las 7 más recientes)
@@ -26,5 +27,5 @@ mes a mes, en su índice del mes.
 
 ## Por mes (2 índices)
 
-- `docs/registry/index/notes-2026-10.md` — 2026-10: 2 entregas, 0 lecciones
+- `docs/registry/index/notes-2026-10.md` — 2026-10: 3 entregas, 0 lecciones
 - `docs/registry/index/notes-2026-09.md` — 2026-09: 0 entregas, 7 lecciones

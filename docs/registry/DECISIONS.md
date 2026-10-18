@@ -1,7 +1,7 @@
 # Registro de decisiones (índice)
 
 GENERADO por tools/board desde `docs/registry/decisions/`. No editar a mano: se reescribe.
-board-fingerprint:daf05419f15fc656 — su contenido cambió por última vez el 2026-10-19.
+board-fingerprint:f6ad0b3c00352d80 — su contenido cambió por última vez el 2026-10-19.
 
 Cada decisión es un fichero `docs/registry/decisions/<identidad>.md` con su cabecera de campos y su
 texto; una cita `#<identidad>` resuelve abriendo ese fichero. Cómo se escribe una y cómo
@@ -12,9 +12,8 @@ Aquí van enteras las que piden trabajo; el resto solo se cuenta. Todas, sea cua
 estado, están en el índice de cada fase que nombran, y las que no nombran ninguna, en el
 de `none`.
 
-## ABIERTAS (1)
+## ABIERTAS (0)
 
-- `#skip-to-content-link-is-missing` — Falta el enlace para saltar al contenido principal (OPEN 2026-10-19) · F1
 
 ## DEUDAS VIVAS (0)
 
@@ -22,11 +21,11 @@ de `none`.
 ## PROVISIONALES (0)
 
 
-## EL RESTO (6), SOLO CONTADAS
+## EL RESTO (8), SOLO CONTADAS
 
-CONFIRMADAS 5 · RESUELTAS 1 · DESCARTADAS 0 · RETIRADAS 0
+CONFIRMADAS 6 · RESUELTAS 2 · DESCARTADAS 0 · RETIRADAS 0
 
 ## Por fase (2 índices)
 
-- `docs/registry/index/decisions-F1.md` — F1: 4
+- `docs/registry/index/decisions-F1.md` — F1: 5
 - `docs/registry/index/decisions-none.md` — sin fase: 3

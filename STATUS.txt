@@ -1,6 +1,6 @@
 ESTADO DEL PROYECTO
 GENERADO por tools/board desde el repositorio. No editar a mano: se reescribe.
-board-fingerprint:cb15c0d9bee7960b — su contenido cambió por última vez el 2026-10-19.
+board-fingerprint:a5cee6ba5991c0f8 — su contenido cambió por última vez el 2026-10-19.
 Esto es un resumen derivado. Manda el documento o el registro, no este fichero.
 ------------------------------------------------------------------------------
 PUERTAS      9 de 9 en verde (sin cambios desde 2026-10-19)
@@ -9,11 +9,10 @@ ORDEN H      H0 ✔ > H1 ✔
 
 EN CURSO — F1: Navegar una lista larga
 
-FRENTES ABIERTOS  1 vivos (1 resueltos que conservan su rastro)
+FRENTES ABIERTOS  0 vivos (2 resueltos que conservan su rastro)
   Cada frente es una decision abierta; la fase es la que su registro declara. La
   lista entera, en el indice de decisiones (seccion ABIERTAS).
-  DE LA FASE EN CURSO (1) — lo que arrastra de verdad:
-    · F1             Falta el enlace para saltar al contenido principal
+  DE LA FASE EN CURSO (0) — lo que arrastra de verdad:
   DEL RESTO, POR FASE (0): ninguno
   SIN FASE PENDIENTE (0) — su registro dice `none`, o solo nombra fases ya hechas:
 

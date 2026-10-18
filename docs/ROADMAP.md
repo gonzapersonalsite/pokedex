@@ -56,6 +56,9 @@ por identidad).
   principio de la página; forma y cifra en
   `#return-to-top-is-a-link-to-root-shown-past-400px`. Entrega:
   `#2026-10-19-return-to-top-link`.
-- **Lo que sigue es del dueño:** si entra el enlace para saltar al contenido
-  (`#skip-to-content-link-is-missing`). Los textos de la interfaz van en inglés
-  (`#product-ui-text-is-english`).
+- **F1.2 Saltar al contenido — DONE.** Enlace que aparece con el primer Tab y
+  lleva el foco a la lista sin cruzar la cabecera; forma y cifra en
+  `#skip-link-focuses-main-clear-of-the-sticky-header`. Entrega:
+  `#2026-10-19-skip-to-content-link`.
+- **Lo que sigue es del dueño:** ninguna parte más decidida. Los textos de la
+  interfaz van en inglés (`#product-ui-text-is-english`).

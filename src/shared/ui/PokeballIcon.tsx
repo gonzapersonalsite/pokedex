@@ -1,6 +1,6 @@
 /**
- * Pokéball estática (mismo estilo que el loader: roja/blanca, línea y botón central).
- * Sin animación. Tamaño configurable para header, favicon, etc.
+ * Static Pokéball icon (same style as the loader: red/white halves, center band, and button).
+ * Configurable size for header, favicon, etc.
  */
 export function PokeballIcon({ size = 40, className = '' }: { size?: number; className?: string }) {
   const border = Math.max(2, Math.round(size * 0.06))
@@ -11,7 +11,7 @@ export function PokeballIcon({ size = 40, className = '' }: { size?: number; cla
 
   return (
     <div className={`relative flex-shrink-0 ${className}`} style={{ width: size, height: size }} aria-hidden>
-      {/* Círculo: borde negro + mitad roja arriba, mitad blanca abajo */}
+      {/* Outer circle: black border + red top half, white bottom half */}
       <div
         className="absolute inset-0 rounded-full overflow-hidden"
         style={{
@@ -22,7 +22,7 @@ export function PokeballIcon({ size = 40, className = '' }: { size?: number; cla
         <div className="absolute top-0 left-0 right-0 bg-[#dd2120]" style={{ height: '50%' }} />
         <div className="absolute bottom-0 left-0 right-0 bg-white" style={{ height: '50%' }} />
       </div>
-      {/* Línea central horizontal */}
+      {/* Horizontal center band */}
       <div
         className="absolute left-0 right-0 bg-[#1d1d1b]"
         style={{
@@ -32,7 +32,7 @@ export function PokeballIcon({ size = 40, className = '' }: { size?: number; cla
           zIndex: 1,
         }}
       />
-      {/* Botón central: anillo blanco con borde negro */}
+      {/* Center button: white ring with black border */}
       <div
         className="absolute left-1/2 top-1/2 rounded-full bg-white -translate-x-1/2 -translate-y-1/2"
         style={{
@@ -42,7 +42,7 @@ export function PokeballIcon({ size = 40, className = '' }: { size?: number; cla
           zIndex: 2,
         }}
       />
-      {/* Punto negro central */}
+      {/* Inner black dot */}
       <div
         className="absolute left-1/2 top-1/2 rounded-full bg-[#1d1d1b] -translate-x-1/2 -translate-y-1/2"
         style={{

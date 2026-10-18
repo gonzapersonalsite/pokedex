@@ -1,4 +1,4 @@
-/** Clases Tailwind por tipo de Pokémon (mismo color en cartas y modal). */
+/** Tailwind classes per Pokémon type (shared across cards and modal). */
 export function getTypeBadgeClass(type: string): string {
   const map: Record<string, string> = {
     normal: 'bg-slate-400/90 text-white',

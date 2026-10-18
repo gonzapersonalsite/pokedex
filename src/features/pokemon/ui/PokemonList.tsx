@@ -11,16 +11,15 @@ import { mapPokemonFromApi } from '@/entities/pokemon'
 
 export interface PokemonListProps {
   onSelectPokemon?: (id: number) => void
-  /** Si está definido, filtra la lista por este tipo (nombre, ej. "grass"). */
+  /** When set, filters the list by this type name (e.g. "grass"). */
   typeFilter?: string | null
-  /** Si true, muestra solo los favoritos (ignora typeFilter). */
+  /** When true, displays only favorites (ignores typeFilter). */
   favoritesOnly?: boolean
 }
 
 /**
- * Lista en grid responsive. Scroll de toda la página (no ventana fija).
- * Infinite scroll con Intersection Observer.
- * Si typeFilter está definido, muestra solo Pokémon de ese tipo.
+ * Responsive grid list with full-page scroll and IntersectionObserver infinite scroll.
+ * When typeFilter is set, displays only Pokémon of that type.
  */
 export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false }: PokemonListProps) {
   const defaultList = usePokemonList()
@@ -114,7 +113,7 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
 
   return (
     <div className="w-full">
-      {/* Grid responsive: 1 col móvil, 2–3–4 en pantallas mayores. Cada carta se ve entera. */}
+      {/* Responsive grid: 1 col on mobile, 2–3–4 on larger viewports. */}
       <ul
         className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 list-none p-0 m-0"
         role="list"
@@ -142,7 +141,7 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
         ))}
       </ul>
 
-      {/* Sentinel para cargar más al hacer scroll */}
+      {/* Sentinel to load more on scroll */}
       {!favoritesOnly && <div ref={sentinelRef} className="h-4 flex-shrink-0" aria-hidden />}
       {!favoritesOnly && isFetchingNextPage && (
         <div className="flex justify-center py-8">

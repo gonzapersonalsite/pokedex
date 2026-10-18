@@ -1,8 +1,8 @@
 import { PokeballIcon } from './PokeballIcon'
 
 /**
- * Loader con forma de Pokéball que se balancea (adaptado del CodePen).
- * Usa la misma PokeballIcon que el header, con animación.
+ * Wobbling Pokéball loader (adapted from CodePen).
+ * Uses the same PokeballIcon as the header with a CSS animation.
  */
 export function PokeballLoader({ className = '' }: { className?: string }) {
   return (

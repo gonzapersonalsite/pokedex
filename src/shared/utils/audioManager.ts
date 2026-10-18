@@ -14,7 +14,7 @@ export class AudioManager {
     return AudioManager.instance
   }
 
-  // Inicializar el contexto de audio (se llama en la primera interacción)
+  // Initialize the audio context on the first user interaction
   async init(): Promise<void> {
     if (this.isInitialized || this.isInitializing) return
 
@@ -26,7 +26,7 @@ export class AudioManager {
       if (!AudioContextCtor) throw new Error('Web Audio API is not available')
       this.audioContext = new AudioContextCtor()
 
-      // Si el contexto está suspendido, intentar reanudarlo
+      // Resume the context if it started suspended
       if (this.audioContext.state === 'suspended') {
         await this.audioContext.resume()
       }
@@ -38,7 +38,7 @@ export class AudioManager {
     }
   }
 
-  // Cargar un archivo de sonido
+  // Load a single sound file
   async loadSound(name: string, path: string): Promise<void> {
     if (!this.isInitialized) {
       await this.init()
@@ -55,13 +55,13 @@ export class AudioManager {
     }
   }
 
-  // Cargar múltiples sonidos
+  // Load multiple sounds
   async loadSounds(soundMap: Record<string, string>): Promise<void> {
     const loadPromises = Object.entries(soundMap).map(([name, path]) => this.loadSound(name, path))
     await Promise.allSettled(loadPromises)
   }
 
-  // Reproducir un sonido
+  // Play a loaded sound
   play(name: string): void {
     if (!this.isInitialized || !this.audioContext) return
 
@@ -81,17 +81,17 @@ export class AudioManager {
     }
   }
 
-  // Verificar si el audio está disponible
+  // Check whether audio playback is ready
   isReady(): boolean {
     return this.isInitialized && this.audioContext?.state === 'running'
   }
 
-  // Obtener estado del contexto
+  // Get current AudioContext state
   getContextState(): string | null {
     return this.audioContext?.state || null
   }
 
-  // Limpiar recursos
+  // Release audio resources
   dispose(): void {
     if (this.audioContext) {
       this.audioContext.close()

@@ -5,7 +5,7 @@ export function useAudio() {
   const [isReady, setIsReady] = useState(false)
   const audioManager = AudioManager.getInstance()
 
-  // Inicializar audio en la primera interacción si no está listo
+  // Initialize audio on the first interaction if not ready yet
   const ensureInitialized = useCallback(async () => {
     if (!audioManager.isReady()) {
       await audioManager.init()
@@ -13,7 +13,7 @@ export function useAudio() {
     }
   }, [audioManager])
 
-  // Reproducir sonido (asegurando inicialización)
+  // Play sound (ensuring initialization)
   const playSound = useCallback(
     async (soundName: string) => {
       await ensureInitialized()
@@ -22,7 +22,7 @@ export function useAudio() {
     [audioManager, ensureInitialized],
   )
 
-  // Cargar sonidos
+  // Load multiple sounds
   const loadSounds = useCallback(
     async (soundMap: Record<string, string>) => {
       await ensureInitialized()
@@ -31,7 +31,7 @@ export function useAudio() {
     [audioManager, ensureInitialized],
   )
 
-  // Cargar un sonido específico
+  // Load a single sound
   const loadSound = useCallback(
     async (name: string, path: string) => {
       await ensureInitialized()
@@ -40,13 +40,13 @@ export function useAudio() {
     [audioManager, ensureInitialized],
   )
 
-  // Verificar estado
+  // Check readiness state
   const checkReady = useCallback(() => {
     setIsReady(audioManager.isReady())
     return audioManager.isReady()
   }, [audioManager])
 
-  // Monitorear estado del audio
+  // Monitor audio readiness state
   useEffect(() => {
     const interval = setInterval(() => {
       const currentState = audioManager.isReady()

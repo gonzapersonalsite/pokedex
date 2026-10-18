@@ -10,7 +10,7 @@ export interface PokemonCardProps {
 }
 
 /**
- * Carta de Pokémon: imagen + número + nombre + tipos siempre visibles (sin recortes).
+ * Pokémon card: image + number + name + types always visible without clipping.
  */
 export function PokemonCard({ pokemon, isFavorite = false, onToggleFavorite, onClick, className }: PokemonCardProps) {
   const name = pokemon.name.replace(/-/g, ' ')
@@ -31,7 +31,7 @@ export function PokemonCard({ pokemon, isFavorite = false, onToggleFavorite, onC
           onClick={() => onClick?.(pokemon.id)}
           aria-label={`View details of ${displayName}`}
         >
-          {/* Zona imagen: proporción fija, sin recortar contenido de abajo */}
+          {/* Image area: fixed aspect ratio without clipping the content below */}
           <div className="aspect-square bg-gradient-to-b from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 p-4">
             {pokemon.image ? (
               <img src={pokemon.image} alt={displayName} className="w-full h-full object-contain" loading="lazy" />
@@ -40,7 +40,7 @@ export function PokemonCard({ pokemon, isFavorite = false, onToggleFavorite, onC
             )}
           </div>
 
-          {/* Info siempre visible: número, nombre, tipos */}
+          {/* Always-visible info: number, name, types */}
           <div className="p-4 min-h-[5.5rem] flex flex-col justify-center border-t border-slate-100 dark:border-slate-700">
             <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-0.5">
               #{String(pokemon.id).padStart(3, '0')}

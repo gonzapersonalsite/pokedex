@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { pokemonApi } from '../api/pokemonApi'
 import { mapPokemonFromApi } from '@/entities/pokemon'
 
-/** Búsqueda por nombre o ID. Desacoplado del listado. */
+/** Search by name or ID, decoupled from the main list. */
 export function usePokemonSearch(query: string) {
   const trimmed = query.trim().toLowerCase()
   return useQuery({

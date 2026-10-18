@@ -80,7 +80,7 @@ export function PokedexPage() {
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans">
-      {/* Header tipo Pokédex: barra superior clara */}
+      {/* Pokédex-style top header bar */}
       <header
         id="top"
         className="sticky top-0 z-20 border-b-4 border-slate-800 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xs"
@@ -154,7 +154,7 @@ export function PokedexPage() {
         </div>
       </header>
 
-      {/* Contenido a ancho completo: scroll de toda la página */}
+      {/* Full-width main content with full-page scroll */}
       <main id="main-content" className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 pb-12">
         {searchSubmitted ? (
           <Suspense

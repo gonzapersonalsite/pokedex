@@ -1,4 +1,4 @@
-/** Tipos de la API PokeAPI (respuestas raw) */
+/** PokeAPI response types (raw payloads) */
 export interface PokeApiPokemonListItem {
   name: string
   url: string

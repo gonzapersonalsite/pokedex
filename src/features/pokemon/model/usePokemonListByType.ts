@@ -9,7 +9,7 @@ function idFromUrl(url: string): number {
   return match ? parseInt(match[1], 10) : 0
 }
 
-/** Refes de Pokémon de un tipo (ids + nombres) para paginar. */
+/** Pokémon references for a type (ids + names) used for pagination. */
 export function useTypeRefs(typeName: string | null) {
   return useQuery({
     queryKey: ['pokemon', 'typeRefs', typeName],
@@ -25,7 +25,7 @@ export function useTypeRefs(typeName: string | null) {
   })
 }
 
-/** Lista paginada de Pokémon por tipo (infinite scroll). */
+/** Paginated Pokémon list by type (infinite scroll). */
 export function usePokemonListByType(typeName: string | null, refs: { id: number; name: string }[]) {
   return useInfiniteQuery({
     queryKey: ['pokemon', 'byType', typeName, refs.length],

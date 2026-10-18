@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { pokemonApi } from '../api/pokemonApi'
 
-/** Lista de todos los nombres + id para sugerencias de búsqueda. Se cachea. */
+/** Cached list of all Pokémon names + IDs for search suggestions. */
 export function usePokemonNames() {
   return useQuery({
     queryKey: ['pokemon', 'allNames'],

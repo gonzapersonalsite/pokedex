@@ -27,7 +27,7 @@ body {
   min-height: 100vh;
 }
 
-/* Pokéball loader (adaptado de CodePen - solo la bola, sin fondo rojo) */
+/* Pokéball loader (adapted from CodePen — ball only, without red background) */
 @keyframes pokeball-loading {
   0% {
     transform: translate(0, 0) rotate(0deg);

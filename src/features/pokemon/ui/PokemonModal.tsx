@@ -110,10 +110,10 @@ export function PokemonModal({ pokemonIdOrName, open, onClose, onNavigate }: Pok
   return (
     <Transition show={open} as={Fragment}>
       <Dialog onClose={closeWithSound} className="relative z-50">
-        {/* 1. BACKDROP MÁS SUAVE */}
+        {/* 1. Smooth backdrop transition */}
         <TransitionChild
           as={Fragment}
-          enter="ease-out duration-500" // Aumentado de 200 a 500
+          enter="ease-out duration-500"
           enterFrom="opacity-0"
           enterTo="opacity-100"
           leave="ease-in duration-300"
@@ -123,11 +123,11 @@ export function PokemonModal({ pokemonIdOrName, open, onClose, onNavigate }: Pok
           <div className="fixed inset-0 bg-black/60" aria-hidden />
         </TransitionChild>
         <div className="fixed inset-0 flex items-center justify-center p-4 safe-inset">
-          {/* 2. TRANSICIÓN DE LA POKÉDEX MÁS LENTA Y DINÁMICA */}
+          {/* 2. Dynamic Pokédex panel transition */}
           <TransitionChild
             as={Fragment}
-            enter="ease-out duration-1000" // Aumentado de 450 a 1000 para que sea lento
-            enterFrom="opacity-0 translate-y-20 scale-90 -rotate-6" // Empieza más abajo y más rotado
+            enter="ease-out duration-1000"
+            enterFrom="opacity-0 translate-y-20 scale-90 -rotate-6"
             enterTo="opacity-100 translate-y-0 scale-100 rotate-0"
             leave="ease-in duration-500"
             leaveFrom="opacity-100 translate-y-0 scale-100 rotate-0"
@@ -471,7 +471,7 @@ export function PokemonModal({ pokemonIdOrName, open, onClose, onNavigate }: Pok
   )
 }
 
-/** Convierte la cadena en lista lineal cuando es A → B → C (sin ramas). */
+/** Flattens a linear evolution chain (A → B → C without branches) into an array. */
 function flattenLinearChain(node: EvolutionNode): EvolutionNode[] {
   const steps: EvolutionNode[] = [node]
   if (node.children.length === 1) {
@@ -480,7 +480,7 @@ function flattenLinearChain(node: EvolutionNode): EvolutionNode[] {
   return steps
 }
 
-/** Muestra la cadena en horizontal: [A] → [B] → [C]. Si hay ramas (ej. Eevee), las muestra debajo. */
+/** Renders the evolution chain horizontally ([A] → [B] → [C]), or branches below when split (e.g. Eevee). */
 function EvolutionChain({ chain, onNavigate }: { chain: EvolutionNode; onNavigate?: (id: number | string) => void }) {
   const isLinear = chain.children.length <= 1
   const steps = isLinear ? flattenLinearChain(chain) : [chain]

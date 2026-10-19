@@ -1,9 +1,11 @@
 // @vitest-environment node
 import { lstatSync, mkdtempSync, readFileSync, rmdirSync, symlinkSync, unlinkSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { join, posix } from 'node:path'
 import { ESLint, type Linter } from 'eslint'
 import { beforeAll, describe, expect, it } from 'vitest'
+import type { TestProjectConfiguration } from 'vitest/config'
+import viteConfig from './vite.config.ts'
 
 // Each architecture rule of eslint.config.js, seen firing on the smallest file
 // that breaks it, and seen silent on files that keep to it: relaxing a rule
@@ -148,9 +150,9 @@ describe('the layers of Feature-Sliced Design', () => {
 
   it('leaves a test free of the import rules of the layers', async () => {
     // A layer above, a sibling slice, a deep import and a relative path out of the slice,
-    // imported, re-exported and imported dynamically.
+    // imported, re-exported, imported dynamically and globbed.
     const code =
-      "import { AddTaskForm } from '@/features/add-task'\nimport { User } from '@/entities/user'\nimport { UserCard } from '@/entities/user/ui/UserCard'\nimport { Avatar } from '../../user'\nexport const parts = [AddTaskForm, User, UserCard, Avatar]\nexport { RenameForm } from '@/features/rename-task'\nexport { Badge } from '@/entities/user'\nexport { UserRow } from '@/entities/user/ui/UserRow'\nexport { Initials } from '../../user/lib/initials'\nexport const load = () => import('@/features/rename-task')\n"
+      "import { AddTaskForm } from '@/features/add-task'\nimport { User } from '@/entities/user'\nimport { UserCard } from '@/entities/user/ui/UserCard'\nimport { Avatar } from '../../user'\nexport const parts = [AddTaskForm, User, UserCard, Avatar]\nexport { RenameForm } from '@/features/rename-task'\nexport { Badge } from '@/entities/user'\nexport { UserRow } from '@/entities/user/ui/UserRow'\nexport { Initials } from '../../user/lib/initials'\nexport const load = () => import('@/features/rename-task')\nexport const pages = import.meta.glob('../../../features/*/index.ts')\n"
 
     expect(await reportsOn('src/entities/task/model/task.extra.test.ts', code)).toEqual([])
   })
@@ -165,7 +167,7 @@ async function gapChecksBrokenBy(path: string, code: string): Promise<string[]> 
     .sort()
 }
 
-describe('the layers over what fsd-lint 1.2.1 does not read: re-exports and a dynamic import()', () => {
+describe('the layers over what fsd-lint 1.2.1 does not read: re-exports, a dynamic import() and import.meta.glob', () => {
   it.each([
     [
       'a re-export from a layer above',
@@ -293,8 +295,89 @@ describe('the layers over what fsd-lint 1.2.1 does not read: re-exports and a dy
       "export const load = () => import('../../../../src/features/add-task')\n",
       ['dynamicImportFromAbove'],
     ],
+    [
+      'a glob from the root of the project',
+      'src/entities/task/model/pages.ts',
+      "export const pages = import.meta.glob('/src/pages/**/index.ts')\n",
+      ['unreadableGlob'],
+    ],
+    [
+      'a glob through the alias',
+      'src/entities/task/model/app.ts',
+      "export const app = import.meta.glob('@/app/*.tsx', { eager: true })\n",
+      ['unreadableGlob'],
+    ],
+    [
+      'a glob that climbs out of its folder',
+      'src/entities/task/model/features.ts',
+      "export const features = import.meta.glob('../../../features/*/index.ts')\n",
+      ['unreadableGlob'],
+    ],
+    [
+      'a glob that climbs out of its folder past a first segment',
+      'src/entities/task/model/features.ts',
+      "export const features = import.meta.glob('./../../../features/*/index.ts')\n",
+      ['unreadableGlob'],
+    ],
+    [
+      'a ".." inside braces, which the lint does not expand',
+      'src/entities/task/model/features.ts',
+      "export const features = import.meta.glob('./{..,model}/*.ts')\n",
+      ['unreadableGlob'],
+    ],
+    [
+      'a glob with a base of its own',
+      'src/entities/task/model/features.ts',
+      "export const features = import.meta.glob('./*/index.ts', { base: '../../../features' })\n",
+      ['unreadableGlob'],
+    ],
+    [
+      'a list of globs with one that climbs out',
+      'src/shared/lib/modules.ts',
+      "export const modules = import.meta.glob(['./parts/*.ts', '../../app/*.tsx'])\n",
+      ['unreadableGlob'],
+    ],
+    [
+      'a glob whose pattern is a template literal',
+      'src/entities/task/model/parts.ts',
+      'export const parts = import.meta.glob(`./parts/*.ts`)\n',
+      ['unreadableGlob'],
+    ],
+    [
+      'a glob whose pattern is a variable',
+      'src/entities/task/model/parts.ts',
+      "const pattern = './parts/*.ts'\nexport const parts = import.meta.glob(pattern)\n",
+      ['unreadableGlob'],
+    ],
+    [
+      'a glob whose options the lint cannot read',
+      'src/entities/task/model/parts.ts',
+      "const options = { base: '../../../features' }\nexport const parts = import.meta.glob('./*/index.ts', options)\n",
+      ['unreadableGlob'],
+    ],
   ])('rejects %s', async (_case, path, code, checks) => {
     expect(await gapChecksBrokenBy(path, code)).toEqual(checks)
+  })
+
+  it('accepts globs that stay inside the folder of their file', async () => {
+    const code =
+      "export const locales = import.meta.glob('./locales/*.json', { eager: true, import: 'default' })\nexport const parts = import.meta.glob(['./parts/*.ts', './more/**/*.ts'])\n"
+
+    expect(await reportsOn('src/entities/task/model/parts.ts', code)).toEqual([])
+  })
+
+  it('leaves app, the top layer, free to glob any layer', async () => {
+    const code = "export const pages = import.meta.glob('/src/pages/**/index.ts')\n"
+
+    expect(await reportsOn('src/app/routes.ts', code)).toEqual([])
+  })
+
+  it('leaves to convention a file at the root of a layer with slices, whose folder holds every slice', async () => {
+    // No rule refuses the file, and from there a glob inside its folder reaches the model of each entity, which
+    // an import of one of them from the same file does not.
+    const code = "export const models = import.meta.glob('./*/model/*.ts')\n"
+
+    expect(await reportsOn('src/entities/registry.ts', code)).toEqual([])
   })
 
   it('accepts re-exports that go down the layers through each public API', async () => {
@@ -393,6 +476,66 @@ describe('the layers over what fsd-lint 1.2.1 does not read: re-exports and a dy
       if (lstatSync(project, { throwIfNoEntry: false })) unlinkSync(project)
       rmdirSync(folder)
     }
+  })
+})
+
+// The one exception of Feature-Sliced Design to slices that do not import each other: an entity B
+// exposes to an entity A what A needs of it in B/@x/A.ts, and only A imports it, as @/entities/B/@x/A.
+describe('the cross-imports of entities through @x', () => {
+  it('accepts an entity importing what another entity exposes to it in @x', async () => {
+    const code =
+      "import type { User } from '@/entities/user/@x/task'\nexport type Owner = User\nexport const load = () => import('@/entities/user/@x/task')\n"
+
+    expect(await reportsOn('src/entities/task/model/task.ts', code)).toEqual([])
+  })
+
+  it('accepts the @x file re-exporting its own slice', async () => {
+    expect(await reportsOn('src/entities/user/@x/task.ts', "export type { User } from '../model/user'\n")).toEqual([])
+  })
+
+  it.each([
+    [
+      'another entity than the one it is exposed to',
+      'src/entities/comment/model/comment.ts',
+      "import type { User } from '@/entities/user/@x/task'\nexport type Author = User\n",
+      'fsd/no-cross-slice-dependency',
+    ],
+    [
+      'a slice of another layer',
+      'src/features/add-task/model/form.ts',
+      "import type { User } from '@/entities/user/@x/add-task'\nexport type Owner = User\n",
+      'fsd/no-public-api-sidestep',
+    ],
+    [
+      'a relative path to the @x file',
+      'src/entities/task/model/task.ts',
+      "import type { User } from '../../user/@x/task'\nexport type Owner = User\n",
+      'fsd/no-relative-imports',
+    ],
+    [
+      'an @x between slices of a layer that is not entities',
+      'src/features/rename-task/model/form.ts',
+      "import type { Form } from '@/features/add-task/@x/rename-task'\nexport type Draft = Form\n",
+      'fsd/no-cross-slice-dependency',
+    ],
+  ])('rejects an @x import from %s', async (_case, path, code, rule) => {
+    expect(await rulesBrokenBy(path, code)).toContain(rule)
+  })
+
+  it('rejects re-exporting the @x of another entity, which would hand it to every consumer of the slice', async () => {
+    const code = "export type { User } from '@/entities/user/@x/task'\n"
+
+    expect(await gapChecksBrokenBy('src/entities/task/model/task.ts', code)).toEqual([
+      'reExportFromSibling',
+      'reExportPastPublicApi',
+    ])
+  })
+
+  it('leaves to convention a path past the @x file, which fsd-lint accepts', async () => {
+    // fsd-lint reads the slice of the consumer from the segment after @x and nothing below it.
+    const code = "import type { User } from '@/entities/user/@x/task/model'\nexport type Owner = User\n"
+
+    expect(await reportsOn('src/entities/task/model/task.ts', code)).toEqual([])
   })
 })
 
@@ -538,21 +681,103 @@ describe('no UI in the model, api and lib segments', () => {
   })
 })
 
-describe('the network through the shared HTTP client only', () => {
+describe('the network only from src/shared/api', () => {
   it.each([
     ['fetch', "export const load = () => fetch('/tasks')\n", 'no-restricted-globals'],
     ['XMLHttpRequest', 'export const open = () => new XMLHttpRequest()\n', 'no-restricted-globals'],
+    ['WebSocket', "export const open = () => new WebSocket('wss://tasks.example.test')\n", 'no-restricted-globals'],
+    ['EventSource', "export const open = () => new EventSource('/tasks/events')\n", 'no-restricted-globals'],
+    [
+      'a constant read from WebSocket',
+      'export const isOpen = (socket: { readyState: number }) => socket.readyState === WebSocket.OPEN\n',
+      'no-restricted-globals',
+    ],
     ['window.fetch', "export const load = () => window.fetch('/tasks')\n", 'no-restricted-properties'],
     ['globalThis.fetch', "export const load = () => globalThis.fetch('/tasks')\n", 'no-restricted-properties'],
     ['self.fetch', "export const load = () => self.fetch('/tasks')\n", 'no-restricted-properties'],
+    ['window.XMLHttpRequest', 'export const open = () => new window.XMLHttpRequest()\n', 'no-restricted-properties'],
+    [
+      'globalThis.XMLHttpRequest',
+      'export const open = () => new globalThis.XMLHttpRequest()\n',
+      'no-restricted-properties',
+    ],
+    [
+      'globalThis.WebSocket',
+      "export const open = () => new globalThis.WebSocket('wss://tasks.example.test')\n",
+      'no-restricted-properties',
+    ],
+    [
+      'self.EventSource',
+      "export const open = () => new self.EventSource('/tasks/events')\n",
+      'no-restricted-properties',
+    ],
+    [
+      'navigator.sendBeacon',
+      "export const send = () => navigator.sendBeacon('/log', '')\n",
+      'no-restricted-properties',
+    ],
+    [
+      'window.navigator.sendBeacon',
+      "export const send = () => window.navigator.sendBeacon('/log', '')\n",
+      'no-restricted-properties',
+    ],
+    [
+      'fetch taken out of window',
+      'const { fetch: send } = window\nexport const load = send\n',
+      'no-restricted-properties',
+    ],
+    ["window['fetch']", "export const load = () => window['fetch']('/tasks')\n", 'no-restricted-properties'],
   ])('rejects %s outside src/shared/api', async (_case, code, rule) => {
     expect(await rulesBrokenBy('src/entities/task/api/loadTasks.ts', code)).toContain(rule)
   })
 
-  it('accepts fetch inside the client', async () => {
-    const code = "export const load = () => fetch('/tasks')\n"
+  // ESLint puts the name it found in front of every message: the text after it is what tells them apart.
+  it('sends a request to the HTTP client from an api segment', async () => {
+    const [request] = await lint('src/entities/task/api/loadTasks.ts', "export const load = () => fetch('/tasks')\n")
+
+    expect(request.message).toContain('call it from an api segment')
+  })
+
+  // A global, a property of a global object and one of any object: three kinds of entry, each with its message.
+  it.each([
+    ['new EventSource', "export const open = () => new EventSource('/tasks/events')\n"],
+    ['globalThis.WebSocket', "export const open = () => new globalThis.WebSocket('wss://tasks.example.test')\n"],
+    ['navigator.sendBeacon', "export const send = () => navigator.sendBeacon('/log', '')\n"],
+  ])('sends %s to src/shared/api, not to the HTTP client', async (_case, code) => {
+    const [connection] = await lint('src/entities/task/api/events.ts', code)
+
+    expect(connection.message).toContain('src/shared/api only')
+    expect(connection.message).not.toContain('call it from an api segment')
+  })
+
+  it('accepts fetch and a connection inside src/shared/api', async () => {
+    const code =
+      "export const load = () => fetch('/tasks')\nexport const open = () => new WebSocket('wss://tasks.example.test')\n"
 
     expect(await reportsOn('src/shared/api/transport.ts', code)).toEqual([])
+  })
+
+  // Left to convention: examples of what the lint does not read, the ones the layer's docs/ARCHITECTURE.md
+  // names. A rule that starts reading one turns its case red, and the convention goes.
+  it.each([
+    ['fetch of top', "export const load = () => top?.fetch('/tasks')\n"],
+    ['fetch of parent', "export const load = () => parent.fetch('/tasks')\n"],
+    ['fetch of frames', "export const load = () => frames.fetch('/tasks')\n"],
+    ['fetch of window.window', "export const load = () => window.window.fetch('/tasks')\n"],
+    ['fetch of document.defaultView', "export const load = () => document.defaultView?.fetch('/tasks')\n"],
+    ['fetch read with Reflect.get', "export const load = () => Reflect.get(window, 'fetch')\n"],
+    ['an image that loads an address', "export const ping = () => {\n  new Image().src = '/log'\n}\n"],
+    ['an audio element that loads an address', "export const ping = () => new Audio('/ping').play()\n"],
+    ['an import() of an address', "export const load = () => import('https://cdn.example.test/tasks.js')\n"],
+    ['a Worker', "export const start = () => new Worker('/worker.js')\n"],
+    ['a SharedWorker', "export const start = () => new SharedWorker('/worker.js')\n"],
+    ['a service worker', "export const install = () => navigator.serviceWorker.register('/sw.js')\n"],
+    ['an RTCPeerConnection', 'export const open = () => new RTCPeerConnection()\n'],
+    ['a WebTransport', "export const open = () => new WebTransport('https://tasks.example.test')\n"],
+    ['a WebSocketStream', "export const open = () => new WebSocketStream('wss://tasks.example.test')\n"],
+    ['fetchLater', "export const later = () => fetchLater('/log')\n"],
+  ])('leaves to convention %s, which no rule reads', async (_case, code) => {
+    expect(await reportsOn('src/entities/task/api/loadTasks.ts', code)).toEqual([])
   })
 })
 
@@ -568,6 +793,219 @@ describe('every test runs', () => {
     expect(await rulesBrokenBy('src/entities/task/model/task.extra.test.ts', code)).toContain(
       'no-restricted-properties',
     )
+  })
+
+  it.each([
+    ['a skip in the options of it', "import { it } from 'vitest'\nit('waits', { skip: true }, () => {})\n"],
+    ['a todo in the options of test', "import { test } from 'vitest'\ntest('later', { todo: true })\n"],
+    [
+      'a skip in the options of describe',
+      "import { describe } from 'vitest'\ndescribe('waits', { skip: true }, () => {})\n",
+    ],
+    ['a todo in the options of suite', "import { suite } from 'vitest'\nsuite('later', { todo: true }, () => {})\n"],
+    [
+      'a skip in the options of describe.concurrent',
+      "import { describe } from 'vitest'\ndescribe.concurrent('waits', { skip: true }, () => {})\n",
+    ],
+    [
+      'a skip in the options of a case of it.each',
+      "import { it } from 'vitest'\nit.each([1])('waits for %i', { skip: true }, () => {})\n",
+    ],
+    [
+      'a skip in the options of a case of it.each with a table',
+      "import { it } from 'vitest'\nit.each`\n  n\n  ${1}\n`('waits for $n', { skip: true }, () => {})\n",
+    ],
+    [
+      'a todo in the options of a case of test.for with a table',
+      "import { test } from 'vitest'\ntest.for`\n  n\n  ${1}\n`('later for $n', { todo: true }, () => {})\n",
+    ],
+    [
+      'a skip in the options of a suite of describe.each with a table',
+      "import { describe } from 'vitest'\ndescribe.each`\n  n\n  ${1}\n`('waits for $n', { skip: true }, () => {})\n",
+    ],
+    ['a skip named by a string', "import { it } from 'vitest'\nit('waits', { 'skip': true }, () => {})\n"],
+    ['a todo named by a computed string', "import { it } from 'vitest'\nit('later', { ['todo']: true }, () => {})\n"],
+    ['a skip named by a template literal', "import { it } from 'vitest'\nit('waits', { [`skip`]: true }, () => {})\n"],
+    [
+      'a skip whose value is computed',
+      "import { it } from 'vitest'\nit('waits', { skip: !process.env.CI }, () => {})\n",
+    ],
+    ['options written as const', "import { it } from 'vitest'\nit('waits', { skip: true } as const, () => {})\n"],
+    [
+      'options checked with satisfies',
+      "import { it, type TestOptions } from 'vitest'\nit('later', { todo: true } satisfies TestOptions, () => {})\n",
+    ],
+    [
+      'options under an angle-bracket assertion',
+      "import { it, type TestOptions } from 'vitest'\nit('waits', <TestOptions>{ skip: true }, () => {})\n",
+    ],
+    ['options with a non-null assertion', "import { it } from 'vitest'\nit('waits', ({ skip: true })!, () => {})\n"],
+  ])('rejects %s', async (_case, code) => {
+    expect(await rulesBrokenBy('src/entities/task/model/task.extra.test.ts', code)).toContain('tests/no-skip-option')
+  })
+
+  // The tests gate of the scaffold's layer turns these red from Vitest's report (--forbid-skipped), and the
+  // layer's docs/ARCHITECTURE.md names them: a rule that learns to read one turns its case red here.
+  it.each([
+    [
+      'options held in a variable',
+      "import { it } from 'vitest'\nconst options = { skip: true }\nit('waits', options, () => {})\n",
+    ],
+    [
+      'options brought in with a spread',
+      "import { it } from 'vitest'\nconst off = { skip: true }\nit('waits', { ...off }, () => {})\n",
+    ],
+    [
+      'a key computed from a name',
+      "import { it } from 'vitest'\nconst KEY = 'skip'\nit('waits', { [KEY]: true }, () => {})\n",
+    ],
+    [
+      'an it imported under another name',
+      "import { it as check } from 'vitest'\ncheck('waits', { skip: true }, () => {})\n",
+    ],
+    ['an it read from an object', "import * as vitest from 'vitest'\nvitest.it('waits', { skip: true }, () => {})\n"],
+    ['an it with no function', "import { it } from 'vitest'\nit('later')\n"],
+  ])('leaves %s to the tests gate, which the rule does not read', async (_case, code) => {
+    expect(await rulesBrokenBy('src/entities/task/model/task.extra.test.ts', code)).not.toContain(
+      'tests/no-skip-option',
+    )
+  })
+
+  it('accepts a skip or a todo set to false, which runs the test', async () => {
+    const code =
+      "import { describe, expect, it } from 'vitest'\ndescribe('runs', { skip: false }, () => {\n  it('runs too', { todo: false }, () => expect(1).toBe(1))\n})\n"
+
+    expect(await reportsOn('src/entities/task/model/task.extra.test.ts', code)).toEqual([])
+  })
+
+  it('accepts a fixture named todo, which is no option of a test', async () => {
+    const code = "import { test } from 'vitest'\nexport const withTodo = test.extend({ todo: 'write the tests' })\n"
+
+    expect(await reportsOn('src/entities/task/model/task.extra.test.ts', code)).toEqual([])
+  })
+
+  it('keeps its rule where another block gives no-restricted-syntax its own options', async () => {
+    // A test outside the layers: the block that refuses the file replaces no option of the test's rule.
+    const code = "import { it } from 'vitest'\nit('waits', { skip: true }, () => {})\n"
+
+    expect(await rulesBrokenBy('src/services/report.test.ts', code)).toEqual(
+      expect.arrayContaining(['no-restricted-syntax', 'tests/no-skip-option']),
+    )
+  })
+})
+
+// What the lint makes of a file at a path: a test it reads as one, a file it refuses, or code.
+// The probe trips the rule of every test that runs and, in src, the rules of the layers.
+const PROBE =
+  "import { it } from 'vitest'\nimport { RenameForm } from '@/features/rename-task/ui/RenameForm'\nit.skip(String(RenameForm), () => {})\n"
+
+async function lintVerdictOf(path: string): Promise<'test' | 'refused' | 'code' | 'inconsistent'> {
+  const broken = await rulesBrokenBy(path, PROBE)
+  if (broken.includes('tests/no-stray-file')) return 'refused'
+  const readAsTest = broken.includes('no-restricted-properties')
+  const readByTheLayers = broken.some((rule) => rule.startsWith('fsd/'))
+  if (readAsTest && !readByTheLayers) return 'test'
+  if (!readAsTest && readByTheLayers === path.startsWith('src/')) return 'code'
+  return 'inconsistent'
+}
+
+// Where Vitest looks for tests, read from the projects of the real vite.config.ts.
+function includeOf(project: TestProjectConfiguration): string[] {
+  if (typeof project === 'object' && !(project instanceof Promise) && project.test?.include) {
+    return project.test.include
+  }
+  throw new Error('a project of vite.config.ts that this test cannot read: declare it inline, with its include')
+}
+function vitestInclude(): string[] {
+  const projects = viteConfig.test?.projects
+  if (projects === undefined) {
+    throw new Error('vite.config.ts declares no test projects, the only place this test reads where Vitest looks')
+  }
+  return projects.flatMap(includeOf)
+}
+const VITEST_INCLUDE = vitestInclude()
+const vitestRuns = (path: string): boolean => VITEST_INCLUDE.some((pattern) => posix.matchesGlob(path, pattern))
+
+describe('every test is where Vitest runs it', () => {
+  it.each([
+    ['a .spec.ts in src', 'src/entities/task/model/task.spec.ts'],
+    ['a .spec.tsx in src', 'src/entities/task/ui/TaskItem.spec.tsx'],
+    ['a story in src', 'src/entities/task/ui/TaskItem.stories.tsx'],
+    ['a story written as .ts', 'src/entities/task/ui/TaskItem.stories.ts'],
+    ['a test outside the folders Vitest runs', 'scripts/check.test.ts'],
+    ['a .spec.ts in tooling', 'tooling/agent-files/shell.spec.ts'],
+    ['a .test.tsx in tooling, whose project runs .test.ts only', 'tooling/agent-files/shell.test.tsx'],
+    ['a test at the root other than the lint cases', 'vite.config.test.ts'],
+    ['a test in JavaScript', 'scripts/check.test.mjs'],
+  ])('rejects %s', async (_case, path) => {
+    const code = "import { expect, it } from 'vitest'\nit('fails', () => expect(1).toBe(2))\n"
+
+    expect(await rulesBrokenBy(path, code)).toContain('tests/no-stray-file')
+  })
+
+  // A project Vitest runs is declared twice: in vite.config.ts, and in the list the lint reads it from.
+  it('tells a test outside Vitest that a new project goes in vite.config.ts and in eslint.config.js', async () => {
+    const messages = await lint(
+      'scripts/check.test.ts',
+      "import { expect, it } from 'vitest'\nit('runs', () => expect(1).toBe(1))\n",
+    )
+    const stray = messages.find((message) => message.ruleId === 'tests/no-stray-file')
+
+    expect(stray?.message).toContain('a project for it in vite.config.ts')
+    expect(stray?.message).toContain('VITEST_TESTS of eslint.config.js')
+  })
+
+  it("holds the rules of the layers over a story, which fsd-lint's default list would take for a test", async () => {
+    const code =
+      "import { App } from '@/app/App'\nimport { AddTaskForm } from '@/features/add-task'\nimport { HomePage } from '@/pages/home'\nexport const parts = [App, AddTaskForm, HomePage]\n"
+
+    expect(await rulesBrokenBy('src/entities/task/ui/TaskItem.stories.ts', code)).toEqual(
+      expect.arrayContaining(['tests/no-stray-file', 'fsd/forbidden-imports']),
+    )
+  })
+
+  it('refuses the file without replacing the options another block gives no-restricted-syntax', async () => {
+    const code = "export const load = () => import('../ui/TaskItem')\n"
+
+    expect(await rulesBrokenBy('src/entities/task/model/task.spec.ts', code)).toEqual(
+      expect.arrayContaining(['tests/no-stray-file', 'no-restricted-syntax']),
+    )
+  })
+
+  // Vitest runs a file exactly when the lint reads it as a test: a project of vite.config.ts that looks
+  // somewhere else, or a lint that reads another suffix, turns a row red.
+  const REPRESENTATIVE: [string, 'test' | 'refused' | 'code'][] = [
+    ['src/entities/task/model/task.test.ts', 'test'],
+    ['src/app/App.test.tsx', 'test'],
+    ['tooling/agent-files/site.test.ts', 'test'],
+    ['eslint.config.test.ts', 'test'],
+    ['src/entities/task/model/task.spec.ts', 'refused'],
+    ['src/pages/home/ui/HomePage.spec.tsx', 'refused'],
+    ['src/entities/task/ui/TaskItem.stories.tsx', 'refused'],
+    ['tooling/agent-files/shell.test.tsx', 'refused'],
+    ['tooling/agent-files/shell.spec.ts', 'refused'],
+    ['scripts/check.test.ts', 'refused'],
+    ['vite.config.test.ts', 'refused'],
+    ['src/entities/task/model/task.ts', 'code'],
+    // Only a name that ends in a suffix is a test: fsd-lint, left to itself, matches it anywhere in the path.
+    ['src/entities/task/model/rows.test.tsv.ts', 'code'],
+    ['tooling/agent-files/site.ts', 'code'],
+  ]
+
+  it.each(REPRESENTATIVE)('reads %s as Vitest does: %s', async (path, verdict) => {
+    expect(await lintVerdictOf(path)).toBe(verdict)
+    expect(vitestRuns(path)).toBe(verdict === 'test')
+  })
+
+  it('has a test row for every place Vitest looks', () => {
+    const tests = REPRESENTATIVE.filter(([, verdict]) => verdict === 'test').map(([path]) => path)
+
+    for (const pattern of VITEST_INCLUDE) {
+      expect(
+        tests.some((path) => posix.matchesGlob(path, pattern)),
+        pattern,
+      ).toBe(true)
+    }
   })
 })
 

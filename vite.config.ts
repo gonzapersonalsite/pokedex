@@ -67,12 +67,14 @@ export default defineConfig({
     globals: true,
     expect: { requireAssertions: true },
     allowOnly: false,
+    // A test is a .test.ts or .test.tsx file, the one suffix the lint reads as a test, and eslint.config.js
+    // refuses one that no include here takes: a new include goes into its VITEST_TESTS too.
     projects: [
       {
         extends: true,
         test: {
           name: 'app',
-          include: ['src/**/*.{test,spec}.{ts,tsx}', 'eslint.config.test.ts'],
+          include: ['src/**/*.test.{ts,tsx}', 'eslint.config.test.ts'],
           environment: 'jsdom',
           setupFiles: ['src/shared/test/setup.ts'],
         },

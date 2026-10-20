@@ -14,17 +14,32 @@ const metaContent = (html: string, attribute: 'name' | 'property', name: string)
 
 describe('buildShell', () => {
   it('does_write_the_title_and_description_of_site_ts_when_index_html_holds_other_values', () => {
-    const template = INDEX_HTML.replace(/<title>[^<]*<\/title>/, '<title>dev title</title>').replace(
-      /(<meta\s+(?:name="description"|property="og:title"|property="og:description")\s+content=")[^"]*"/g,
-      '$1dev value"',
-    )
+    const template = INDEX_HTML.replace(/<title>[^<]*<\/title>/, '<title>dev title</title>')
+      .replace(/<p class="app-startup-brand">[^<]*<\/p>/, '<p class="app-startup-brand">dev brand</p>')
+      .replace(
+        /(<meta\s+(?:name="description"|property="og:title"|property="og:description")\s+content=")[^"]*"/g,
+        '$1dev value"',
+      )
 
     const shell = buildShell(template)
 
     expect(shell.match(/<title>[^<]*<\/title>/g)).toEqual([`<title>${SITE_NAME}</title>`])
+    expect(shell.match(/<p class="app-startup-brand">[^<]*<\/p>/g)).toEqual([
+      `<p class="app-startup-brand">${SITE_NAME}</p>`,
+    ])
     expect(metaContent(shell, 'property', 'og:title')).toEqual([SITE_NAME])
     expect(metaContent(shell, 'name', 'description')).toEqual([SITE_DESCRIPTION])
     expect(metaContent(shell, 'property', 'og:description')).toEqual([SITE_DESCRIPTION])
+  })
+
+  it('does_keep_an_accessible_indeterminate_startup_indicator_inside_root_when_the_shell_is_built', () => {
+    const shell = buildShell(INDEX_HTML)
+    const startup = /<div id="root">\s*<main class="app-startup">([\s\S]*?)<\/main>\s*<\/div>/.exec(shell)?.[1] ?? ''
+    const progress = /<progress\s+([^>]*)><\/progress>/.exec(startup)?.[1] ?? ''
+
+    expect(startup).toContain(`<p class="app-startup-brand">${SITE_NAME}</p>`)
+    expect(progress).toMatch(/aria-label="[^"]+"/)
+    expect(progress).not.toMatch(/\bvalue=/)
   })
 
   it('does_point_the_preview_at_absolute_addresses_of_the_site_when_index_html_names_root_relative_paths', () => {
@@ -77,11 +92,23 @@ describe('buildShell', () => {
   it('does_refuse_the_template_when_a_tag_it_writes_is_missing_or_repeated', () => {
     const withoutUrl = INDEX_HTML.replace(/<meta property="og:url"[^>]*>/, '')
     const twoTitles = INDEX_HTML.replace('</head>', '<title>again</title></head>')
+    const withoutBrand = INDEX_HTML.replace(/<p class="app-startup-brand">[\s\S]*?<\/p>/, '')
+    const withoutProgress = INDEX_HTML.replace(/<progress[\s\S]*?<\/progress>/, '')
+    const emptyProgressLabel = INDEX_HTML.replace(
+      /<progress aria-label="[^"]*"><\/progress>/,
+      '<progress aria-label=" "></progress>',
+    )
 
     const buildWithoutUrl = () => buildShell(withoutUrl)
     const buildWithTwoTitles = () => buildShell(twoTitles)
+    const buildWithoutBrand = () => buildShell(withoutBrand)
+    const buildWithoutProgress = () => buildShell(withoutProgress)
+    const buildEmptyProgressLabel = () => buildShell(emptyProgressLabel)
 
     expect(buildWithoutUrl).toThrow(/expected exactly one meta og:url, found 0/)
     expect(buildWithTwoTitles).toThrow(/expected exactly one <title>, found 2/)
+    expect(buildWithoutBrand).toThrow(/expected exactly one \.app-startup-brand, found 0/)
+    expect(buildWithoutProgress).toThrow(/expected exactly one startup <progress>, found 0/)
+    expect(buildEmptyProgressLabel).toThrow(/startup <progress> must have a non-empty aria-label/)
   })
 })

@@ -18,6 +18,29 @@ const replaceTitle =
     return html.replace(matches[0], () => `<title>${escapeHtml(title)}</title>`)
   }
 
+const replaceBrand =
+  (brand: string): HtmlEdit =>
+  (html) => {
+    const matches = html.match(/<p class="app-startup-brand">[\s\S]*?<\/p>/g) ?? []
+    if (matches.length !== 1) {
+      throw new Error(`agent-files: expected exactly one .app-startup-brand, found ${matches.length}`)
+    }
+
+    return html.replace(matches[0], () => `<p class="app-startup-brand">${escapeHtml(brand)}</p>`)
+  }
+
+const checkStartupProgress: HtmlEdit = (html) => {
+  const matches = [...html.matchAll(/<progress\s+aria-label="([^"]*)"\s*><\/progress>/g)]
+  if (matches.length !== 1) {
+    throw new Error(`agent-files: expected exactly one startup <progress>, found ${matches.length}`)
+  }
+  if (matches[0][1].trim() === '') {
+    throw new Error('agent-files: startup <progress> must have a non-empty aria-label')
+  }
+
+  return html
+}
+
 const updateMeta =
   (attribute: 'name' | 'property', name: string, update: (content: string) => string): HtmlEdit =>
   (html) => {
@@ -46,6 +69,8 @@ const absoluteImagePath =
 // index.html only serve the dev server.
 const SHELL_EDITS: readonly HtmlEdit[] = [
   replaceTitle(SITE_NAME),
+  replaceBrand(SITE_NAME),
+  checkStartupProgress,
   updateMeta('name', 'description', () => SITE_DESCRIPTION),
   updateMeta('property', 'og:title', () => SITE_NAME),
   updateMeta('property', 'og:description', () => SITE_DESCRIPTION),

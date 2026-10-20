@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createElement, type ReactNode } from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, within } from '@testing-library/react'
 import { QueryProvider, ThemeProvider } from '@/app/providers'
 import { useToastStore } from '@/shared/utils'
+import indexHtml from '../../../../index.html?raw'
 import { PokedexPage } from './PokedexPage'
 
 const BASE = 'https://pokeapi.co/api/v2'
@@ -61,5 +62,18 @@ describe('PokedexPage', () => {
     expect(target?.tagName).toBe('MAIN')
     target?.focus()
     expect(target).toHaveFocus()
+  })
+
+  it('replaces_the_initial_html_startup_indicator_when_react_mounts', () => {
+    const doc = new DOMParser().parseFromString(indexHtml, 'text/html')
+    const root = doc.getElementById('root')!
+    document.body.append(root)
+
+    expect(within(root).getByRole('progressbar', { name: 'Loading Pokédex' })).toBeInTheDocument()
+
+    render(createElement(PokedexPage), { container: root, wrapper: Providers })
+
+    expect(root.querySelector('.app-startup')).toBeNull()
+    expect(screen.getByRole('link', { name: 'Skip to content' })).toBeInTheDocument()
   })
 })

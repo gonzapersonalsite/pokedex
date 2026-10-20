@@ -2,9 +2,16 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createElement, type ReactNode } from 'react'
 import { render, screen, fireEvent, within } from '@testing-library/react'
 import { QueryProvider, ThemeProvider } from '@/app/providers'
-import { useToastStore } from '@/shared/utils'
+import { applyTheme, useToastStore } from '@/shared/utils'
 import indexHtml from '../../../../index.html?raw'
 import { PokedexPage } from './PokedexPage'
+
+// Extract the synchronous pre-paint script from index.html so the tests run the real script.
+const inlineThemeScriptMatch = indexHtml.match(/<script>([\s\S]*?)<\/script>/)
+if (!inlineThemeScriptMatch) {
+  throw new Error('Expected inline theme script in index.html')
+}
+const runInlineThemeScript = new Function(inlineThemeScriptMatch[1]) as () => void
 
 const BASE = 'https://pokeapi.co/api/v2'
 const MISSING_POKEMON = 'zzzznotapokemon'
@@ -75,5 +82,35 @@ describe('PokedexPage', () => {
 
     expect(root.querySelector('.app-startup')).toBeNull()
     expect(screen.getByRole('link', { name: 'Skip to content' })).toBeInTheDocument()
+  })
+
+  it('paints_the_saved_or_system_theme_and_promotes_fonts_in_the_inline_pre_paint_script', () => {
+    const matchMediaSpy = vi.fn().mockReturnValue({ matches: true })
+    vi.stubGlobal('matchMedia', matchMediaSpy)
+
+    localStorage.setItem('pokedex-theme', 'dark')
+    runInlineThemeScript()
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark')
+    expect(document.documentElement.classList.contains('dark')).toBe(true)
+    expect(document.documentElement.style.colorScheme).toBe('dark')
+
+    localStorage.removeItem('pokedex-theme')
+    matchMediaSpy.mockReturnValue({ matches: false })
+    runInlineThemeScript()
+    expect(document.documentElement.getAttribute('data-theme')).toBe('light')
+    expect(document.documentElement.classList.contains('dark')).toBe(false)
+    expect(document.documentElement.style.colorScheme).toBe('light')
+
+    applyTheme('dark')
+    expect(document.documentElement.style.colorScheme).toBe('dark')
+
+    const link = document.createElement('link')
+    link.id = 'app-fonts'
+    link.media = 'print'
+    document.head.appendChild(link)
+    runInlineThemeScript()
+    link.dispatchEvent(new Event('load'))
+    expect(link.media).toBe('all')
+    link.remove()
   })
 })

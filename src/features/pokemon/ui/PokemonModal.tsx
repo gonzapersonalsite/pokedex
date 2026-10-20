@@ -253,6 +253,9 @@ export function PokemonModal({ pokemonIdOrName, open, onClose, onNavigate }: Pok
                               <img
                                 src={pokemon.image}
                                 alt={pokemon.name}
+                                width={192}
+                                height={192}
+                                decoding="async"
                                 className="mx-auto w-40 h-40 sm:w-48 sm:h-48 object-contain mt-4"
                               />
                             )}

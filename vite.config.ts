@@ -63,6 +63,35 @@ export default defineConfig({
   resolve: {
     alias: { '@': path.resolve(__dirname, 'src') },
   },
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
+    chunkSizeWarningLimit: 500,
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            // React, TanStack Query and Headless UI change only on upgrades, so their chunks stay cached across deploys.
+            {
+              name: 'react-vendor',
+              test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
+              priority: 20,
+            },
+            {
+              name: 'query-vendor',
+              test: /[\\/]node_modules[\\/]@tanstack[\\/]/,
+              priority: 15,
+            },
+            {
+              name: 'ui-vendor',
+              test: /[\\/]node_modules[\\/](@headlessui|@heroicons)[\\/]/,
+              priority: 10,
+            },
+          ],
+        },
+      },
+    },
+  },
   test: {
     globals: true,
     expect: { requireAssertions: true },

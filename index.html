@@ -55,18 +55,68 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <!-- Available before the app CSS/JS. Scoped to the temporary root content that React replaces. -->
+    <link
+      id="app-fonts"
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+      media="print"
+    />
+    <!-- Theme and non-blocking fonts: paint the saved or system theme before the app loads so dark
+         visitors never see a white screen and .app-startup is visible from the first frame
+         (PokedexPage.test.ts runs this script). -->
+    <script>
+      ;(function () {
+        var theme = null
+        try {
+          var stored = localStorage.getItem('pokedex-theme')
+          if (stored === 'light' || stored === 'dark') {
+            theme = stored
+          }
+        } catch (blocked) {
+          // Site data is blocked: follow the system.
+        }
+        if (theme === null) {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        }
+        document.documentElement.setAttribute('data-theme', theme)
+        document.documentElement.classList.toggle('dark', theme === 'dark')
+        document.documentElement.style.colorScheme = theme
+        var fonts = document.getElementById('app-fonts')
+        if (fonts) {
+          if (fonts.sheet) {
+            fonts.media = 'all'
+          } else {
+            fonts.addEventListener('load', function () {
+              fonts.media = 'all'
+            })
+          }
+        }
+      })()
+    </script>
+    <!-- Available before the app CSS/JS. Scoped to the initial shell and temporary root content that React replaces. -->
     <style>
+      html {
+        color-scheme: light;
+        background-color: #f1f5f9;
+        color: #0f172a;
+      }
+      html.dark {
+        color-scheme: dark;
+        background-color: #020617;
+        color: #f1f5f9;
+      }
+      body {
+        margin: 0;
+      }
       .app-startup {
         box-sizing: border-box;
-        min-height: calc(100svh - 16px);
+        min-height: 100svh;
         display: grid;
         align-content: center;
         justify-items: center;
         gap: 1.5rem;
         padding: 2rem 1rem;
-        color: CanvasText;
+        color: inherit;
         font:
           1rem/1.5 system-ui,
           sans-serif;
@@ -84,7 +134,7 @@
         width: 2rem;
         height: 2rem;
         border: 3px solid color-mix(in srgb, currentColor 20%, transparent);
-        border-top-color: currentColor;
+        border-top-color: #ef4444;
         border-radius: 50%;
         background: transparent;
         color: inherit;
@@ -115,6 +165,7 @@
       }
     </style>
     <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
       <style>
         .app-startup {
           display: none;

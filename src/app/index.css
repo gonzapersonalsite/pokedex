@@ -15,12 +15,18 @@
 }
 
 html {
+  color-scheme: light;
   -webkit-tap-highlight-color: transparent;
+}
+
+html.dark {
+  color-scheme: dark;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  font-size-adjust: from-font;
 }
 
 #root {
@@ -49,8 +55,10 @@ body {
   }
 }
 
-.pokeball-loader-item {
-  animation: pokeball-loading 2s ease-in-out infinite;
+@media (prefers-reduced-motion: no-preference) {
+  .pokeball-loader-item {
+    animation: pokeball-loading 2s ease-in-out infinite;
+  }
 }
 
 @keyframes scanline {
@@ -70,8 +78,10 @@ body {
   }
 }
 
-.animate-scan {
-  animation: scanline 1.6s cubic-bezier(0.16, 1, 0.3, 1) 2 alternate forwards;
+@media (prefers-reduced-motion: no-preference) {
+  .animate-scan {
+    animation: scanline 1.6s cubic-bezier(0.16, 1, 0.3, 1) 2 alternate forwards;
+  }
 }
 
 @keyframes hintPulse {
@@ -86,8 +96,10 @@ body {
   }
 }
 
-.hint-loop {
-  animation: hintPulse 6s ease-in-out infinite;
+@media (prefers-reduced-motion: no-preference) {
+  .hint-loop {
+    animation: hintPulse 6s ease-in-out infinite;
+  }
 }
 
 :root {

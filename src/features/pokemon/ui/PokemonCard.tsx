@@ -34,7 +34,15 @@ export function PokemonCard({ pokemon, isFavorite = false, onToggleFavorite, onC
           {/* Image area: fixed aspect ratio without clipping the content below */}
           <div className="aspect-square bg-gradient-to-b from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 p-4">
             {pokemon.image ? (
-              <img src={pokemon.image} alt={displayName} className="w-full h-full object-contain" loading="lazy" />
+              <img
+                src={pokemon.image}
+                alt={displayName}
+                width={192}
+                height={192}
+                decoding="async"
+                className="w-full h-full object-contain"
+                loading="lazy"
+              />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm">No image</div>
             )}

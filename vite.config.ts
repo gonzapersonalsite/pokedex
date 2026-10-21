@@ -45,7 +45,7 @@ export default defineConfig({
         scope: '/',
         icons: [
           {
-            src: '/pokeball.png',
+            src: '/favicon.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any',

@@ -59,6 +59,14 @@ Guía de desarrollo local, build, tests, comportamiento PWA y despliegue del pro
 - Las etiquetas estáticas de `index.html` son placeholders para desarrollo; el build las reescribe con la URL absoluta de producción.
 - `pnpm test` verifica los ficheros de metadata generados, las dimensiones de la imagen social y que el plugin de Vite esté conectado al build y al servidor de desarrollo reales.
 
+## 🎨 Receta de recursos locales (primera página e iconos PWA)
+- Primera página de Pokémon (`1`–`24`): generados desde el arte oficial de PokeAPI (`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/{id}.png`, `475×475` RGBA nativo) con Python `Pillow 13.0.0`:
+  - `public/pokemon/{id}.webp`: `475×475` RGBA nativo (`format="WEBP", quality=75, alpha_quality=80, method=4`).
+  - `public/pokemon/{id}-256.webp`: redimensionado a `256×256` RGBA (`Image.Resampling.LANCZOS`, `format="WEBP", quality=75, alpha_quality=80, method=4`).
+- Iconos del manifiesto PWA: redimensionados desde el icono RGBA maestro con `Pillow 13.0.0` (`Image.Resampling.LANCZOS`, `quantize(colors=256, method=Image.Quantize.FASTOCTREE)`, `format="PNG", optimize=True`):
+  - `public/favicon.png`: PNG de `192×192` (`5.789` bytes).
+  - `public/pokeball.png`: PNG de `512×512` (`21.276` bytes).
+
 ## 🔧 Variables de Entorno
 - No se requieren variables para usar PokeAPI.
 

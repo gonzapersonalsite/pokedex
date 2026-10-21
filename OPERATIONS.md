@@ -56,6 +56,14 @@ Covers local development, build, testing, PWA behavior, and deployment for the P
 - Static tags in `index.html` are placeholders for development; the build rewrites them with the absolute production URL.
 - `pnpm test` verifies the generated metadata files, the social image dimensions, and that the Vite plugin is wired into the real build and dev server.
 
+## 🎨 Local Seed Artwork & PWA Icons Recipe
+- First-page Pokémon (`1`–`24`): generated from PokeAPI official artwork (`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/{id}.png`, native `475×475` RGBA) using Python `Pillow 13.0.0`:
+  - `public/pokemon/{id}.webp`: native `475×475` RGBA (`format="WEBP", quality=75, alpha_quality=80, method=4`).
+  - `public/pokemon/{id}-256.webp`: resized `256×256` RGBA (`Image.Resampling.LANCZOS`, `format="WEBP", quality=75, alpha_quality=80, method=4`).
+- PWA manifest icons: resized from the RGBA Pokéball master with `Pillow 13.0.0` (`Image.Resampling.LANCZOS`, `quantize(colors=256, method=Image.Quantize.FASTOCTREE)`, `format="PNG", optimize=True`):
+  - `public/favicon.png`: `192×192` PNG (`5,789` bytes).
+  - `public/pokeball.png`: `512×512` PNG (`21,276` bytes).
+
 ## 🔧 Environment Variables
 - None required for PokeAPI usage.
 

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { Pokemon } from '@/entities/pokemon'
+import { POKEMON_CARD_IMAGE_SIZES, resolvePokemonArtworkSrcSet, type Pokemon } from '@/entities/pokemon'
 import { cn, getTypeBadgeClass } from '@/shared/utils'
 
 export interface PokemonCardProps {
@@ -24,6 +24,7 @@ export function PokemonCard({
 }: PokemonCardProps) {
   const name = pokemon.name.replace(/-/g, ' ')
   const displayName = name.charAt(0).toUpperCase() + name.slice(1)
+  const srcSet = resolvePokemonArtworkSrcSet(pokemon.id)
   const cardRef = useRef<HTMLElement>(null)
   const [isVisible, setIsVisible] = useState(() => priority || typeof IntersectionObserver === 'undefined')
 
@@ -41,7 +42,7 @@ export function PokemonCard({
           observer.disconnect()
         }
       },
-      { rootMargin: '120px 0px', threshold: 0 },
+      { rootMargin: '64px 0px', threshold: 0 },
     )
     observer.observe(element)
     return () => observer.disconnect()
@@ -68,6 +69,8 @@ export function PokemonCard({
               isVisible ? (
                 <img
                   src={pokemon.image}
+                  srcSet={srcSet}
+                  sizes={srcSet ? POKEMON_CARD_IMAGE_SIZES : undefined}
                   alt={displayName}
                   width={192}
                   height={192}

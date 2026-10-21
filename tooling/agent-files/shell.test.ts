@@ -1,6 +1,13 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import {
+  POKEMON_CARD_IMAGE_SIZES,
+  resolvePokemonArtwork,
+  resolvePokemonArtworkSrcSet,
+  SEED_POKEMON_MAX_ID,
+} from '../../src/entities/pokemon/model.ts'
+import { FIRST_PAGE_POKEMON } from '../../src/features/pokemon/model/usePokemonList.ts'
 import { buildNotFoundShell, buildShell } from './shell.ts'
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from './site.ts'
 
@@ -8,6 +15,17 @@ import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from './site.ts'
 const ROOT = join(import.meta.dirname, '..', '..')
 const INDEX_HTML = readFileSync(join(ROOT, 'index.html'), 'utf8')
 const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
+
+const readWebpDimensions = (webp: Buffer): { width: number; height: number } => {
+  expect(webp.subarray(0, 4).toString('ascii')).toBe('RIFF')
+  expect(webp.subarray(8, 12).toString('ascii')).toBe('WEBP')
+  const chunk = webp.subarray(12, 16).toString('ascii')
+  expect(chunk).toBe('VP8X')
+  return {
+    width: webp.readUIntLE(24, 3) + 1,
+    height: webp.readUIntLE(27, 3) + 1,
+  }
+}
 
 const metaContent = (html: string, attribute: 'name' | 'property', name: string): string[] =>
   [...html.matchAll(new RegExp(`<meta\\s+${attribute}="${name}"\\s+content="([^"]*)"`, 'g'))].map((match) => match[1])
@@ -120,10 +138,34 @@ describe('buildShell', () => {
     const shell = buildShell(INDEX_HTML)
     const notFound = buildNotFoundShell(INDEX_HTML)
 
-    expect(shell).toContain(
-      'href="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png"',
-    )
-    expect(notFound).not.toContain('rel="preload" as="image"')
+    expect(shell).toContain(`href="${resolvePokemonArtwork(1, '')}"`)
+    expect(shell).toContain(`imagesrcset="${resolvePokemonArtworkSrcSet(1)}"`)
+    expect(shell).toContain(`imagesizes="${POKEMON_CARD_IMAGE_SIZES}"`)
+    expect(notFound).not.toContain('rel="preload"')
     expect(metaContent(notFound, 'name', 'robots')).toEqual(['noindex'])
+  })
+
+  it('does_keep_valid_local_webp_variants_and_pwa_icons_in_sync_with_seed_pokemon_and_manifest', () => {
+    expect(FIRST_PAGE_POKEMON).toHaveLength(SEED_POKEMON_MAX_ID)
+    expect(FIRST_PAGE_POKEMON.map((pokemon) => pokemon.id)).toEqual(
+      Array.from({ length: SEED_POKEMON_MAX_ID }, (_, index) => index + 1),
+    )
+
+    for (const pokemon of FIRST_PAGE_POKEMON) {
+      expect(pokemon.image).toBe(`/pokemon/${pokemon.id}.webp`)
+      const fullWebp = readFileSync(join(ROOT, 'public', 'pokemon', `${pokemon.id}.webp`))
+      const cardWebp = readFileSync(join(ROOT, 'public', 'pokemon', `${pokemon.id}-256.webp`))
+      expect(readWebpDimensions(fullWebp)).toEqual({ width: 475, height: 475 })
+      expect(readWebpDimensions(cardWebp)).toEqual({ width: 256, height: 256 })
+    }
+
+    expect(existsSync(join(ROOT, 'public', 'pokemon', '25.webp'))).toBe(false)
+
+    const icon192 = readFileSync(join(ROOT, 'public', 'favicon.png'))
+    const icon512 = readFileSync(join(ROOT, 'public', 'pokeball.png'))
+    expect(icon192.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE)).toBe(true)
+    expect(icon512.subarray(0, PNG_SIGNATURE.length).equals(PNG_SIGNATURE)).toBe(true)
+    expect({ width: icon192.readUInt32BE(16), height: icon192.readUInt32BE(20) }).toEqual({ width: 192, height: 192 })
+    expect({ width: icon512.readUInt32BE(16), height: icon512.readUInt32BE(20) }).toEqual({ width: 512, height: 512 })
   })
 })

@@ -26,8 +26,32 @@ export interface TypeOption {
   name: string
 }
 
+export const SEED_POKEMON_MAX_ID = 24
+export const POKEMON_CARD_IMAGE_SIZES = '(min-width: 1280px) 256px, (min-width: 640px) 280px, calc(100vw - 68px)'
+
+function isSeedPokemonId(id: number): boolean {
+  return Number.isInteger(id) && id >= 1 && id <= SEED_POKEMON_MAX_ID
+}
+
+/** Returns the local 475×475 WebP artwork path for initial seed Pokémon (1–24), or the remote fallback. */
+export function resolvePokemonArtwork(id: number, remoteUrl: string): string {
+  if (isSeedPokemonId(id)) {
+    return `/pokemon/${id}.webp`
+  }
+  return remoteUrl
+}
+
+/** Returns the responsive 256w/475w WebP srcset for initial seed Pokémon (1–24), or undefined outside the seed range. */
+export function resolvePokemonArtworkSrcSet(id: number): string | undefined {
+  if (isSeedPokemonId(id)) {
+    return `/pokemon/${id}-256.webp 256w, /pokemon/${id}.webp 475w`
+  }
+  return undefined
+}
+
 export function mapPokemonFromApi(api: PokeApiPokemon): Pokemon {
-  const image = api.sprites.other?.['official-artwork']?.front_default ?? api.sprites.front_default ?? ''
+  const remoteImage = api.sprites.other?.['official-artwork']?.front_default ?? api.sprites.front_default ?? ''
+  const image = resolvePokemonArtwork(api.id, remoteImage)
   const imageShiny = api.sprites.other?.['official-artwork']?.front_shiny ?? api.sprites.front_shiny ?? null
   return {
     id: api.id,

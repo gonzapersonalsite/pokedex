@@ -1,8 +1,8 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { pokemonApi } from '../api/pokemonApi'
-import { mapPokemonFromApi, type Pokemon } from '@/entities/pokemon'
+import { mapPokemonFromApi, resolvePokemonArtwork, SEED_POKEMON_MAX_ID, type Pokemon } from '@/entities/pokemon'
 
-const PAGE_SIZE = 24
+const PAGE_SIZE = SEED_POKEMON_MAX_ID
 const ARTWORK_BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork'
 const SPECIES_BASE = 'https://pokeapi.co/api/v2/pokemon-species'
 
@@ -11,14 +11,14 @@ const buildSeedPokemon = (id: number, name: string, types: string[], height: num
   name,
   height,
   weight,
-  image: `${ARTWORK_BASE}/${id}.png`,
+  image: resolvePokemonArtwork(id, `${ARTWORK_BASE}/${id}.png`),
   imageShiny: `${ARTWORK_BASE}/shiny/${id}.png`,
   types,
   speciesUrl: `${SPECIES_BASE}/${id}/`,
   moves: [],
 })
 
-const FIRST_PAGE_POKEMON: Pokemon[] = [
+export const FIRST_PAGE_POKEMON: Pokemon[] = [
   buildSeedPokemon(1, 'bulbasaur', ['grass', 'poison'], 7, 69),
   buildSeedPokemon(2, 'ivysaur', ['grass', 'poison'], 10, 130),
   buildSeedPokemon(3, 'venusaur', ['grass', 'poison'], 20, 1000),

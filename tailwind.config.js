@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Outfit', 'system-ui', 'sans-serif'],
+        sans: ['Outfit', 'Outfit Fallback', 'system-ui', 'sans-serif'],
       },
       colors: {
         primary: {

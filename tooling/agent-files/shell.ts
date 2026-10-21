@@ -93,5 +93,7 @@ export const buildShell = (template: string): string => SHELL_EDITS.reduce((html
 
 export const buildNotFoundShell = (template: string): string => {
   const shell = buildShell(template)
-  return shell.replace(/<link\s+rel="canonical"\s+href="[^"]*"\s*\/>/, () => '<meta name="robots" content="noindex" />')
+  return shell
+    .replace(/\s*<link\s+rel="preload"\s+as="image"[\s\S]*?\/>/, () => '')
+    .replace(/<link\s+rel="canonical"\s+href="[^"]*"\s*\/>/, () => '<meta name="robots" content="noindex" />')
 }

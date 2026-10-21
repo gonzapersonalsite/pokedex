@@ -2,6 +2,15 @@
 @config "../../tailwind.config.js";
 @custom-variant dark (&:where(.dark, .dark *));
 
+@font-face {
+  font-family: 'Outfit Fallback';
+  src: local('Segoe UI'), local('Roboto'), local('Liberation Sans'), local('DejaVu Sans'), local('Arial');
+  size-adjust: 100.6%;
+  ascent-override: 100%;
+  descent-override: 26%;
+  line-gap-override: 0%;
+}
+
 /* Tailwind 4's preflight no longer gives buttons the pointer cursor that version 3 did. */
 @layer base {
   button:not(:disabled),
@@ -26,7 +35,6 @@ html.dark {
 body {
   margin: 0;
   min-height: 100vh;
-  font-size-adjust: from-font;
 }
 
 #root {

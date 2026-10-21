@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import type { Pokemon } from '@/entities/pokemon'
 import { cn, getTypeBadgeClass } from '@/shared/utils'
 
@@ -23,9 +24,32 @@ export function PokemonCard({
 }: PokemonCardProps) {
   const name = pokemon.name.replace(/-/g, ' ')
   const displayName = name.charAt(0).toUpperCase() + name.slice(1)
+  const cardRef = useRef<HTMLElement>(null)
+  const [isVisible, setIsVisible] = useState(() => priority || typeof IntersectionObserver === 'undefined')
+
+  useEffect(() => {
+    if (isVisible) return
+    const element = cardRef.current
+    if (!element || typeof IntersectionObserver === 'undefined') {
+      setIsVisible(true)
+      return
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setIsVisible(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '120px 0px', threshold: 0 },
+    )
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [isVisible])
 
   return (
     <article
+      ref={cardRef}
       className={cn(
         'rounded-2xl overflow-hidden shadow-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 transition hover:shadow-xl hover:border-primary-500/50 dark:hover:border-primary-500/50',
         className,
@@ -41,16 +65,20 @@ export function PokemonCard({
           {/* Image area: fixed aspect ratio without clipping the content below */}
           <div className="aspect-square bg-gradient-to-b from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 p-4">
             {pokemon.image ? (
-              <img
-                src={pokemon.image}
-                alt={displayName}
-                width={192}
-                height={192}
-                decoding="async"
-                className="w-full h-full object-contain"
-                loading={priority ? 'eager' : 'lazy'}
-                fetchPriority={priority ? 'high' : undefined}
-              />
+              isVisible ? (
+                <img
+                  src={pokemon.image}
+                  alt={displayName}
+                  width={192}
+                  height={192}
+                  decoding="async"
+                  className="w-full h-full object-contain"
+                  loading={priority ? 'eager' : 'lazy'}
+                  fetchPriority={priority ? 'high' : undefined}
+                />
+              ) : (
+                <div className="w-full h-full" aria-hidden="true" />
+              )
             ) : (
               <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm">No image</div>
             )}

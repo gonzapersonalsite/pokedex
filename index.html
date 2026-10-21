@@ -55,11 +55,17 @@
     <!-- Fonts & API Preconnect -->
     <link rel="preconnect" href="https://pokeapi.co" crossorigin />
     <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin />
+    <link
+      rel="preload"
+      as="image"
+      href="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png"
+      fetchpriority="high"
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       id="app-fonts"
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=optional"
       rel="stylesheet"
       media="print"
     />
@@ -167,7 +173,10 @@
       }
     </style>
     <noscript>
-      <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=optional"
+        rel="stylesheet"
+      />
       <style>
         .app-startup {
           display: none;

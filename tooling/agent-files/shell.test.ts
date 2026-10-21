@@ -117,8 +117,13 @@ describe('buildShell', () => {
   })
 
   it('does_inject_noindex_into_404_html_when_buildNotFoundShell_is_called', () => {
+    const shell = buildShell(INDEX_HTML)
     const notFound = buildNotFoundShell(INDEX_HTML)
 
+    expect(shell).toContain(
+      'href="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png"',
+    )
+    expect(notFound).not.toContain('rel="preload" as="image"')
     expect(metaContent(notFound, 'name', 'robots')).toEqual(['noindex'])
   })
 })

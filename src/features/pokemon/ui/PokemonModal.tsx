@@ -1,6 +1,7 @@
 import {
   Dialog,
   DialogPanel,
+  DialogTitle,
   Transition,
   TransitionChild,
   Disclosure,
@@ -216,6 +217,7 @@ export function PokemonModal({ pokemonIdOrName, open, onClose, onNavigate }: Pok
                       </Button>
                     </div>
                     <div className="p-4 pt-0">
+                      {!pokemon && <DialogTitle className="sr-only">Pokémon details</DialogTitle>}
                       {status === 'pending' && !pokemon && <Loader className="min-h-[200px]" />}
                       {status === 'error' && (
                         <p className="text-red-600 dark:text-red-400 py-6">
@@ -233,9 +235,12 @@ export function PokemonModal({ pokemonIdOrName, open, onClose, onNavigate }: Pok
                             <p className="text-sm text-slate-500 dark:text-slate-400">
                               #{String(pokemon.id).padStart(3, '0')}
                             </p>
-                            <h2 className="text-2xl font-bold capitalize text-slate-800 dark:text-slate-100">
+                            <DialogTitle
+                              as="h2"
+                              className="text-2xl font-bold capitalize text-slate-800 dark:text-slate-100"
+                            >
                               {pokemon.name.replace(/-/g, ' ')}
-                            </h2>
+                            </DialogTitle>
                             <div className="flex justify-center gap-2 mt-2 flex-wrap">
                               {pokemon.types.map((t) => (
                                 <span
@@ -357,10 +362,18 @@ export function PokemonModal({ pokemonIdOrName, open, onClose, onNavigate }: Pok
                     type="button"
                     onPointerDown={(e) => {
                       e.stopPropagation()
+                      skipNextClickRef.current = true
+                      closeWithSound()
+                    }}
+                    onClick={() => {
+                      if (skipNextClickRef.current) {
+                        skipNextClickRef.current = false
+                        return
+                      }
                       closeWithSound()
                     }}
                     className="w-12 h-12 bg-slate-800 rounded-full border-b-4 border-black shadow-lg active:translate-y-1 transition-all hint-loop"
-                    aria-label="Close"
+                    aria-label="Close Pokédex"
                   />
                   <div className="flex gap-3">
                     <div
@@ -531,7 +544,6 @@ function EvolutionChip({ id, name, onClick }: { id: number; name: string; onClic
       type="button"
       onClick={() => onClick?.(id)}
       className="inline-flex px-3 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100 capitalize text-sm font-medium hover:bg-slate-300 dark:hover:bg-slate-600 transition"
-      aria-label={`View ${displayName}`}
       title={`View ${displayName}`}
     >
       {displayName}

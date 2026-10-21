@@ -12,6 +12,9 @@ const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0
 const metaContent = (html: string, attribute: 'name' | 'property', name: string): string[] =>
   [...html.matchAll(new RegExp(`<meta\\s+${attribute}="${name}"\\s+content="([^"]*)"`, 'g'))].map((match) => match[1])
 
+const linkHref = (html: string, rel: string): string[] =>
+  [...html.matchAll(new RegExp(`<link\\s+rel="${rel}"\\s+href="([^"]*)"`, 'g'))].map((match) => match[1])
+
 describe('buildShell', () => {
   it('does_write_the_title_and_description_of_site_ts_when_index_html_holds_other_values', () => {
     const template = INDEX_HTML.replace(/<title>[^<]*<\/title>/, '<title>dev title</title>')
@@ -49,6 +52,7 @@ describe('buildShell', () => {
 
     expect(imagePath.startsWith('/')).toBe(true)
     expect(metaContent(shell, 'property', 'og:url')).toEqual([`${SITE_URL}/`])
+    expect(linkHref(shell, 'canonical')).toEqual([`${SITE_URL}/`])
     expect(metaContent(shell, 'property', 'og:image')).toEqual([`${SITE_URL}${imagePath}`])
     expect(metaContent(shell, 'name', 'twitter:image')).toEqual([`${SITE_URL}${imagePath}`])
   })

@@ -48,13 +48,14 @@ export function PokedexPage() {
   const [pathname, setPathname] = useState(() => window.location.pathname)
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [searchActive, setSearchActive] = useState(false)
   const [searchSubmitted, setSearchSubmitted] = useState('')
   const [typeFilter, setTypeFilter] = useState<string | null>(null)
   const [showFavorites, setShowFavorites] = useState(false)
   const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null)
   const [canInstall, setCanInstall] = useState(false)
   const { theme, toggleTheme } = useTheme()
-  const { data: allNames = [] } = usePokemonNames()
+  const { data: allNames = [] } = usePokemonNames(searchActive || searchQuery.length > 0)
   const { data: typesList = [] } = useTypes()
   const isNotFound = isNotFoundPathname(pathname)
 
@@ -144,6 +145,7 @@ export function PokedexPage() {
               <SearchBar
                 value={searchQuery}
                 onChange={setSearchQuery}
+                onActivate={() => setSearchActive(true)}
                 onSubmit={handleSearch}
                 onSelectSuggestion={handleSelectSuggestion}
                 onClear={() => {
@@ -284,10 +286,11 @@ function TypeFilter({
 }) {
   return (
     <div className="mb-6">
-      <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Filter by type</p>
+      <h2 className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Filter by type</h2>
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
+          aria-pressed={selectedType === null && !showFavorites}
           onClick={() => onSelectType(null)}
           className={cn(
             'px-3 py-1.5 rounded-full text-sm font-medium transition',
@@ -300,6 +303,7 @@ function TypeFilter({
         </button>
         <button
           type="button"
+          aria-pressed={showFavorites}
           onClick={onToggleFavorites}
           className={cn(
             'px-3 py-1.5 rounded-full text-sm font-medium transition',
@@ -316,6 +320,7 @@ function TypeFilter({
             <button
               key={t.id}
               type="button"
+              aria-pressed={isSelected}
               onClick={() => onSelectType(isSelected ? null : t.name)}
               className={cn(
                 'px-3 py-1.5 rounded-full text-sm font-medium capitalize transition',
@@ -336,6 +341,7 @@ function TypeFilter({
 function SearchBar({
   value,
   onChange,
+  onActivate,
   onSubmit,
   onClear,
   onSelectSuggestion,
@@ -344,6 +350,7 @@ function SearchBar({
 }: {
   value: string
   onChange: (v: string) => void
+  onActivate?: () => void
   onSubmit: () => void
   onClear: () => void
   onSelectSuggestion?: (name: string) => void
@@ -390,15 +397,21 @@ function SearchBar({
       <div className="relative flex-1 min-w-0">
         <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none z-10" />
         <input
+          id="pokemon-search"
+          name="pokemon-search"
           type="search"
           role="combobox"
           value={value}
           onChange={(e) => {
+            onActivate?.()
             onChange(e.target.value)
             setOpen(true)
             setActiveIndex(0)
           }}
-          onFocus={() => value.length > 0 && setOpen(true)}
+          onFocus={() => {
+            onActivate?.()
+            if (value.length > 0) setOpen(true)
+          }}
           onKeyDown={(e) => {
             if (e.key === 'ArrowDown') {
               e.preventDefault()

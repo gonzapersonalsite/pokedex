@@ -118,10 +118,12 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
         className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 list-none p-0 m-0"
         role="list"
       >
-        {(favoritesOnly ? favList : list).map((pokemon) => (
+        {(favoritesOnly ? favList : list).map((pokemon, index) => (
           <li key={pokemon.id} className="min-w-0">
             <PokemonCard
               pokemon={pokemon}
+              priority={index < 2}
+              eager={index < 8}
               isFavorite={favorites.includes(pokemon.id)}
               onToggleFavorite={(id) => {
                 const wasFavorite = favorites.includes(id)

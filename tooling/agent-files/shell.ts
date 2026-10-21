@@ -65,6 +65,15 @@ const absoluteImagePath =
     return absoluteUrl(path)
   }
 
+const insertCanonicalLink: HtmlEdit = (html) => {
+  const matches = html.match(/<\/head>/g) ?? []
+  if (matches.length !== 1) {
+    throw new Error(`agent-files: expected exactly one </head>, found ${matches.length}`)
+  }
+
+  return html.replace('</head>', () => `    <link rel="canonical" href="${escapeHtml(absoluteUrl('/'))}" />\n  </head>`)
+}
+
 // The title, description and addresses of the preview come from site.ts; the values in
 // index.html only serve the dev server.
 const SHELL_EDITS: readonly HtmlEdit[] = [
@@ -77,15 +86,12 @@ const SHELL_EDITS: readonly HtmlEdit[] = [
   updateMeta('property', 'og:url', () => absoluteUrl('/')),
   updateMeta('property', 'og:image', absoluteImagePath('og:image')),
   updateMeta('name', 'twitter:image', absoluteImagePath('twitter:image')),
+  insertCanonicalLink,
 ]
 
 export const buildShell = (template: string): string => SHELL_EDITS.reduce((html, edit) => edit(html), template)
 
 export const buildNotFoundShell = (template: string): string => {
   const shell = buildShell(template)
-  const matches = shell.match(/<\/head>/g) ?? []
-  if (matches.length !== 1) {
-    throw new Error(`agent-files: expected exactly one </head>, found ${matches.length}`)
-  }
-  return shell.replace('</head>', () => '  <meta name="robots" content="noindex" />\n  </head>')
+  return shell.replace(/<link\s+rel="canonical"\s+href="[^"]*"\s*\/>/, () => '<meta name="robots" content="noindex" />')
 }

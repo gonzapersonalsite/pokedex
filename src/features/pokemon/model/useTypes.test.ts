@@ -33,19 +33,10 @@ function mockPokeApi(url: string) {
       count: 5,
       next: null,
       previous: null,
-      results: Object.keys(typeDetails).map((name) => ({ name, url: `${BASE}/type/${name}/` })),
+      results: Object.entries(typeDetails).map(([name, detail]) => ({ name, url: `${BASE}/type/${detail.id}/` })),
     })
   }
-  const name = url.replace(`${BASE}/type/`, '')
-  const detail = typeDetails[name]
-  return jsonResponse({
-    id: detail.id,
-    name,
-    pokemon: detail.pokemonNames.map((pokemonName, i) => ({
-      slot: 1,
-      pokemon: { name: pokemonName, url: `${BASE}/pokemon/${i + 1}/` },
-    })),
-  })
+  throw new Error(`Unexpected URL: ${url}`)
 }
 
 describe('useTypes', () => {
@@ -59,7 +50,7 @@ describe('useTypes', () => {
   it('only lists types that have at least one Pokémon', async () => {
     const { result } = renderHook(() => useTypes(), { wrapper: createWrapper() })
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    await waitFor(() => expect(result.current.isPlaceholderData).toBe(false))
 
     expect(result.current.data).toEqual([
       { id: 10, name: 'fire' },

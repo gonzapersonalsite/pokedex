@@ -7,12 +7,22 @@ export interface PokemonCardProps {
   onToggleFavorite?: (id: number) => void
   onClick?: (id: number) => void
   className?: string
+  priority?: boolean
+  eager?: boolean
 }
 
 /**
  * Pokémon card: image + number + name + types always visible without clipping.
  */
-export function PokemonCard({ pokemon, isFavorite = false, onToggleFavorite, onClick, className }: PokemonCardProps) {
+export function PokemonCard({
+  pokemon,
+  isFavorite = false,
+  onToggleFavorite,
+  onClick,
+  className,
+  priority = false,
+  eager = false,
+}: PokemonCardProps) {
   const name = pokemon.name.replace(/-/g, ' ')
   const displayName = name.charAt(0).toUpperCase() + name.slice(1)
 
@@ -29,7 +39,6 @@ export function PokemonCard({ pokemon, isFavorite = false, onToggleFavorite, onC
           type="button"
           className="w-full text-left focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:ring-inset rounded-2xl"
           onClick={() => onClick?.(pokemon.id)}
-          aria-label={`View details of ${displayName}`}
         >
           {/* Image area: fixed aspect ratio without clipping the content below */}
           <div className="aspect-square bg-gradient-to-b from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 p-4">
@@ -41,7 +50,8 @@ export function PokemonCard({ pokemon, isFavorite = false, onToggleFavorite, onC
                 height={192}
                 decoding="async"
                 className="w-full h-full object-contain"
-                loading="lazy"
+                loading={priority || eager ? 'eager' : 'lazy'}
+                fetchPriority={priority ? 'high' : undefined}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-slate-400 text-sm">No image</div>
@@ -53,9 +63,9 @@ export function PokemonCard({ pokemon, isFavorite = false, onToggleFavorite, onC
             <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-0.5">
               #{String(pokemon.id).padStart(3, '0')}
             </p>
-            <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg leading-tight break-words">
+            <h2 className="font-bold text-slate-800 dark:text-slate-100 text-lg leading-tight break-words">
               {displayName}
-            </h3>
+            </h2>
             <div className="flex flex-wrap gap-1.5 mt-2">
               {pokemon.types.map((type) => (
                 <span

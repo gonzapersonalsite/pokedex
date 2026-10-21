@@ -57,6 +57,7 @@ export function mapEvolutionChain(chain: PokeApiEvolutionChainLink): EvolutionNo
   }
 }
 
-export function mapTypeFromApi(api: PokeApiType): TypeOption {
-  return { id: api.id, name: api.name }
+export function mapTypeFromApi(api: PokeApiType | { id?: number; name: string; url?: string }): TypeOption {
+  const id = typeof api.id === 'number' ? api.id : 'url' in api && api.url ? idFromUrl(api.url) : 0
+  return { id, name: api.name }
 }

@@ -22,11 +22,11 @@ export interface PokemonListProps {
  * When typeFilter is set, displays only Pokémon of that type.
  */
 export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false }: PokemonListProps) {
-  const defaultList = usePokemonList()
+  const useFiltered = !favoritesOnly && !!typeFilter && typeFilter.length > 0
+  const defaultList = usePokemonList(!favoritesOnly && !useFiltered)
   const { data: typeRefs = [], isPending: isRefsPending } = useTypeRefs(typeFilter ?? null)
   const byTypeList = usePokemonListByType(typeFilter ?? null, typeRefs)
 
-  const useFiltered = !favoritesOnly && !!typeFilter && typeFilter.length > 0
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status, error } = useFiltered ? byTypeList : defaultList
 
   const list = data?.pages.flatMap((p) => p.list) ?? []
@@ -122,8 +122,7 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
           <li key={pokemon.id} className="min-w-0">
             <PokemonCard
               pokemon={pokemon}
-              priority={index < 2}
-              eager={index < 8}
+              priority={index === 0}
               isFavorite={favorites.includes(pokemon.id)}
               onToggleFavorite={(id) => {
                 const wasFavorite = favorites.includes(id)

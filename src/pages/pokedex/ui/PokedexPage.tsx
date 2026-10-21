@@ -55,9 +55,9 @@ export function PokedexPage() {
   const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null)
   const [canInstall, setCanInstall] = useState(false)
   const { theme, toggleTheme } = useTheme()
-  const { data: allNames = [] } = usePokemonNames(searchActive || searchQuery.length > 0)
-  const { data: typesList = [] } = useTypes()
   const isNotFound = isNotFoundPathname(pathname)
+  const { data: allNames = [] } = usePokemonNames(searchActive || searchQuery.length > 0)
+  const { data: typesList = [] } = useTypes(!isNotFound)
 
   const handleReturnHome = () => {
     if (isNotFoundPathname(window.location.pathname)) {
@@ -91,12 +91,15 @@ export function PokedexPage() {
     let robotsMeta = document.querySelector<HTMLMetaElement>('meta[name="robots"]')
     const createdMeta = !robotsMeta
     const previousRobots = robotsMeta?.getAttribute('content') ?? null
+    const canonicalLink = document.querySelector<HTMLLinkElement>('link[rel="canonical"]')
+    const previousCanonicalHref = canonicalLink?.getAttribute('href') ?? null
     if (!robotsMeta) {
       robotsMeta = document.createElement('meta')
       robotsMeta.setAttribute('name', 'robots')
       document.head.appendChild(robotsMeta)
     }
     robotsMeta.setAttribute('content', 'noindex')
+    canonicalLink?.remove()
 
     return () => {
       document.title = previousTitle
@@ -104,6 +107,12 @@ export function PokedexPage() {
         robotsMeta?.remove()
       } else if (previousRobots !== null) {
         robotsMeta?.setAttribute('content', previousRobots)
+      }
+      if (previousCanonicalHref !== null && !document.querySelector('link[rel="canonical"]')) {
+        const link = document.createElement('link')
+        link.setAttribute('rel', 'canonical')
+        link.setAttribute('href', previousCanonicalHref)
+        document.head.appendChild(link)
       }
     }
   }, [isNotFound])

@@ -8,7 +8,6 @@ export interface PokemonCardProps {
   onClick?: (id: number) => void
   className?: string
   priority?: boolean
-  eager?: boolean
 }
 
 /**
@@ -21,7 +20,6 @@ export function PokemonCard({
   onClick,
   className,
   priority = false,
-  eager = false,
 }: PokemonCardProps) {
   const name = pokemon.name.replace(/-/g, ' ')
   const displayName = name.charAt(0).toUpperCase() + name.slice(1)
@@ -50,7 +48,7 @@ export function PokemonCard({
                 height={192}
                 decoding="async"
                 className="w-full h-full object-contain"
-                loading={priority || eager ? 'eager' : 'lazy'}
+                loading={priority ? 'eager' : 'lazy'}
                 fetchPriority={priority ? 'high' : undefined}
               />
             ) : (

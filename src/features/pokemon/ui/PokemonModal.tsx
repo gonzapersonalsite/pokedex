@@ -390,12 +390,12 @@ export function PokemonModal({ pokemonIdOrName, open, onClose, onNavigate }: Pok
                     />
                   </div>
                   <div
-                    className={cn('relative w-16 h-16 cursor-pointer hint-loop select-none touch-none')}
+                    className={cn('relative w-20 h-20 cursor-pointer hint-loop select-none touch-none')}
                     onPointerDown={(e) => e.stopPropagation()}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <div className="absolute top-1/2 left-0 w-16 h-5 -translate-y-1/2 bg-slate-800 rounded-xs border-b-2 border-black transition hover:ring-2 hover:ring-emerald-400/40" />
-                    <div className="absolute left-1/2 top-0 w-5 h-16 -translate-x-1/2 bg-slate-800 rounded-xs border-r-2 border-black transition hover:ring-2 hover:ring-emerald-400/40" />
+                    <div className="absolute top-1/2 left-0 w-20 h-6 -translate-y-1/2 bg-slate-800 rounded-xs border-b-2 border-black transition hover:ring-2 hover:ring-emerald-400/40" />
+                    <div className="absolute left-1/2 top-0 w-6 h-20 -translate-x-1/2 bg-slate-800 rounded-xs border-r-2 border-black transition hover:ring-2 hover:ring-emerald-400/40" />
                     <button
                       type="button"
                       aria-label="Previous"
@@ -418,7 +418,7 @@ export function PokemonModal({ pokemonIdOrName, open, onClose, onNavigate }: Pok
                         const prevId = Math.max(1, pokemon.id - 1)
                         navigateTo(prevId)
                       }}
-                      className="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10"
+                      className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-6"
                     />
                     <button
                       type="button"
@@ -440,7 +440,7 @@ export function PokemonModal({ pokemonIdOrName, open, onClose, onNavigate }: Pok
                         if (!pokemon || !onNavigate) return
                         navigateTo(pokemon.id + 1)
                       }}
-                      className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10"
+                      className="absolute right-0 top-1/2 -translate-y-1/2 w-6 h-6"
                     />
                     <button
                       type="button"
@@ -457,7 +457,7 @@ export function PokemonModal({ pokemonIdOrName, open, onClose, onNavigate }: Pok
                         }
                         screenRef.current?.scrollBy({ top: -120, behavior: 'smooth' })
                       }}
-                      className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-10"
+                      className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-6"
                     />
                     <button
                       type="button"
@@ -474,7 +474,7 @@ export function PokemonModal({ pokemonIdOrName, open, onClose, onNavigate }: Pok
                         }
                         screenRef.current?.scrollBy({ top: 120, behavior: 'smooth' })
                       }}
-                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-10 h-10"
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-6"
                     />
                   </div>
                 </div>

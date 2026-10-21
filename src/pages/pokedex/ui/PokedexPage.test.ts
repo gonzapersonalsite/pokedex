@@ -118,11 +118,16 @@ describe('PokedexPage', () => {
 
   it('renders_the_pokedex_404_scanner_with_varied_pokemon_on_unknown_routes_and_returns_home', () => {
     window.history.replaceState(null, '', '/route-404-tall-grass')
+    const canonical = document.createElement('link')
+    canonical.setAttribute('rel', 'canonical')
+    canonical.setAttribute('href', 'https://pokedex-pokeapi-gonzalo.vercel.app/')
+    document.head.appendChild(canonical)
 
     render(createElement(PokedexPage), { wrapper: Providers })
 
     expect(screen.getByRole('heading', { level: 2, name: 'Wild Missing Route Appeared!' })).toBeInTheDocument()
     expect(document.querySelector('meta[name="robots"]')).toHaveAttribute('content', 'noindex')
+    expect(document.querySelector('link[rel="canonical"]')).toBeNull()
     const grid = screen.getByTestId('not-found-pokemon-grid')
     for (const name of ['Psyduck', 'Snorlax', 'Pikachu', 'Gengar', 'Ditto', 'Mew']) {
       expect(within(grid).getByText(name)).toBeInTheDocument()
@@ -132,5 +137,10 @@ describe('PokedexPage', () => {
 
     expect(window.location.pathname).toBe('/')
     expect(screen.queryByRole('heading', { name: 'Wild Missing Route Appeared!' })).toBeNull()
+    expect(document.querySelector('link[rel="canonical"]')).toHaveAttribute(
+      'href',
+      'https://pokedex-pokeapi-gonzalo.vercel.app/',
+    )
+    document.querySelector('link[rel="canonical"]')?.remove()
   })
 })

@@ -103,7 +103,7 @@ export function NotFoundSection({ pathname, onReturnHome, onInspectPokemon }: No
                     Tall Grass Radar · Active Signals
                   </p>
                   <div className="grid grid-cols-3 gap-2 items-end">
-                    {SEARCH_PARTY_POKEMON.slice(0, 3).map((pokemon) => (
+                    {SEARCH_PARTY_POKEMON.slice(0, 3).map((pokemon, index) => (
                       <button
                         key={pokemon.id}
                         type="button"
@@ -116,6 +116,8 @@ export function NotFoundSection({ pathname, onReturnHome, onInspectPokemon }: No
                           width={88}
                           height={88}
                           decoding="async"
+                          loading={index === 0 ? 'eager' : 'lazy'}
+                          fetchPriority={index === 0 ? 'high' : undefined}
                           className="w-20 h-20 object-contain group-hover:scale-110 transition"
                         />
                         <span className="mt-1 text-xs font-bold text-slate-800 dark:text-slate-200">

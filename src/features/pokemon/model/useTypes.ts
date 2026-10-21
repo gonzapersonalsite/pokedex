@@ -29,7 +29,7 @@ const DEFAULT_TYPES: TypeOption[] = [
  * Types offered by the type filter. Types without any Pokémon (PokeAPI lists Shadow,
  * Stellar and Unknown) are left out, since selecting them could only show an empty list.
  */
-export function useTypes() {
+export function useTypes(enabled = true) {
   return useQuery({
     queryKey: ['pokemon', 'types'],
     queryFn: async ({ signal }) => {
@@ -43,5 +43,6 @@ export function useTypes() {
     },
     placeholderData: DEFAULT_TYPES,
     staleTime: 1000 * 60 * 60,
+    enabled,
   })
 }

@@ -32,6 +32,8 @@ function mockPokeApi(url: string) {
 
 describe('PokedexPage', () => {
   beforeEach(() => {
+    window.history.replaceState(null, '', '/')
+    vi.stubGlobal('scrollTo', vi.fn())
     // ThemeProvider falls back to matchMedia, which jsdom does not implement.
     localStorage.setItem('pokedex-theme', 'light')
     useToastStore.getState().clear()
@@ -112,5 +114,23 @@ describe('PokedexPage', () => {
     link.dispatchEvent(new Event('load'))
     expect(link.media).toBe('all')
     link.remove()
+  })
+
+  it('renders_the_pokedex_404_scanner_with_varied_pokemon_on_unknown_routes_and_returns_home', () => {
+    window.history.replaceState(null, '', '/route-404-tall-grass')
+
+    render(createElement(PokedexPage), { wrapper: Providers })
+
+    expect(screen.getByRole('heading', { level: 2, name: 'Wild Missing Route Appeared!' })).toBeInTheDocument()
+    expect(document.querySelector('meta[name="robots"]')).toHaveAttribute('content', 'noindex')
+    const grid = screen.getByTestId('not-found-pokemon-grid')
+    for (const name of ['Psyduck', 'Snorlax', 'Pikachu', 'Gengar', 'Ditto', 'Mew']) {
+      expect(within(grid).getByText(name)).toBeInTheDocument()
+    }
+
+    fireEvent.click(screen.getByRole('button', { name: /back to pokédex/i }))
+
+    expect(window.location.pathname).toBe('/')
+    expect(screen.queryByRole('heading', { name: 'Wild Missing Route Appeared!' })).toBeNull()
   })
 })

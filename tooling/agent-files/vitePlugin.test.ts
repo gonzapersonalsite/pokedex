@@ -59,6 +59,7 @@ describe('agentFilesPlugin in vite.config.ts', () => {
         const address = new RegExp(`<meta (?:name|property)="${name}" content="([^"]*)"`).exec(index)?.[1]
         expect(address?.startsWith(`${SITE_URL}/`), name).toBe(true)
       }
+      expect(assets.get('404.html')).toContain('<meta name="robots" content="noindex" />')
     },
     VITE_TIMEOUT_MS,
   )

@@ -37,7 +37,7 @@ Guía de desarrollo local, build, tests, comportamiento PWA y despliegue del pro
 ## 📦 Build
 - `pnpm build`
 - Salida: `dist/` (assets estáticos)
-- El build de Vite reescribe la vista previa social estática de `index.html` y emite `llms.txt`, `robots.txt` y `sitemap.xml`.
+- El build de Vite reescribe la vista previa social estática de `index.html` y emite `404.html`, `llms.txt`, `robots.txt` y `sitemap.xml`.
 
 ## 📱 PWA
 - vite-plugin-pwa con autoUpdate y Service Worker en desarrollo.

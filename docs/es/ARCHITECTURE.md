@@ -38,7 +38,7 @@ src/
 ├── features/
 │   └── pokemon/          # Un slice: api (pokemonApi), model (hooks), ui (card, lista, modal)
 ├── pages/
-│   └── pokedex/          # Un slice: ui (PokedexPage)
+│   └── pokedex/          # Un slice: model (notFoundRoute), ui (PokedexPage, NotFoundSection)
 └── shared/               # api (el único cliente HTTP), ui (primitivas), utils (cn, typeBadge, audio, toast, tema, requestError), test (setup)
 ```
 
@@ -60,7 +60,7 @@ src/
 ### Vista previa social y salida legible por agentes
 - Los crawlers y las plataformas sociales leen `index.html` sin ejecutar React. Las etiquetas Open Graph y Twitter estáticas viven ahí, y el tooling de build en `tooling/agent-files/` las reescribe con la URL absoluta de producción.
 - La URL del sitio tiene una única fuente en `tooling/agent-files/site.ts`.
-- El build emite `llms.txt`, `robots.txt` y `sitemap.xml`. El sitemap solo lista `/`, porque la app no tiene subpáginas servidas desde el servidor.
+- El build emite `404.html` (con `<meta name="robots" content="noindex" />` para que el alojamiento estático sirva rutas desconocidas con HTTP 404), `llms.txt`, `robots.txt` y `sitemap.xml`. El sitemap solo lista `/`, porque la app no tiene subpáginas servidas desde el servidor.
 - `public/og-cover.png` es la imagen social PNG de 1200×630; los tests cruzan su tipo y tamaño declarados con el fichero real.
 
 ## 📚 Tests

@@ -203,7 +203,7 @@ lint solo impide que una capa use lo que tiene encima.
   por su ruta, con su tipo, su tamaño y su texto alternativo; el plugin
   cableado en `vite.config.ts` reescribe en el build el título, la descripción
   y las direcciones absolutas de la vista previa social de `index.html`, y
-  emite llms.txt, robots.txt y sitemap.xml (el servidor de desarrollo sirve
+  emite 404.html (con `<meta name="robots" content="noindex" />`), llms.txt, robots.txt y sitemap.xml (el servidor de desarrollo sirve
   los mismos ficheros por middleware). Los tests de `tooling/agent-files`
   cruzan cada valor con el fichero real —el tipo y el tamaño declarados de la
   portada incluidos— y comprueban que el plugin sigue cableado en la

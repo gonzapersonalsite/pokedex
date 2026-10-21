@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { buildShell } from './shell.ts'
+import { buildNotFoundShell, buildShell } from './shell.ts'
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from './site.ts'
 
 // The real template: a tag the shell writes cannot disappear from it unnoticed.
@@ -110,5 +110,11 @@ describe('buildShell', () => {
     expect(buildWithoutBrand).toThrow(/expected exactly one \.app-startup-brand, found 0/)
     expect(buildWithoutProgress).toThrow(/expected exactly one startup <progress>, found 0/)
     expect(buildEmptyProgressLabel).toThrow(/startup <progress> must have a non-empty aria-label/)
+  })
+
+  it('does_inject_noindex_into_404_html_when_buildNotFoundShell_is_called', () => {
+    const notFound = buildNotFoundShell(INDEX_HTML)
+
+    expect(metaContent(notFound, 'name', 'robots')).toEqual(['noindex'])
   })
 })

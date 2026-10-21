@@ -1,6 +1,6 @@
 import type { Plugin } from 'vite'
 import { buildAgentFiles } from './generate.ts'
-import { buildShell } from './shell.ts'
+import { buildNotFoundShell, buildShell } from './shell.ts'
 
 // Crawlers and agents read the HTML without running the app: the build writes the social preview
 // into index.html and emits the agent files; the dev server serves the same files.
@@ -30,6 +30,7 @@ export function agentFilesPlugin(): Plugin {
 
       const template = typeof index.source === 'string' ? index.source : new TextDecoder().decode(index.source)
       index.source = buildShell(template)
+      this.emitFile({ type: 'asset', fileName: '404.html', source: buildNotFoundShell(template) })
 
       for (const file of buildAgentFiles()) {
         this.emitFile({ type: 'asset', fileName: file.path.slice(1), source: file.source })

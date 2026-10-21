@@ -37,7 +37,7 @@ Covers local development, build, testing, PWA behavior, and deployment for the P
 ## 📦 Build
 - `pnpm build`
 - Output: `dist/` (static assets)
-- The Vite build rewrites the static social preview in `index.html` and emits `llms.txt`, `robots.txt` and `sitemap.xml`.
+- The Vite build rewrites the static social preview in `index.html` and emits `404.html`, `llms.txt`, `robots.txt` and `sitemap.xml`.
 
 ## 📱 PWA
 - vite-plugin-pwa with autoUpdate and dev SW enabled.

@@ -80,3 +80,12 @@ const SHELL_EDITS: readonly HtmlEdit[] = [
 ]
 
 export const buildShell = (template: string): string => SHELL_EDITS.reduce((html, edit) => edit(html), template)
+
+export const buildNotFoundShell = (template: string): string => {
+  const shell = buildShell(template)
+  const matches = shell.match(/<\/head>/g) ?? []
+  if (matches.length !== 1) {
+    throw new Error(`agent-files: expected exactly one </head>, found ${matches.length}`)
+  }
+  return shell.replace('</head>', () => '  <meta name="robots" content="noindex" />\n  </head>')
+}

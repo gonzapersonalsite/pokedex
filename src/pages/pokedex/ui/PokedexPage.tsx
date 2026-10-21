@@ -3,6 +3,8 @@ import { PokemonList, PokemonModal, usePokemonSearch, usePokemonNames, useTypes 
 import { Button, Loader, PokeballIcon } from '@/shared/ui'
 import { classifyRequestError, cn, getTypeBadgeClass, toast, useTheme, type RequestErrorKind } from '@/shared/utils'
 import { SunIcon, MoonIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import { isNotFoundPathname } from '../model/notFoundRoute'
+import { NotFoundSection } from './NotFoundSection'
 import { ReturnToTop } from './ReturnToTop'
 import { SkipToContent } from './SkipToContent'
 
@@ -43,6 +45,7 @@ const SEARCH_ERROR_COPY: Record<RequestErrorKind, { message: string; hint: strin
 }
 
 export function PokedexPage() {
+  const [pathname, setPathname] = useState(() => window.location.pathname)
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchSubmitted, setSearchSubmitted] = useState('')
@@ -53,15 +56,56 @@ export function PokedexPage() {
   const { theme, toggleTheme } = useTheme()
   const { data: allNames = [] } = usePokemonNames()
   const { data: typesList = [] } = useTypes()
+  const isNotFound = isNotFoundPathname(pathname)
+
+  const handleReturnHome = () => {
+    if (isNotFoundPathname(window.location.pathname)) {
+      window.history.pushState(null, '', '/')
+    }
+    setPathname('/')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   const handleSearch = () => {
+    if (isNotFound) handleReturnHome()
     setSearchSubmitted(searchQuery.trim())
   }
 
   const handleSelectSuggestion = (name: string) => {
+    if (isNotFound) handleReturnHome()
     setSearchQuery(name)
     setSearchSubmitted(name)
   }
+
+  useEffect(() => {
+    const onPopState = () => setPathname(window.location.pathname)
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [])
+
+  useEffect(() => {
+    if (!isNotFound) return
+    const previousTitle = document.title
+    document.title = 'Page not found — Pokédex'
+    let robotsMeta = document.querySelector<HTMLMetaElement>('meta[name="robots"]')
+    const createdMeta = !robotsMeta
+    const previousRobots = robotsMeta?.getAttribute('content') ?? null
+    if (!robotsMeta) {
+      robotsMeta = document.createElement('meta')
+      robotsMeta.setAttribute('name', 'robots')
+      document.head.appendChild(robotsMeta)
+    }
+    robotsMeta.setAttribute('content', 'noindex')
+
+    return () => {
+      document.title = previousTitle
+      if (createdMeta) {
+        robotsMeta?.remove()
+      } else if (previousRobots !== null) {
+        robotsMeta?.setAttribute('content', previousRobots)
+      }
+    }
+  }, [isNotFound])
 
   useEffect(() => {
     function onBeforeInstall(e: BeforeInstallPromptEvent) {
@@ -167,7 +211,16 @@ export function PokedexPage() {
         tabIndex={-1}
         className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 pb-12 scroll-mt-40 outline-hidden"
       >
-        {searchSubmitted ? (
+        {isNotFound ? (
+          <NotFoundSection
+            pathname={pathname}
+            onReturnHome={handleReturnHome}
+            onInspectPokemon={(id) => {
+              handleReturnHome()
+              setSelectedId(id)
+            }}
+          />
+        ) : searchSubmitted ? (
           <Suspense
             fallback={
               <div className="min-h-[60vh] flex items-center justify-center">

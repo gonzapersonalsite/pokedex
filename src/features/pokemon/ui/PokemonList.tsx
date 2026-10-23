@@ -1,13 +1,10 @@
 import { useRef, useEffect } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { usePokemonList, useTypeRefs, usePokemonListByType } from '../model'
+import { usePokemonList, useTypeRefs, usePokemonListByType, useFavoritePokemon } from '../model'
 import { useFavoritesStore } from '@/entities/favorites'
 import { PokemonCard } from './PokemonCard'
 import { loadErrorMessage } from './loadErrorMessage'
 import { Loader } from '@/shared/ui'
 import { toast } from '@/shared/utils'
-import { pokemonApi } from '../api/pokemonApi'
-import { mapPokemonFromApi } from '@/entities/pokemon'
 
 export interface PokemonListProps {
   onSelectPokemon?: (id: number) => void
@@ -35,18 +32,7 @@ export function PokemonList({ onSelectPokemon, typeFilter, favoritesOnly = false
 
   const isLoadingRefs = useFiltered && isRefsPending
 
-  const {
-    data: favList = [],
-    status: favStatus,
-    error: favError,
-  } = useQuery({
-    queryKey: ['pokemon', 'favorites', favorites],
-    queryFn: async () => {
-      const details = await Promise.all(favorites.map((id) => pokemonApi.byIdOrName(id)))
-      return details.map(mapPokemonFromApi)
-    },
-    enabled: favoritesOnly && favorites.length > 0,
-  })
+  const { list: favList, status: favStatus, error: favError } = useFavoritePokemon(favoritesOnly ? favorites : [])
 
   useEffect(() => {
     if (favoritesOnly) return

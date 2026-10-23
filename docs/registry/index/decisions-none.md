@@ -1,13 +1,14 @@
 # Decisiones sin fase (índice)
 
 GENERADO por tools/board desde `docs/registry/decisions/`. No editar a mano: se reescribe.
-board-fingerprint:8dccdeb89b3259d3 — su contenido cambió por última vez el 2026-10-18.
+board-fingerprint:ebe4d08b264e1bab — su contenido cambió por última vez el 2026-10-23.
 
 Las decisiones que no nombran ninguna fase de los planes: sin `phase`, o con `none`.
 El índice principal es `docs/registry/DECISIONS.md`.
 
-## ABIERTAS (0)
+## ABIERTAS (1)
 
+- `#pokedex-detail-responses-are-heavy` — Las respuestas de detalle de PokeAPI pesan demasiado por página (OPEN 2026-10-23) · none
 
 ## DEUDAS VIVAS (0)
 

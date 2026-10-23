@@ -46,7 +46,7 @@ export function PokemonModal({ pokemonIdOrName, open, onClose, onNavigate }: Pok
     ;(async () => {
       await loadSounds({
         'pokedex-move': '/sounds/pokedexMoveButton.mp3',
-        'pokedex-on': '/sounds/pokedexOn.wav',
+        'pokedex-on': '/sounds/pokedexOn.mp3',
         'pokedex-off': '/sounds/pokedexOff.wav',
       })
       playSound('pokedex-on')

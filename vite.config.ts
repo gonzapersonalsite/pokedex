@@ -19,7 +19,9 @@ export default defineConfig({
         enabled: true,
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}', '**/*-256.webp'],
+        // The social cover is only read by crawlers; precaching it would add 248 KB to every install.
+        globIgnores: ['og-cover.png'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/pokeapi\.co\/api\/v2\/.*/i,
@@ -29,6 +31,17 @@ export default defineConfig({
               expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 },
               cacheableResponse: { statuses: [0, 200] },
               networkTimeoutSeconds: 10,
+            },
+          },
+          {
+            // The seed cards are precached; this covers the full artwork and every sound on first use.
+            urlPattern: ({ url }) =>
+              url.origin === self.location.origin && /^\/(?:pokemon|sounds)\//.test(url.pathname),
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'local-media',
+              expiration: { maxEntries: 64, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheableResponse: { statuses: [0, 200] },
             },
           },
         ],

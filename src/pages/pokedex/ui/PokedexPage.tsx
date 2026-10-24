@@ -4,6 +4,7 @@ import { Button, Loader, PokeballIcon } from '@/shared/ui'
 import { classifyRequestError, cn, getTypeBadgeClass, toast, useTheme, type RequestErrorKind } from '@/shared/utils'
 import { SunIcon, MoonIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { isNotFoundPathname } from '../model/notFoundRoute'
+import { CreditsButton, CreditsDialog, CreditsFooter } from './Credits'
 import { NotFoundSection } from './NotFoundSection'
 import { ReturnToTop } from './ReturnToTop'
 import { SkipToContent } from './SkipToContent'
@@ -54,6 +55,7 @@ export function PokedexPage() {
   const [showFavorites, setShowFavorites] = useState(false)
   const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null)
   const [canInstall, setCanInstall] = useState(false)
+  const [creditsOpen, setCreditsOpen] = useState(false)
   const { theme, toggleTheme } = useTheme()
   const isNotFound = isNotFoundPathname(pathname)
   const { data: allNames = [] } = usePokemonNames(searchActive || searchQuery.length > 0)
@@ -137,7 +139,7 @@ export function PokedexPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans">
+    <div className="flex min-h-screen flex-col bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans">
       <SkipToContent targetId={MAIN_CONTENT_ID} />
       {/* Pokédex-style top header bar */}
       <header
@@ -220,7 +222,7 @@ export function PokedexPage() {
       <main
         id={MAIN_CONTENT_ID}
         tabIndex={-1}
-        className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 pb-12 scroll-mt-40 outline-hidden"
+        className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-6 pb-12 scroll-mt-40 outline-hidden flex-1"
       >
         {isNotFound ? (
           <NotFoundSection
@@ -268,7 +270,13 @@ export function PokedexPage() {
         )}
       </main>
 
+      <CreditsFooter />
+
       <ReturnToTop />
+
+      <CreditsButton onOpen={() => setCreditsOpen(true)} />
+
+      <CreditsDialog open={creditsOpen} onClose={() => setCreditsOpen(false)} />
 
       <PokemonModal
         pokemonIdOrName={selectedId}

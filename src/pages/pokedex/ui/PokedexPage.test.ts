@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createElement, type ReactNode } from 'react'
-import { render, screen, fireEvent, within } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
 import { QueryProvider, ThemeProvider } from '@/app/providers'
 import { applyTheme, useToastStore } from '@/shared/utils'
 import indexHtml from '../../../../index.html?raw'
@@ -57,6 +57,21 @@ describe('PokedexPage', () => {
     const searchCalls = vi.mocked(fetch).mock.calls.filter(([url]) => url === MISSING_POKEMON_URL)
     expect(searchCalls).toHaveLength(1)
     expect(useToastStore.getState().toasts).toEqual([])
+  })
+
+  it('opens_the_credits_and_legal_panel_from_the_footer_reveal', async () => {
+    render(createElement(PokedexPage), { wrapper: Providers })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Credits' }))
+
+    const dialog = await screen.findByRole('dialog', { name: 'Credits & legal' })
+    expect(within(dialog).getByRole('link', { name: 'Portfolio' })).toHaveAttribute(
+      'href',
+      'https://mi-portafolio-gonzalo.vercel.app/',
+    )
+
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Close' }))
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Credits & legal' })).not.toBeInTheDocument())
   })
 
   it('opens_with_a_skip_link_that_moves_the_focus_into_the_main_content', () => {

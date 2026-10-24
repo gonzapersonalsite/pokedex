@@ -1,7 +1,7 @@
 # Decisiones sin fase (índice)
 
 GENERADO por tools/board desde `docs/registry/decisions/`. No editar a mano: se reescribe.
-board-fingerprint:ebe4d08b264e1bab — su contenido cambió por última vez el 2026-10-23.
+board-fingerprint:1b7fd188da33a03d — su contenido cambió por última vez el 2026-10-24.
 
 Las decisiones que no nombran ninguna fase de los planes: sin `phase`, o con `none`.
 El índice principal es `docs/registry/DECISIONS.md`.
@@ -13,8 +13,9 @@ El índice principal es `docs/registry/DECISIONS.md`.
 ## DEUDAS VIVAS (0)
 
 
-## PROVISIONALES (0)
+## PROVISIONALES (1)
 
+- `#credits-reachable-from-an-infinite-list` — La firma y la atribución legal se alcanzan con un botón de créditos en una lista infinita (PROVISIONAL 2026-10-24) · none
 
 ## CONFIRMADAS (3)
 

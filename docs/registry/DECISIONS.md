@@ -1,7 +1,7 @@
 # Registro de decisiones (índice)
 
 GENERADO por tools/board desde `docs/registry/decisions/`. No editar a mano: se reescribe.
-board-fingerprint:74c3f5820bd3012e — su contenido cambió por última vez el 2026-10-24.
+board-fingerprint:1fc65c3f11b1d4df — su contenido cambió por última vez el 2026-10-24.
 
 Cada decisión es un fichero `docs/registry/decisions/<identidad>.md` con su cabecera de campos y su
 texto; una cita `#<identidad>` resuelve abriendo ese fichero. Cómo se escribe una y cómo
@@ -23,11 +23,11 @@ de `none`.
 
 - `#credits-reachable-from-an-infinite-list` — La firma y la atribución legal se alcanzan con un botón de créditos en una lista infinita (PROVISIONAL 2026-10-24) · none
 
-## EL RESTO (8), SOLO CONTADAS
+## EL RESTO (9), SOLO CONTADAS
 
-CONFIRMADAS 6 · RESUELTAS 2 · DESCARTADAS 0 · RETIRADAS 0
+CONFIRMADAS 7 · RESUELTAS 2 · DESCARTADAS 0 · RETIRADAS 0
 
 ## Por fase (2 índices)
 
 - `docs/registry/index/decisions-F1.md` — F1: 5
-- `docs/registry/index/decisions-none.md` — sin fase: 5
+- `docs/registry/index/decisions-none.md` — sin fase: 6

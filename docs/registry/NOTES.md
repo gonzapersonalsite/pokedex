@@ -1,7 +1,7 @@
 # Notas de desarrollo (índice)
 
 GENERADO por tools/board desde `docs/registry/deliveries/` y `docs/registry/lessons/`. No editar a mano: se reescribe.
-board-fingerprint:a131bd3699c80f02 — su contenido cambió por última vez el 2026-10-30.
+board-fingerprint:43aa837088b4c885 — su contenido cambió por última vez el 2026-11-11.
 
 Cada entrega es un fichero `docs/registry/deliveries/<fecha>-<tema>.md` con lo que se hizo, cómo se
 verificó y qué costó; cada lección es un fichero `docs/registry/lessons/<identidad>.md` y se cita como
@@ -9,8 +9,9 @@ verificó y qué costó; cada lección es un fichero `docs/registry/lessons/<ide
 entregas dicen cómo llegó a estar así. Aquí van las más recientes de cada clase; todas,
 mes a mes, en su índice del mes.
 
-## Entregas (10; aquí las 10 más recientes)
+## Entregas (11; aquí las 11 más recientes)
 
+- 2026-11-11 `#2026-11-11-scaffold-upgrade-to-0-4-0` Actualización a agentic-scaffold 0.4.0, con el tablero como página
 - 2026-10-30 `#2026-10-30-dependency-refresh` Actualización de dependencias y alineación del toolchain de pnpm
 - 2026-10-24 `#2026-10-24-credits-and-legal-footer` Créditos y aviso legal alcanzables desde la lista infinita
 - 2026-10-24 `#2026-10-24-specific-security-exceptions` Reconciliación de la precedencia con la autoridad del dueño
@@ -32,7 +33,8 @@ mes a mes, en su índice del mes.
 - `#lesson-the-examples-are-the-real-template` Los ejemplos que hay en el repositorio son la plantilla real, no el README
 - `#lesson-the-watchdog-lives-outside-the-gate` Una guarda dentro del proceso no protege contra el proceso que no llega a construirla
 
-## Por mes (2 índices)
+## Por mes (3 índices)
 
+- `docs/registry/index/notes-2026-11.md` — 2026-11: 1 entregas, 0 lecciones
 - `docs/registry/index/notes-2026-10.md` — 2026-10: 10 entregas, 0 lecciones
 - `docs/registry/index/notes-2026-09.md` — 2026-09: 0 entregas, 7 lecciones

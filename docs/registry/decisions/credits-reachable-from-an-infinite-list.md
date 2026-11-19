@@ -1,14 +1,22 @@
 ---
 title: La firma y la atribución legal se alcanzan con un botón de créditos en una lista infinita
-state: provisional
+state: confirmed
 date: 2026-10-24
+domain: interface
 phase: none
-criterion: el dueño ve el botón y el diálogo funcionando en la página; entonces se confirma, o se cambia por un final real con `Load more`
 ---
 **La firma y la atribución legal se alcanzan con un botón de créditos que abre
 un diálogo, además del footer semántico al final de la página.** El dueño
 eligió esta opción entre las que le puso el agente; no la dictó. La lista de
 Pokémon no cambia de comportamiento: sigue siendo scroll infinito.
+
+**Confirmada por delegación del dueño.** Su criterio era verla funcionando en
+la página, y el dueño delegó esa revisión: «quiero que dejes tu todo remediado
+y aprobado y listo sin deuda, no te cortes o dejes cosas sin hacer por mi,
+tienes carta blanca». El agente la vio funcionando en el servidor de
+desarrollo, con la refutación de abajo delante: el botón abre el diálogo con
+su título accesible y el contenido de «Forma», `Escape` lo cierra y el foco
+vuelve al botón.
 
 **Forma.**
 
@@ -48,6 +56,3 @@ Pokémon no cambia de comportamiento: sigue siendo scroll infinito.
   cambia la experiencia central de la página y no se ha pedido. El botón es el
   cambio menor que hace alcanzable el contenido legal sin tocar la lista. Si el
   dueño prefiere un final real, se revisa con `Load more`.
-
-2026-10-24: queda provisional hasta que el dueño vea el botón y el diálogo
-funcionando; entonces se confirma o se cambia.

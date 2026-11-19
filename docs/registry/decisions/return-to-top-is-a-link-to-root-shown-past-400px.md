@@ -2,6 +2,7 @@
 title: Volver arriba es un enlace al contenedor raíz que aparece pasados 400 px de scroll
 state: confirmed
 date: 2026-10-19
+domain: interface
 phase: F1
 ---
 **Volver arriba es un enlace al contenedor raíz que aparece pasados 400 px de
@@ -30,5 +31,4 @@ tarda. Los 400 px no salen de medir nada en esta página. Se mantiene: el salto 
 lo que espera quien pulsa «volver arriba» tras un scroll largo, y la cifra se
 cambia en una constante (`SHOW_AFTER_SCROLL_PX`) si el dueño pide otra.
 
-2026-10-19: confirmada; el dueño la aprobó tras verla funcionando, con la
-refutación delante.
+El dueño la confirmó tras verla funcionando, con la refutación delante.

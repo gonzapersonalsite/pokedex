@@ -2,6 +2,7 @@
 title: Saltar al contenido lleva el foco al main y deja sitio al header fijo
 state: confirmed
 date: 2026-10-19
+domain: interface
 phase: F1
 ---
 **Saltar al contenido lleva el foco al `main` y deja sitio al header fijo.** El
@@ -30,5 +31,4 @@ ajustaría al píxel, a costa de un observador de tamaño solo para esto. Se
 mantiene: el hueco solo aparece al usar el enlace desde abajo, y la cifra se
 cambia en una clase si el dueño lo pide.
 
-2026-10-19: confirmada; el dueño la aprobó tras verla funcionando, con la
-refutación delante.
+El dueño la confirmó tras verla funcionando, con la refutación delante.

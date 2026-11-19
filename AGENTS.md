@@ -272,10 +272,10 @@ la columna "manda sobre" y el otro se corrige en el mismo cambio.
    documento. `board.html` pinta ese mismo modelo como página para una persona,
    y tampoco manda. **Los registros se CONSULTAN, no se leen enteros:** por identidad
    cuando algo cita uno; por `docs/registry/DECISIONS.md`, que lista entero lo
-   que pide trabajo; y, antes de tocar algo, por dos índices de
-   `docs/registry/index/`: el de la fase o el tramo que lo gobierna y el de
-   `none`, que reúne las decisiones que no nombran fase y valen para todo. Son
-   la fuente de verdad: una decisión no existe hasta tener su fichero.
+   que pide trabajo; y, antes de tocar algo, por la página de su dominio en
+   `docs/registry/index/`, que reúne todo lo que gobierna ese sistema, se
+   decidiera en la fase que se decidiera. Son la fuente de verdad: una decisión
+   no existe hasta tener su fichero, y todo registro del árbol gobierna hoy.
 2. Las puertas en verde ANTES de tocar nada, salvo en un árbol que el hook ya
    verificó; las dos cosas, y qué se hace si arrancan en rojo, las dice el §1.
 3. Regla de negocio = función pura + tests en el mismo cambio.
@@ -354,7 +354,9 @@ enuncia: la intención vive también en los nombres de los tests.
   todas es la última línea de `python verify.py`.
 - **Registro:** un fichero de `docs/registry/` (decisión, lección o entrega)
   con cabecera de campos. Su **identidad** es el nombre del fichero sin `.md`
-  (en una entrega, con su fecha delante) y se cita `#<identidad>`.
+  (en una entrega, con su fecha delante) y se cita `#<identidad>`. Una decisión
+  o una lección dice lo que vale hoy: cuando cambia se reescribe, y cuando deja
+  de gobernar sale y deja su línea en `docs/registry/retired.txt`.
 - **Derivado:** lo que escribe el tablero (`STATUS.txt`, la página `board.html`
   y los índices del registro); se regenera, no se edita.
 

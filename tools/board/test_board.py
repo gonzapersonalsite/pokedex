@@ -21,6 +21,7 @@ import sys
 import tempfile
 import threading
 import time
+import types
 import _thread
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -746,6 +747,10 @@ def test_sections_and_lists():
     check(len(B.apply_exceptions(findings, [{"keyword": "order", "value": "F3", "line": 7, "motive": "m"}])) == 1, "excepciones: excusa la suya y solo la suya")
     orphan = B.apply_exceptions(findings, [{"keyword": "order", "value": "F9", "line": 7, "motive": "m"}])
     check(len(orphan) == 3 and "huerfana" in orphan[2]["message"], "excepciones: una que ya no excusa nada es un hallazgo (visto fallar)")
+    broken = [B.finding(B.KIND_RECORD, "#roto", "r.md", "x")]
+    kept = B.apply_exceptions(broken, [{"keyword": "record", "value": "#roto", "line": 9, "motive": "m"}])
+    check([f["kind"] for f in kept] == [B.KIND_RECORD, B.KIND_DATA] and "no se excusa" in kept[1]["message"],
+          "excepciones: un hallazgo de registro, derivado o dato no se excusa aunque la leyenda lo declare, y la excepcion sale (visto fallar)")
     end()
 
 
@@ -1323,7 +1328,7 @@ def test_verify_main():
         write(root, "t.py", "print('ok sin guardas')\n")
         write(root, "tools/board/documents.txt", "harness otro.py\n")
         red, said = quietly(V.main, [], root)
-        check(red == 1 and "exit=3" in said and "    | se rompio" in said and "WARNING: ninguna puerta se llama" in said, "verify: una puerta roja sale con su codigo y su cola")
+        check(red == 1 and "exit=3" in said and "    | se rompio" in said and "WARNING: ninguna puerta se llama" in said, "verify: una puerta roja sale con su codigo y su salida")
         check("salio 0 sin imprimir sus guardas: guard finished" in said and said.count("sin imprimir sus guardas") == 1,
               "verify: la fila marcada [harness] que sale 0 sin sus guardas es roja, y la que no lleva la marca no (visto fallar)")
         write(root, "gates.txt", "colgada | - | " + HUNG + "\n")
@@ -1378,6 +1383,93 @@ def test_verify_main():
         derived_red, said = quietly(V.main, [], root)
         check(derived_red == 1 and "RESULT: 1 puertas, 1 en rojo -> board: build" in said,
               "verify: si regenerar los derivados falla tras escribir el veredicto, la puerta sale en rojo en RESULT (visto fallar)")
+        remove_tree(os.path.join(root, "tools"))
+        lines = "[print('linea %d' % n) for n in range(200)]; "
+        long_red = PY + ' -c "import sys; ' + lines + 'sys.exit(1)"'
+        long_derived = PY + ' -c "import os, sys; ' + lines + "sys.exit(1 if os.path.exists('tools/board/verdict.txt') else 0)" + '"'
+        write(root, "gates.txt", "larga | - | " + long_red + "\nboard: build | - | " + long_derived + "\n")
+        whole, said = quietly(V.main, [], root)
+        shown = [line for line in said.splitlines() if line.startswith("    | linea ")]
+        check(whole == 1 and shown == ["    | linea %d" % n for n in range(200)] * 2,
+              "verify: una puerta en rojo, y la regeneracion de derivados que falla, ensenan toda su salida, no su cola (visto fallar)")
+        write(root, "gates.txt", "verde | - | " + PY + ' -c "' + lines + '"\n')
+        green, said = quietly(V.main, ["--", "verde"], root)
+        check(green == 0 and "    | " not in said, "verify: una puerta en verde da solo su linea de resumen")
+    end()
+
+
+def holding_verify(root, release):
+    """The real verify.py of `root` running a gate that waits for the file
+    `release`; it returns once that gate runs, so the lock is held."""
+    write(root, "verify.py", read_bytes(V.ROOT, "verify.py"))
+    wait = (PY + ' -c "import os, time; open(\'runs.txt\', \'a\').write(\'run\\n\'); '
+            "[time.sleep(0.05) for _ in range(1200) if not os.path.exists('" + release + "')]" + '"')
+    write(root, "gates.txt", "espera | - | " + wait + "\n")
+    before = runs_in(root)
+    holder = subprocess.Popen([sys.executable, os.path.join(root, "verify.py")], cwd=root, env=sanitized_env(),
+                              stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    deadline = time.monotonic() + 30
+    while time.monotonic() < deadline and runs_in(root) == before:
+        time.sleep(0.05)
+    return holder
+
+
+def runs_in(root):
+    path = os.path.join(root, "runs.txt")
+    return len(read_bytes(root, "runs.txt").splitlines()) if os.path.exists(path) else 0
+
+
+def test_verify_lock():
+    begin("test_verify_lock")
+    with scratch_tree() as root:
+        write(root, "repo/.git/HEAD", "ref: refs/heads/main\n")
+        write(root, "repo/sub/x.txt", "x\n")
+        write(root, "linked/.git", "gitdir: ../repo/.git/worktrees/linked\n")
+        write(root, "loose/.git", "sin linea gitdir\n")
+        repo, sub, linked = os.path.join(root, "repo"), os.path.join(root, "repo", "sub"), os.path.join(root, "linked")
+        check(V.git_dir_of(repo) == os.path.join(repo, ".git") and V.git_dir_of(sub) == os.path.join(repo, ".git"),
+              "cerrojo: el directorio de git se busca hacia arriba desde el arbol, como hace git (visto fallar)")
+        check(V.git_dir_of(linked) == os.path.join(repo, ".git", "worktrees", "linked"),
+              "cerrojo: un worktree enlazado lo guarda donde dice su linea gitdir (visto fallar)")
+        check(V.git_dir_of(os.path.join(root, "loose")) is None, "cerrojo: un .git sin linea gitdir no es un repositorio")
+        in_repo, in_sub = V.lock_path(repo, V.git_dir_of(repo)), V.lock_path(sub, V.git_dir_of(sub))
+        outside = V.lock_path(repo, None)
+        check(os.path.dirname(in_repo) == os.path.join(repo, ".git") and in_repo != in_sub
+              and in_repo == V.lock_path(repo + os.sep, os.path.join(repo, ".git")),
+              "cerrojo: vive en el directorio de git y su nombre es el del arbol: dos arboles de un repositorio no se excluyen (visto fallar)")
+        check(os.path.dirname(outside) == tempfile.gettempdir() and os.path.basename(outside) == os.path.basename(in_repo),
+              "cerrojo: sin git, en la carpeta temporal y con el mismo nombre")
+    with scratch_tree() as root:
+        write(root, ".git/HEAD", "ref: refs/heads/main\n")
+        holder = holding_verify(root, "suelta-1")
+        try:
+            busy, said = quietly(V.main, [], root)
+            filtered, said_filtered = quietly(V.main, ["--", "espera"], root)
+            last = said.strip().splitlines()[-1] if said.strip() else ""
+            check(busy == V.REFUSED_EXIT == 3 and last.startswith("RESULT: no se verifica -> otra verificacion corre sobre este arbol")
+                  and "pid %d" % holder.pid in said and filtered == 3 and "no se verifica" in said_filtered,
+                  "cerrojo: con otra verificacion en curso sobre el arbol, la completa y la filtrada salen con 3 y su motivo (visto fallar)")
+            check(runs_in(root) == 1 and not os.path.exists(os.path.join(root, "tools", "board", "verdict.txt")),
+                  "cerrojo: la rechazada no corre ninguna puerta ni toca el veredicto (visto fallar)")
+        finally:
+            write(root, "suelta-1", "")
+            holder.wait(60)
+        after, said = quietly(V.main, ["--", "espera"], root)
+        check(after == 0 and runs_in(root) == 2, "cerrojo: la duena lo suelta al terminar y la siguiente corre (visto fallar)")
+        killed = holding_verify(root, "suelta-2")
+        killed.kill()
+        killed.wait(60)
+        write(root, "suelta-2", "")
+        reclaimed, said = quietly(V.main, ["--", "espera"], root)
+        check(reclaimed == 0 and runs_in(root) == 4, "cerrojo: si matan a la duena, el sistema lo suelta y la siguiente no se queda fuera (visto fallar)")
+        # The gate the killed holder left behind sees its release file and ends.
+        time.sleep(0.5)
+    with scratch_tree() as root:
+        write(root, ".git", "gitdir: no-existe/nada\n")
+        write(root, "gates.txt", "uno | - | {python} -c \"open('runs.txt', 'a').write('run')\"\n")
+        broken, said = quietly(V.main, [], root)
+        check(broken == 3 and "RESULT: no se verifica -> no se puede crear el cerrojo de verificacion" in said and runs_in(root) == 0,
+              "cerrojo: si no se puede crear, no se verifica y se dice donde, sin correr puertas (visto fallar)")
     end()
 
 
@@ -1819,6 +1911,13 @@ def test_pre_push():
     unknown = P.refused_why(None)
     check("rojo" in red and "commitea" not in red and "verdict.txt" in changed and "commitea" in changed and "rojo" in changed and "rojo" in unknown and "commitea" in unknown,
           "pre-push: tras unas puertas que no salen en verde dice lo que toca: arreglar las rojas, o commitear los derivados si solo cambio el veredicto (visto fallar)")
+    check(P.VERIFY_REFUSED_EXIT == V.REFUSED_EXIT, "pre-push: el codigo de una verificacion rechazada es el de verify.py (las dos copias se cruzan)")
+    refused = types.SimpleNamespace(returncode=V.REFUSED_EXIT)
+    with patched(P, check_push=lambda root, refs: {"problems": []}, rewritten_files=unexpected), \
+            patched(P.subprocess, run=lambda *args, **kwargs: refused):
+        code, said = quietly(P.main, [], "unused", io.StringIO("refs/heads/main %s refs/heads/main %s\n" % (head, zero)))
+    check(code != 0 and "otra verificacion corre sobre este arbol" in said and "rojo" not in said and "Push rechazado" in said,
+          "pre-push: si otra verificacion retiene el arbol, lo dice en vez de hablar de puertas en rojo (visto fallar)")
     if shutil.which("git") is not None:
         with scratch_tree() as root:
             write(root, "a.txt", "a\n")
@@ -2142,6 +2241,92 @@ def big_registry():
     deliveries = [delivery("2026-%02d-%02d-entrega-%03d" % (7 + n % 3, 1 + n % 28, n), "2026-%02d-%02d" % (7 + n % 3, 1 + n % 28)) for n in range(300)]
     lessons = [lesson("lesson-%02d" % n, "2026-09-%02d" % (1 + n % 28)) for n in range(50)]
     return groups_of(decisions, lessons, deliveries)
+
+
+def test_plan_position():
+    begin("test_plan_position")
+    # The numbers are identity, not sequence: a phase that enters between two
+    # keeps its number and the line puts it where it goes.
+    product = ("**F0 ✔ → F13 (IN PROGRESS) → F7**\n\n## F0 — Base (DONE)\n\n## F13 — Puertos (IN PROGRESS)\n\n"
+               "## F7 — Mapas (PENDING)\n\n## F2 — Aparte (PENDING)\n")
+    tooling = "**H0 ✔ → H1**\n\n## H0 — Andamio (DONE)\n\n## H1 — Puertas (PENDING)\n"
+    registry = groups_of([decision("mapas-y-puertos", "open", "2026-09-12", {"phase": "F7 F13"}),
+                          decision("solo-mapas", "open", "2026-09-11", {"phase": "F7"}),
+                          decision("solo-puertos", "open", "2026-09-10", {"phase": "F13"}),
+                          decision("de-las-puertas", "open", "2026-09-09", {"phase": "H1"}),
+                          decision("la-aparte", "open", "2026-09-08", {"phase": "F2"})])
+    model = B.build_model([{"axis": "F", "file": "p.md", "text": product}, {"axis": "H", "file": "t.md", "text": tooling}],
+                          registry, {"date": "", "rows": []}, "")
+    both = [f for f in model["fronts"] if f["id"] == "mapas-y-puertos"][0]
+    check(both["named_by"] == {"names": ["F13", "F7"], "open": True},
+          "orden: un frente que nombra F7 y F13 cae en F13, la que la linea pone antes y esta en curso (visto fallar)")
+    summary = B.render_summary(model)
+    check(summary.find("· F13 F7") >= 0 and "DEL RESTO, POR FASE (3): F7 1 · F2 1 · H1 1" in summary,
+          "orden: el resumen cuenta el resto por la linea de cada plan, con la fase fuera de ella al final de su plan (visto fallar)")
+    page = B.render_page(model)
+    check(page.find("Solo puertos") < page.find("Solo mapas") < page.find("La aparte") < page.find("De las puertas"),
+          "orden: la pagina lista los frentes por la linea de su plan (visto fallar)")
+    check([key for key, _ in B.decisions_by_phase(model)] == ["F13", "F7", "F2", "H1"],
+          "orden: los indices por fase siguen la linea de su plan (visto fallar)")
+    end()
+
+
+def test_live_debts():
+    begin("test_live_debts")
+    debt = lambda rid, state, extra=None: decision(rid, state, "2026-09-12", dict({"type": "debt", "phase": "F3", "criterion": "c"}, **(extra or {})))
+    registry = groups_of([debt("viva", "open"), debt("confirmada", "confirmed"), debt("descartada", "discarded"),
+                          debt("retirada-sin-pagar", "confirmed", {"retired": "2026-09-13"}), debt("pagada", "resolved"),
+                          debt("pagada-y-retirada", "resolved", {"retired": "2026-09-13"})])
+    model = B.build_model(plans(), registry, {"date": "", "rows": []}, "")
+    alive = sorted(d["id"] for d in model["debts"] if not d["paid"])
+    paid = sorted(d["id"] for d in model["debts"] if d["paid"])
+    check(alive == ["confirmada", "viva"], "deudas: viva es la que rige; ni la descartada ni la retirada sin pagar (visto fallar)")
+    check(paid == ["pagada", "pagada-y-retirada"], "deudas: pagada es la resuelta, tambien si despues se retiro")
+    summary = B.render_summary(model)
+    index = B.render_decisions_index(model, {"decisions": "docs/registry/decisions", "lessons": "docs/registry/lessons", "deliveries": "docs/registry/deliveries"})
+    check("DEUDAS       2 vivas, 2 pagadas" in summary and "## DEUDAS VIVAS (2)" in index,
+          "deudas: el resumen y el indice cuentan las mismas vivas (visto fallar)")
+    check(not B.needs_phase(debt("descartada", "discarded", {"phase": ""})) and B.needs_phase(debt("viva", "open")),
+          "deudas: solo una deuda viva necesita su fase (visto fallar)")
+    end()
+
+
+def test_one_phase_in_progress():
+    begin("test_one_phase_in_progress")
+    two = "**F0 (IN PROGRESS) → F1 (IN PROGRESS)**\n\n## F0 — Base (IN PROGRESS)\n\n## F1 — Siguiente (IN PROGRESS)\n"
+    headers = B.phase_headers(two, ["F"])
+    found = B.order_and_headers_agree(headers, B.order_lines(two, ["F"]), "p.md", ["F"])
+    check([(f["kind"], f["key"]) for f in found] == [(B.KIND_ORDER, "F1")] and "F0" in found[0]["message"],
+          "orden: la segunda fase en curso de un plan sale, aunque la linea case con sus cabeceras, y nombra la primera (visto fallar)")
+    one = "**F0 ✔ → F1 (IN PROGRESS) → F2**\n\n## F0 — Base (DONE)\n\n## F1 — Siguiente (IN PROGRESS)\n\n## F2 — Otra (PENDING)\n"
+    check(B.order_and_headers_agree(B.phase_headers(one, ["F"]), B.order_lines(one, ["F"]), "p.md", ["F"]) == [],
+          "orden: una fase en curso por plan no sale")
+    end()
+
+
+def test_provisional_is_not_done():
+    begin("test_provisional_is_not_done")
+    known = {"F0", "F1"}
+    bare = decision("a-prueba", "provisional", "2026-09-12")
+    messages = B.validate_record(bare, "decision", known)
+    check(any("'criterion'" in m for m in messages) and any("'phase'" in m for m in messages),
+          "provisional: declara con que se revisa y donde cae (visto fallar)")
+    check(B.validate_record(decision("a-prueba", "provisional", "2026-09-12", {"phase": "none", "criterion": "El dueno la ve en la app"}), "decision", known) == [],
+          "provisional: con fase y criterio esta bien formada")
+    check(B.validate_record(decision("vieja", "provisional", "2026-09-12", {"retired": "2026-09-13"}), "decision", known) == [],
+          "provisional: una retirada ya no rige y no pide nada")
+    phases = {"F0": {"marker": B.DONE}, "F1": {"marker": B.PENDING}}
+    decisions = [decision("colgada", "open", "2026-09-12", {"phase": "F0"}),
+                 decision("colgada-con-none", "provisional", "2026-09-12", {"phase": "F0 none", "criterion": "c"}),
+                 decision("deuda-colgada", "confirmed", "2026-09-12", {"type": "debt", "phase": "F0", "criterion": "c"}),
+                 decision("recogida", "open", "2026-09-12", {"phase": "F0 F1"}),
+                 decision("sin-fase", "open", "2026-09-12", {"phase": "none"}),
+                 decision("cerrada", "confirmed", "2026-09-12", {"phase": "F0"}),
+                 decision("resuelta", "resolved", "2026-09-12", {"phase": "F0"})]
+    found = B.done_phases_leave_nothing_alive(decisions, phases)
+    check(sorted(f["key"] for f in found) == ["#colgada", "#colgada-con-none", "#deuda-colgada"] and all(f["kind"] == B.KIND_RECORD for f in found),
+          "provisional: una fase hecha no deja viva una decision ni una deuda que solo la nombre a ella (visto fallar)")
+    end()
 
 
 def test_split_indexes():
@@ -4739,9 +4924,9 @@ def main():
     tests = [test_data_files, test_docs, test_citations, test_order_and_titles, test_records,
              test_record_checks, test_sections_and_lists, test_startup_and_timeless, test_model_and_render, test_page,
              test_settled_citations_and_verify, test_encoding, test_links_and_comments, test_derived_strict,
-             test_gates_file, test_run_gate, test_gate_environment, test_kill_report, test_verify_main, test_atomic_writes, test_board_end_to_end,
+             test_gates_file, test_run_gate, test_gate_environment, test_kill_report, test_verify_main, test_verify_lock, test_atomic_writes, test_board_end_to_end,
              test_tree_listing_with_git, test_adapters, test_harness_rows, test_skills, test_commit_message, test_pre_push,
-             test_hooks_through_git, test_long_paths, test_python_discovery, test_hook_modes, test_guard_adapters, test_dart_test_adapter, test_runner_by_its_path, test_instantiate_merges, test_instantiate, test_instantiate_command_line, test_layer_readiness, test_template_layers, test_accept, test_accept_posix_lifetime, test_python_layer_needs, test_released_engine, test_layer_requires_its_engine, test_engine_manifest, test_upgrade_plan, test_upgrade, test_components_model, test_component_creation_and_update, test_component_safety, test_component_review_safety, test_component_rendered_paths, test_component_blob_failure, test_component_physical_paths, test_component_unreadable_gate_row, test_scratch_tree_is_physical, test_stack_rendered_destinations, test_component_adoption, test_stack_templates, test_record_rules, test_prose_is_data, test_order_line_and_parts, test_split_indexes,
+             test_hooks_through_git, test_long_paths, test_python_discovery, test_hook_modes, test_guard_adapters, test_dart_test_adapter, test_runner_by_its_path, test_instantiate_merges, test_instantiate, test_instantiate_command_line, test_layer_readiness, test_template_layers, test_accept, test_accept_posix_lifetime, test_python_layer_needs, test_released_engine, test_layer_requires_its_engine, test_engine_manifest, test_upgrade_plan, test_upgrade, test_components_model, test_component_creation_and_update, test_component_safety, test_component_review_safety, test_component_rendered_paths, test_component_blob_failure, test_component_physical_paths, test_component_unreadable_gate_row, test_scratch_tree_is_physical, test_stack_rendered_destinations, test_component_adoption, test_stack_templates, test_record_rules, test_prose_is_data, test_order_line_and_parts, test_plan_position, test_live_debts, test_one_phase_in_progress, test_provisional_is_not_done, test_split_indexes,
              test_adopt]
     for test in tests:
         try:

@@ -152,13 +152,17 @@ no casa con ello.
    plan.** Toda cabecera termina en `(DONE)`, `(IN PROGRESS)` o `(PENDING)`;
    cada paso de la línea, entre `→` o `·`, es una fase de su plan con `✔` o su
    estado entre paréntesis como mucho; toda fase de la línea tiene sección; toda
-   sección aparece en la línea; y el estado que da la línea es el que declara la
-   cabecera.
+   sección aparece en la línea; el estado que da la línea es el que declara la
+   cabecera; y un plan tiene a lo sumo una cabecera `(IN PROGRESS)`, porque el
+   resumen y la página pintan una sola fase en curso por plan.
 3. **Todo documento vivo empieza por su título `# `.**
 4. **Todo registro está bien formado.** Cabecera entre `---`, campos
    obligatorios presentes y ninguno desconocido, estado del esquema, fechas
-   `AAAA-MM-DD`, fases que algún plan tiene, `phase` en toda abierta y en toda
-   deuda viva, `criterion` en toda deuda, nombre de fichero que sea identidad.
+   `AAAA-MM-DD`, fases que algún plan tiene, `phase` en toda abierta, en toda
+   provisional y en toda deuda viva, `criterion` en toda deuda y en toda
+   provisional (con qué se revisa), nombre de fichero que sea identidad. Una
+   deuda está viva mientras rige: abierta, postergada, provisional o confirmada,
+   y sin retirar; el resumen, la página y `DECISIONS.md` cuentan las mismas.
 5. **Una identidad nombra un solo registro**, entre los tres directorios.
 6. **Toda cita `#<identidad>` resuelve a un registro.** En documentos vivos, en
    todos los registros y en los comentarios del código declarado, también los
@@ -236,7 +240,12 @@ no casa con ello.
     repositorio que ya existía, su `AGENTS.md` queda entero bajo la cabecera
     que declara `prose.txt` (`pending`), y mientras esa sección siga en el
     contrato mandan dos contratos sin que nada diga cuál gana.
-24. **Esta enumeración va de 1 a N y `board.py` corre N filas.** Ella misma es
+24. **Una fase hecha no deja nada suyo vivo.** Una decisión abierta,
+    postergada o provisional, o una deuda viva, que solo nombra fases `(DONE)`
+    sale como `[record]`: se le da la fase abierta que la recoge, o se resuelve
+    o se descarta: lo provisional no se da por hecho al cerrar su fase. `none`
+    no la recoge: es para lo que no cae en ninguna fase.
+25. **Esta enumeración va de 1 a N y `board.py` corre N filas.** Ella misma es
     la última fila.
 
 **Añadir una comprobación es añadir una fila** en `board.py` y su entrada aquí;
@@ -273,8 +282,8 @@ y la cierra el primer comentario vacío; qué hace cada clave lo dice esta pági
 - `[citation]` — un fichero citado que no está en el árbol.
 - `[marker]` / `[order]` — cabecera sin marcador, o línea y cabeceras en
   contradicción, o una línea que nombra algo que no es una fase de su plan.
-- `[record]` — un registro mal formado, con una identidad demasiado larga, o que
-  repite su estado. No se excusa.
+- `[record]` — un registro mal formado, con una identidad demasiado larga, que
+  repite su estado, o vivo en una fase que ya está hecha. No se excusa.
 - `[slug]` — identidad repetida, o cita `#<identidad>` que no resuelve.
 - `[shape]` — título ausente, sección leída que ya no existe, fecha en documento
   intemporal, línea larga, lápida ausente, esquema sin documentar, skill mal
@@ -282,11 +291,12 @@ y la cierra el primer comentario vacío; qué hace cada clave lo dice esta pági
   arranque, adaptador o índice principal o de `none` por encima de su tope.
 - `[derived]` — derivado que falta, viejo, editado a mano o que ya no genera
   ninguna fuente. No se excusa: se regenera.
-- `[data]` — fichero de datos roto, `gates.txt` que `verify.py` no acepta,
-  documento declarado inexistente, excepción sin motivo o huérfana, runner sin
-  guarda o guardas sin marca, markdown sin casa, adaptador que no lleva a la
-  lectura de arranque o que no se sabe leer, hook no ejecutable, fichero que no
-  es UTF-8 sin BOM, o árbol que git no pudo listar.
+- `[data]` — fichero de datos roto, excepción de una clase que no se excusa,
+  `gates.txt` que `verify.py` no acepta, documento declarado inexistente,
+  excepción sin motivo o huérfana, runner sin guarda o guardas sin marca,
+  markdown sin casa, adaptador que no lleva a la lectura de arranque o que no se
+  sabe leer, hook no ejecutable, fichero que no es UTF-8 sin BOM, o árbol que
+  git no pudo listar.
 - `[encoding]` — fuente de código declarado que no es UTF-8. Se excusa con su
   motivo mientras no se pueda convertir.
 - `[engine]` — fichero del motor cambiado, ausente o sin sellar. Se excusa con

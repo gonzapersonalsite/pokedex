@@ -188,6 +188,9 @@ SCHEMA = {
 }
 STATES = ["confirmed", "provisional", "open", "resolved", "postponed", "discarded"]
 OPEN_STATES = ["open", "postponed"]
+# A debt is alive while it governs and is not paid: one list for the summary,
+# the page and the index.
+LIVE_DEBT_STATES = ["open", "postponed", "provisional", "confirmed"]
 RESOLVED_STATE = "resolved"
 DEBT_TYPE = "debt"
 DATE_FIELDS = ["date", "retired"]
@@ -276,13 +279,22 @@ def is_open(record):
     return record["fields"].get("state", "") in OPEN_STATES and not is_retired(record)
 
 
+def is_live_debt(record):
+    return is_debt(record) and not is_retired(record) and record["fields"].get("state", "") in LIVE_DEBT_STATES
+
+
+def is_provisional(record):
+    return record["fields"].get("state", "") == "provisional" and not is_retired(record)
+
+
+def is_alive(record):
+    """What still asks for work: an open or postponed decision, a provisional
+    one and a live debt."""
+    return is_open(record) or is_provisional(record) or is_live_debt(record)
+
+
 def needs_phase(record):
-    fields = record["fields"]
-    if is_retired(record):
-        return False
-    if fields.get("state", "") in OPEN_STATES:
-        return True
-    return is_debt(record) and fields.get("state", "") != RESOLVED_STATE
+    return is_alive(record)
 
 
 def governs(record):
@@ -320,6 +332,8 @@ def validate_record(record, kind, known_phases):
         found.append("un registro %s tiene que decir su 'phase' (o '%s' con el motivo en el cuerpo)" % (why, NO_PHASE))
     if is_debt(record) and "criterion" not in fields:
         found.append("una deuda declara su 'criterion' de pago")
+    elif is_provisional(record) and "criterion" not in fields:
+        found.append("una provisional declara su 'criterion': con que se revisa")
     return found
 
 
@@ -838,7 +852,14 @@ def dates_in(text):
 
 # ----------------------------------------------------------------- checks
 
+# A malformed record is fixed in its header, a stale derivative is rebuilt and
+# a broken data file is corrected: none is excused, whatever the legend says.
+UNEXCUSABLE = (KIND_RECORD, KIND_DERIVED, KIND_DATA)
+
+
 def apply_exceptions(findings, exceptions):
+    refused = [e for e in exceptions if e["keyword"] in UNEXCUSABLE]
+    exceptions = [e for e in exceptions if e["keyword"] not in UNEXCUSABLE]
     used = {(e["keyword"], e["value"]): False for e in exceptions}
     reported = []
     for f in findings:
@@ -851,6 +872,9 @@ def apply_exceptions(findings, exceptions):
         if not used[(e["keyword"], e["value"])]:
             reported.append(finding(KIND_DATA, e["value"], "exceptions.txt:%d" % e["line"],
                                     "excepcion huerfana: '%s %s' ya no excusa nada" % (e["keyword"], e["value"])))
+    for e in refused:
+        reported.append(finding(KIND_DATA, e["value"], "exceptions.txt:%d" % e["line"],
+                                "'%s %s': un hallazgo de la clase '%s' no se excusa, se corrige en su fuente" % (e["keyword"], e["value"], e["keyword"])))
     return reported
 
 
@@ -932,6 +956,12 @@ def order_and_headers_agree(headers, lines, doc, prefixes):
         by_id[header["id"]] = header
         if not header["marker"]:
             findings.append(finding(KIND_MARKER, header["id"], "%s:%d" % (doc, header["line"]), "la cabecera de %s no termina en %s" % (header["id"], ", ".join("(%s)" % m for m in PHASE_MARKERS))))
+    # The model paints one phase in progress per plan, and the line has one
+    # cursor.
+    in_progress = [h for h in by_id.values() if h["marker"] == IN_PROGRESS]
+    for header in in_progress[1:]:
+        findings.append(finding(KIND_ORDER, header["id"], "%s:%d" % (doc, header["line"]),
+                                "%s tambien esta (%s) y un plan tiene una sola fase en curso: ya lo esta %s" % (header["id"], IN_PROGRESS, in_progress[0]["id"])))
     if len(lines) != 1:
         findings.append(finding(KIND_ORDER, "line", doc, "se esperaba UNA linea de orden y hay %d" % len(lines)))
         return findings
@@ -972,6 +1002,22 @@ def records_are_well_formed(groups, known_phases):
                 findings.append(finding(KIND_RECORD, "#" + record["id"], record["file"], "%s: %s" % (record["file"], message)))
         for problem in group["problems"]:
             findings.append(finding(KIND_RECORD, problem, group["dir"], problem))
+    return findings
+
+
+def done_phases_leave_nothing_alive(decisions, phases):
+    """A phase is DONE with nothing of its own alive: a decision or a debt that
+    still asks for work and names only phases already done is fixed in its
+    record, by giving it the open phase that will take it, or by resolving or
+    discarding it."""
+    findings = []
+    for record in decisions:
+        named = [t for t in phases_of(record) if t in phases]
+        if not is_alive(record) or not named or any(phases[t]["marker"] != DONE for t in named):
+            continue
+        findings.append(finding(KIND_RECORD, "#" + record["id"], record["file"],
+                                "%s: sigue %s y solo nombra fases hechas (%s): dale la fase abierta que la recoge, o resuelvela o descartala"
+                                % (record["file"], record["fields"].get("state", ""), " ".join(named))))
     return findings
 
 
@@ -1621,17 +1667,17 @@ def product_name(readme):
 
 def build_model(plans, records, verdict, name):
     axes = [build_axis(p["axis"], p["file"], p["text"]) for p in plans]
-    anywhere, order = {}, []
+    anywhere = {}
     for axis in axes:
-        order.append(axis["axis"])
         anywhere.update(axis["phases"])
+    positions = plan_positions(axes)
     decisions = records.get("decisions", {}).get("records", [])
     return {
         "name": name,
         "axes": axes,
-        "axis_order": order,
+        "positions": positions,
         "phases": anywhere,
-        "fronts": fronts_of(decisions, anywhere, order),
+        "fronts": fronts_of(decisions, anywhere, positions),
         "resolved": sum(1 for r in decisions if is_resolved(r) and not is_debt(r)),
         "debts": debts_of(decisions),
         "records": records,
@@ -1639,18 +1685,25 @@ def build_model(plans, records, verdict, name):
     }
 
 
-def sort_key(order):
-    return lambda pid: (order.index(pid[0]) if pid[0] in order else 99, int(pid[1:]))
+def plan_positions(axes):
+    """Where each phase stands: its plan, in the order the plans are declared,
+    and its step in that plan's order line, the phases the line leaves out
+    after the rest. The numbers are identity, not sequence."""
+    return {step["id"]: (plan, rank) for plan, axis in enumerate(axes) for rank, step in enumerate(axis["steps"])}
 
 
-def pending_named_by(ids, phases, order):
-    pending = sorted([pid for pid in ids if phases[pid]["marker"] != DONE], key=sort_key(order))
+def by_position(positions):
+    return lambda pid: positions[pid]
+
+
+def pending_named_by(ids, phases, positions):
+    pending = sorted([pid for pid in ids if phases[pid]["marker"] != DONE], key=by_position(positions))
     if not pending:
         return {}
     return {"names": pending, "open": phases[pending[0]]["marker"] == IN_PROGRESS}
 
 
-def fronts_of(decisions, phases, order):
+def fronts_of(decisions, phases, positions):
     found = []
     for record in decisions:
         if not is_open(record) or is_debt(record):
@@ -1660,14 +1713,14 @@ def fronts_of(decisions, phases, order):
             if token in phases and token not in ids:
                 ids.append(token)
         found.append({"id": record["id"], "name": record["fields"].get("title", record["id"]),
-                      "phases": ids, "named_by": pending_named_by(ids, phases, order)})
+                      "phases": ids, "named_by": pending_named_by(ids, phases, positions)})
     return found
 
 
 def debts_of(decisions):
     found = []
     for record in decisions:
-        if not is_debt(record):
+        if not (is_live_debt(record) or (is_debt(record) and is_resolved(record))):
             continue
         ids = [t for t in phases_of(record) if t != NO_PHASE]
         found.append({"id": record["id"], "name": record["fields"].get("title", record["id"]), "phases": ids,
@@ -1679,8 +1732,8 @@ def debts_of(decisions):
 WIDTH = 78
 
 
-def by_plan_then_name(order):
-    return lambda front: (sort_key(order)(front["named_by"]["names"][0]), front["name"])
+def by_plan_then_name(positions):
+    return lambda front: (by_position(positions)(front["named_by"]["names"][0]), front["name"])
 
 
 def render_summary(model):
@@ -1721,7 +1774,7 @@ def render_summary(model):
         text += "\nEN CURSO — %s: %s\n" % (current["id"], current["title"])
         for part in current["parts"]:
             text += "  %-6s %-44s %s\n" % (current["id"] + "." + part["number"], part["title"], PART_SHOWN[part["state"]])
-    placed = sorted([f for f in model["fronts"] if f["named_by"]], key=by_plan_then_name(model["axis_order"]))
+    placed = sorted([f for f in model["fronts"] if f["named_by"]], key=by_plan_then_name(model["positions"]))
     unplaced = [f for f in model["fronts"] if not f["named_by"]]
     any_current = any(axis["current"] for axis in model["axes"])
     now = [f for f in placed if not any_current or f["named_by"]["open"]]
@@ -1999,7 +2052,7 @@ def page_phases(model):
 
 
 def page_fronts(model):
-    placed = sorted([f for f in model["fronts"] if f["named_by"]], key=by_plan_then_name(model["axis_order"]))
+    placed = sorted([f for f in model["fronts"] if f["named_by"]], key=by_plan_then_name(model["positions"]))
     unplaced = [f for f in model["fronts"] if not f["named_by"]]
     text = '<section>\n<div class="head open">\n<p class="eyebrow">Lo que está abierto</p>\n<h2>Frentes abiertos</h2>\n'
     text += ('<p class="note">Cada frente es una decisión con estado abierto en el registro, y la fase es <b>la que su registro declara en su'
@@ -2082,7 +2135,7 @@ def render_page(model):
 
 DECISION_SECTIONS = [
     {"title": "ABIERTAS", "states": ["open", "postponed"], "debts": False, "work": True},
-    {"title": "DEUDAS VIVAS", "states": ["open", "postponed", "provisional", "confirmed"], "debts": True, "work": True},
+    {"title": "DEUDAS VIVAS", "states": LIVE_DEBT_STATES, "debts": True, "work": True},
     {"title": "PROVISIONALES", "states": ["provisional"], "debts": False, "work": True},
     {"title": "CONFIRMADAS", "states": ["confirmed"], "debts": False, "work": False},
     {"title": "RESUELTAS", "states": ["resolved"], "debts": None, "work": False},
@@ -2139,10 +2192,10 @@ def index_header(title, sources, about):
     return text + about
 
 
-def phase_keys(record, phases, order):
+def phase_keys(record, phases, positions):
     """The per-phase indexes a decision belongs to: each phase of a plan it
     names, or NO_PHASE when it names none."""
-    keys = sorted({token for token in phases_of(record) if token in phases}, key=sort_key(order))
+    keys = sorted({token for token in phases_of(record) if token in phases}, key=by_position(positions))
     return keys or [NO_PHASE]
 
 
@@ -2150,9 +2203,9 @@ def decisions_by_phase(model):
     records = model["records"].get("decisions", {}).get("records", [])
     grouped = {}
     for record in records:
-        for key in phase_keys(record, model["phases"], model["axis_order"]):
+        for key in phase_keys(record, model["phases"], model["positions"]):
             grouped.setdefault(key, []).append(record)
-    keys = sorted([k for k in grouped if k != NO_PHASE], key=sort_key(model["axis_order"]))
+    keys = sorted([k for k in grouped if k != NO_PHASE], key=by_position(model["positions"]))
     return [(key, grouped[key]) for key in keys + ([NO_PHASE] if NO_PHASE in grouped else [])]
 
 
@@ -2918,6 +2971,7 @@ def inspect(root, day=None):
         ("body without state", lambda: record_bodies_declare_no_state(groups, prose["state_words"])),
         ("timeless rests on settled", lambda: timeless_cites_only_settled(timeless_citations, records_by_id)),
         ("merged contract", lambda: contract_is_merged(contract, prose[PENDING_KEY], CONTRACT) if prose[PENDING_KEY] else []),
+        ("nothing alive in done", lambda: done_phases_leave_nothing_alive(records.get("decisions", {}).get("records", []), model["phases"])),
     ]
     total = len(rows) + 1
     rows.append(("numbered readme", lambda: numbered_list_matches(under(texts.get(BOARD_README, ""), prose["checklist"]), total, BOARD_README)

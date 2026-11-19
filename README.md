@@ -27,7 +27,8 @@ Modern Pokédex built with React + Vite + TypeScript. It uses Feature-Sliced Des
 ## Getting Started
 - Install: `pnpm install --frozen-lockfile --ignore-scripts`
 - Hooks: `git config core.hooksPath .githooks`
-- Gates: `python verify.py`
+- Gates: `python verify.py`; the full run is the pre-push hook's, and before a
+  commit `python verify.py -- <label>` runs the gates the change can move
 - Dev: `pnpm dev`
 - Test: `pnpm test`
 - Lint: `pnpm lint`

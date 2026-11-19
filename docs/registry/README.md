@@ -52,8 +52,8 @@ phase: F1
 
 **Qué cambió.** Lo que entra y lo que sale, con sus ficheros.
 
-**Cómo se verificó.** Qué defecto se reintrodujo y qué check lo cazó; el
-veredicto de `python verify.py` al arrancar y al terminar, con sus cifras.
+**Cómo se verificó.** Qué defecto se reintrodujo y qué check lo cazó; qué
+puertas se corrieron al arrancar y al terminar, y su veredicto, con sus cifras.
 
 **Pendiente.** Lo que quedó fuera, con el registro que lo recoge.
 ```
@@ -82,9 +82,9 @@ veredicto de `python verify.py` al arrancar y al terminar, con sus cifras.
 | `title` | obligatorio | obligatorio | obligatorio | Una frase, sin markdown. |
 | `state` | obligatorio | — | — | `confirmed` · `provisional` · `open` · `resolved` · `postponed` · `discarded`. |
 | `date` | obligatorio | obligatorio | obligatorio | `AAAA-MM-DD` del estado actual (para una entrega, el día de la entrega). |
-| `phase` | obligatorio si `open`, `postponed` o deuda viva | — | opcional | Ids de fase o tramo separados por espacio (`F1 H0`), o `none` con el motivo en el cuerpo. |
+| `phase` | obligatorio si `open`, `postponed`, `provisional` o deuda viva | — | opcional | Ids de fase o tramo separados por espacio (`F1 H0`), o `none` con el motivo en el cuerpo. |
 | `type` | opcional | — | — | `debt`: una deuda técnica, con su fase de pago en `phase` y su `criterion`. |
-| `criterion` | obligatorio si deuda | — | — | Con qué se da por pagada, en una frase. |
+| `criterion` | obligatorio si deuda o `provisional` | — | — | Con qué se da por pagada una deuda, o con qué se revisa una provisional, en una frase. |
 | `retired` | opcional | — | — | `AAAA-MM-DD` desde el que ya no gobierna trabajo futuro. Sigue en su índice, bajo RETIRADAS. |
 | `origin` | opcional | opcional | — | De dónde viene el registro cuando no nació en este repositorio: el repositorio de origen o la plantilla (`agentic-scaffold`). Su fecha es la que tenía allí. |
 
@@ -97,6 +97,9 @@ es añadir una fila allí y aquí, y una puerta cruza esta tabla con el esquema.
 - `open`: un hueco que el proyecto necesita cerrar y nadie ha decidido. Dice
   dónde caería (`phase`) para que esa fase tropiece con él.
 - `provisional`: propuesta o cifra pendiente de que el dueño la confirme.
+  Dice con qué se revisa y qué fase la recoge, y no queda viva cuando todas
+  las fases que nombra están hechas: se confirma, se descarta o pasa a una
+  fase abierta.
 - `confirmed`: decidida por el dueño o por delegación suya. Gobierna trabajo
   futuro hasta que otra la sustituya (`retired`).
 - `resolved`: una abierta que se cerró y se queda como rastro. Una deuda pagada
@@ -115,9 +118,10 @@ de `../../AGENTS.md`.
   decisión.
 - **Lección:** qué pasó, por qué engañó, y la regla que evita repetirlo.
 - **Entrega:** objetivo y dueño (producto o herramienta), qué cambió, cómo se
-  vio fallar el test, el veredicto de las puertas al arrancar (sobre qué commit)
-  y al terminar, cifras medidas, y qué quedó pendiente con su registro. Lo que
-  una entrega decide se registra como decisión aparte y se cita.
+  vio fallar el test, qué puertas se corrieron al arrancar (sobre qué commit)
+  y al terminar y su veredicto, cifras medidas, y qué quedó pendiente con su
+  registro. Lo que una entrega decide se registra como decisión aparte y se
+  cita.
 
 ## Lo que llegó con la plantilla
 

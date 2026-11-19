@@ -3,6 +3,7 @@ title: La firma y la atribución legal se alcanzan con un botón de créditos en
 state: provisional
 date: 2026-10-24
 phase: none
+criterion: el dueño ve el botón y el diálogo funcionando en la página; entonces se confirma, o se cambia por un final real con `Load more`
 ---
 **La firma y la atribución legal se alcanzan con un botón de créditos que abre
 un diálogo, además del footer semántico al final de la página.** El dueño

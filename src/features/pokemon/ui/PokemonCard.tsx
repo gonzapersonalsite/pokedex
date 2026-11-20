@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { POKEMON_CARD_IMAGE_SIZES, resolvePokemonArtworkSrcSet, type Pokemon } from '@/entities/pokemon'
+import { POKEMON_CARD_IMAGE_SIZES, resolvePokemonArtworkSrcSet, type PokemonSummary } from '@/entities/pokemon'
 import { cn, getTypeBadgeClass } from '@/shared/utils'
 
 export interface PokemonCardProps {
-  pokemon: Pokemon
+  pokemon: PokemonSummary
   isFavorite?: boolean
   onToggleFavorite?: (id: number) => void
   onClick?: (id: number) => void
@@ -27,6 +27,8 @@ export function PokemonCard({
   const srcSet = resolvePokemonArtworkSrcSet(pokemon.id)
   const cardRef = useRef<HTMLElement>(null)
   const [isVisible, setIsVisible] = useState(() => priority || typeof IntersectionObserver === 'undefined')
+  const [failedImage, setFailedImage] = useState<string | null>(null)
+  const hasImage = pokemon.image !== '' && failedImage !== pokemon.image
 
   useEffect(() => {
     if (isVisible) return
@@ -65,7 +67,7 @@ export function PokemonCard({
         >
           {/* Image area: fixed aspect ratio without clipping the content below */}
           <div className="aspect-square bg-gradient-to-b from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 p-4">
-            {pokemon.image ? (
+            {hasImage ? (
               isVisible ? (
                 <img
                   src={pokemon.image}
@@ -78,6 +80,7 @@ export function PokemonCard({
                   className="w-full h-full object-contain"
                   loading={priority ? 'eager' : 'lazy'}
                   fetchPriority={priority ? 'high' : undefined}
+                  onError={() => setFailedImage(pokemon.image)}
                 />
               ) : (
                 <div className="w-full h-full" aria-hidden="true" />

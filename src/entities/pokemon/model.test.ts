@@ -1,12 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import {
+  buildTypeIndex,
   idFromUrl,
   mapEvolutionChain,
   mapPokemonFromApi,
   mapTypeFromApi,
+  officialArtworkUrl,
   resolvePokemonArtwork,
   resolvePokemonArtworkSrcSet,
   SEED_POKEMON_MAX_ID,
+  summarizeListedPokemon,
+  summarizePokemon,
 } from './model'
 
 describe('resolvePokemonArtwork', () => {
@@ -114,6 +118,92 @@ describe('mapPokemonFromApi', () => {
     expect(mapTypeFromApi({ name: 'electric', url: 'https://pokeapi.co/api/v2/type/13/' })).toEqual({
       id: 13,
       name: 'electric',
+    })
+  })
+})
+
+const TYPE_URL = 'https://pokeapi.co/api/v2/type'
+
+function typeListing(id: number, name: string, members: Array<[number, number]>) {
+  return {
+    id,
+    name,
+    pokemon: members.map(([pokemonId, slot]) => ({
+      slot,
+      pokemon: { name: `pokemon-${pokemonId}`, url: `https://pokeapi.co/api/v2/pokemon/${pokemonId}/` },
+    })),
+  }
+}
+
+describe('buildTypeIndex', () => {
+  it('does_order_each_pokemons_types_by_slot_whatever_order_the_type_resources_arrive_in', () => {
+    const index = buildTypeIndex([
+      typeListing(3, 'flying', [[6, 2]]),
+      typeListing(10, 'fire', [
+        [4, 1],
+        [6, 1],
+      ]),
+      typeListing(16, 'dragon', [[10268, 2]]),
+      typeListing(13, 'electric', [[10268, 1]]),
+    ])
+
+    expect(index.get(6)).toEqual(['fire', 'flying'])
+    expect(index.get(4)).toEqual(['fire'])
+    expect(index.get(10268)).toEqual(['electric', 'dragon'])
+    expect(index.has(25)).toBe(false)
+  })
+
+  it('does_return_an_empty_index_when_the_types_list_no_pokemon', () => {
+    expect(buildTypeIndex([typeListing(19, 'stellar', [])]).size).toBe(0)
+  })
+})
+
+describe('summarizeListedPokemon', () => {
+  const index = buildTypeIndex([typeListing(13, 'electric', [[25, 1]]), typeListing(4, 'poison', [[23, 1]])])
+
+  it('does_build_the_card_from_the_index_with_the_official_artwork_derived_from_the_id', () => {
+    expect(officialArtworkUrl(25)).toBe(
+      'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png',
+    )
+    expect(summarizeListedPokemon({ id: 25, name: 'pikachu' }, index)).toEqual({
+      id: 25,
+      name: 'pikachu',
+      image: officialArtworkUrl(25),
+      types: ['electric'],
+    })
+  })
+
+  it('does_use_the_local_seed_artwork_for_a_seed_pokemon', () => {
+    expect(summarizeListedPokemon({ id: 23, name: 'ekans' }, index)?.image).toBe('/pokemon/23.webp')
+  })
+
+  it('does_ask_for_no_artwork_for_a_form_pokeapi_publishes_none_for', () => {
+    const forms = buildTypeIndex([typeListing(16, 'dragon', [[10268, 2]])])
+
+    expect(summarizeListedPokemon({ id: 10268, name: 'miraidon-low-power-mode' }, forms)?.image).toBe('')
+  })
+
+  it('does_return_null_for_a_pokemon_the_index_does_not_know', () => {
+    expect(summarizeListedPokemon({ id: 1100, name: 'newcomer' }, index)).toBeNull()
+  })
+
+  it('does_keep_only_what_a_card_shows_from_a_full_pokemon', () => {
+    const pikachu = mapPokemonFromApi({
+      id: 25,
+      name: 'pikachu',
+      height: 4,
+      weight: 60,
+      sprites: { front_default: 'https://example.com/25.png', front_shiny: null },
+      types: [{ slot: 1, type: { name: 'electric', url: `${TYPE_URL}/13/` } }],
+      species: { name: 'pikachu', url: 'https://pokeapi.co/api/v2/pokemon-species/25/' },
+      moves: [],
+    })
+
+    expect(summarizePokemon(pikachu)).toEqual({
+      id: 25,
+      name: 'pikachu',
+      image: 'https://example.com/25.png',
+      types: ['electric'],
     })
   })
 })

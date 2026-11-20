@@ -19,3 +19,4 @@
 #
 answered product-ui-text-language-is-undecided 2026-10-19 product-ui-text-is-english
 applied skip-to-content-link-is-missing 2026-10-19 2026-10-19-skip-to-content-link
+paid pokedex-detail-responses-are-heavy 2026-11-20 2026-11-20-list-pages-from-the-type-index

@@ -1,51 +1,52 @@
-import { useInfiniteQuery } from '@tanstack/react-query'
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import { pokemonApi } from '../api/pokemonApi'
-import { mapPokemonFromApi, resolvePokemonArtwork, SEED_POKEMON_MAX_ID, type Pokemon } from '@/entities/pokemon'
+import {
+  idFromUrl,
+  officialArtworkUrl,
+  resolvePokemonArtwork,
+  SEED_POKEMON_MAX_ID,
+  type PokemonSummary,
+} from '@/entities/pokemon'
+import { loadTypeIndex, summarizeListedPage } from './typeIndex'
 
 const PAGE_SIZE = SEED_POKEMON_MAX_ID
-const ARTWORK_BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork'
-const SPECIES_BASE = 'https://pokeapi.co/api/v2/pokemon-species'
 
-const buildSeedPokemon = (id: number, name: string, types: string[], height: number, weight: number): Pokemon => ({
+const buildSeedPokemon = (id: number, name: string, types: string[]): PokemonSummary => ({
   id,
   name,
-  height,
-  weight,
-  image: resolvePokemonArtwork(id, `${ARTWORK_BASE}/${id}.png`),
-  imageShiny: `${ARTWORK_BASE}/shiny/${id}.png`,
+  image: resolvePokemonArtwork(id, officialArtworkUrl(id)),
   types,
-  speciesUrl: `${SPECIES_BASE}/${id}/`,
-  moves: [],
 })
 
-export const FIRST_PAGE_POKEMON: Pokemon[] = [
-  buildSeedPokemon(1, 'bulbasaur', ['grass', 'poison'], 7, 69),
-  buildSeedPokemon(2, 'ivysaur', ['grass', 'poison'], 10, 130),
-  buildSeedPokemon(3, 'venusaur', ['grass', 'poison'], 20, 1000),
-  buildSeedPokemon(4, 'charmander', ['fire'], 6, 85),
-  buildSeedPokemon(5, 'charmeleon', ['fire'], 11, 190),
-  buildSeedPokemon(6, 'charizard', ['fire', 'flying'], 17, 905),
-  buildSeedPokemon(7, 'squirtle', ['water'], 5, 90),
-  buildSeedPokemon(8, 'wartortle', ['water'], 10, 225),
-  buildSeedPokemon(9, 'blastoise', ['water'], 16, 855),
-  buildSeedPokemon(10, 'caterpie', ['bug'], 3, 29),
-  buildSeedPokemon(11, 'metapod', ['bug'], 7, 99),
-  buildSeedPokemon(12, 'butterfree', ['bug', 'flying'], 11, 320),
-  buildSeedPokemon(13, 'weedle', ['bug', 'poison'], 3, 32),
-  buildSeedPokemon(14, 'kakuna', ['bug', 'poison'], 6, 100),
-  buildSeedPokemon(15, 'beedrill', ['bug', 'poison'], 10, 295),
-  buildSeedPokemon(16, 'pidgey', ['normal', 'flying'], 3, 18),
-  buildSeedPokemon(17, 'pidgeotto', ['normal', 'flying'], 11, 300),
-  buildSeedPokemon(18, 'pidgeot', ['normal', 'flying'], 15, 395),
-  buildSeedPokemon(19, 'rattata', ['normal'], 3, 35),
-  buildSeedPokemon(20, 'raticate', ['normal'], 7, 185),
-  buildSeedPokemon(21, 'spearow', ['normal', 'flying'], 3, 20),
-  buildSeedPokemon(22, 'fearow', ['normal', 'flying'], 12, 380),
-  buildSeedPokemon(23, 'ekans', ['poison'], 20, 69),
-  buildSeedPokemon(24, 'arbok', ['poison'], 35, 650),
+export const FIRST_PAGE_POKEMON: PokemonSummary[] = [
+  buildSeedPokemon(1, 'bulbasaur', ['grass', 'poison']),
+  buildSeedPokemon(2, 'ivysaur', ['grass', 'poison']),
+  buildSeedPokemon(3, 'venusaur', ['grass', 'poison']),
+  buildSeedPokemon(4, 'charmander', ['fire']),
+  buildSeedPokemon(5, 'charmeleon', ['fire']),
+  buildSeedPokemon(6, 'charizard', ['fire', 'flying']),
+  buildSeedPokemon(7, 'squirtle', ['water']),
+  buildSeedPokemon(8, 'wartortle', ['water']),
+  buildSeedPokemon(9, 'blastoise', ['water']),
+  buildSeedPokemon(10, 'caterpie', ['bug']),
+  buildSeedPokemon(11, 'metapod', ['bug']),
+  buildSeedPokemon(12, 'butterfree', ['bug', 'flying']),
+  buildSeedPokemon(13, 'weedle', ['bug', 'poison']),
+  buildSeedPokemon(14, 'kakuna', ['bug', 'poison']),
+  buildSeedPokemon(15, 'beedrill', ['bug', 'poison']),
+  buildSeedPokemon(16, 'pidgey', ['normal', 'flying']),
+  buildSeedPokemon(17, 'pidgeotto', ['normal', 'flying']),
+  buildSeedPokemon(18, 'pidgeot', ['normal', 'flying']),
+  buildSeedPokemon(19, 'rattata', ['normal']),
+  buildSeedPokemon(20, 'raticate', ['normal']),
+  buildSeedPokemon(21, 'spearow', ['normal', 'flying']),
+  buildSeedPokemon(22, 'fearow', ['normal', 'flying']),
+  buildSeedPokemon(23, 'ekans', ['poison']),
+  buildSeedPokemon(24, 'arbok', ['poison']),
 ]
 
 export function usePokemonList(enabled = true) {
+  const queryClient = useQueryClient()
   return useInfiniteQuery({
     queryKey: ['pokemon', 'list'],
     queryFn: async ({ pageParam = 0, signal }) => {
@@ -67,14 +68,10 @@ export function usePokemonList(enabled = true) {
           hasMore: !!res.next,
         }
       }
-      const details = await Promise.all(
-        res.results.map((r) => {
-          const id = r.url.replace(/.*\/(\d+)\/$/, '$1')
-          return pokemonApi.byIdOrName(id, { signal })
-        }),
-      )
+      const typeIndex = await loadTypeIndex(queryClient)
+      const listed = res.results.map((r) => ({ id: idFromUrl(r.url), name: r.name }))
       return {
-        list: details.map(mapPokemonFromApi),
+        list: await summarizeListedPage(queryClient, listed, typeIndex),
         nextOffset: res.next ? (pageParam as number) + PAGE_SIZE : null,
         hasMore: !!res.next,
       }

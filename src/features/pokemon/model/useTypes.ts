@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 import { pokemonApi } from '../api/pokemonApi'
 import { mapTypeFromApi, type TypeOption } from '@/entities/pokemon'
 
@@ -26,23 +26,28 @@ const DEFAULT_TYPES: TypeOption[] = [
 ]
 
 /**
- * Types offered by the type filter. Types without any Pokémon (PokeAPI lists Shadow,
- * Stellar and Unknown) are left out, since selecting them could only show an empty list.
+ * The types that have Pokémon. PokeAPI also lists Shadow, Stellar and Unknown, which have none,
+ * so selecting them could only show an empty list.
  */
+export const typesQuery = queryOptions({
+  queryKey: ['pokemon', 'types'],
+  queryFn: async ({ signal }): Promise<TypeOption[]> => {
+    const res = await pokemonApi.types({ signal })
+    return res.results
+      .filter((t) => !NON_POKEMON_TYPES.has(t.name))
+      .map((t, index) => {
+        const mapped = mapTypeFromApi(t)
+        return mapped.id ? mapped : { id: index + 1, name: mapped.name }
+      })
+  },
+  staleTime: 1000 * 60 * 60,
+})
+
+/** Types offered by the type filter. */
 export function useTypes(enabled = true) {
   return useQuery({
-    queryKey: ['pokemon', 'types'],
-    queryFn: async ({ signal }) => {
-      const res = await pokemonApi.types({ signal })
-      return res.results
-        .filter((t) => !NON_POKEMON_TYPES.has(t.name))
-        .map((t, index) => {
-          const mapped = mapTypeFromApi(t)
-          return mapped.id ? mapped : { id: index + 1, name: mapped.name }
-        })
-    },
+    ...typesQuery,
     placeholderData: DEFAULT_TYPES,
-    staleTime: 1000 * 60 * 60,
     enabled,
   })
 }

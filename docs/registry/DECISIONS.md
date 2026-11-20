@@ -1,7 +1,7 @@
 # Registro de decisiones (índice)
 
 GENERADO por tools/board desde `docs/registry/decisions/`. No editar a mano: se reescribe.
-board-fingerprint:ae78d7cedf0a7c17 — su contenido cambió por última vez el 2026-11-19.
+board-fingerprint:56db0e0f4ca61990 — su contenido cambió por última vez el 2026-11-20.
 
 Cada decisión es un fichero `docs/registry/decisions/<identidad>.md` con su cabecera de campos y su
 texto; una cita `#<identidad>` resuelve abriendo ese fichero. Cómo se escribe una y cómo
@@ -11,9 +11,8 @@ del árbol gobiernan hoy: la que deja de gobernar sale y deja su línea en `docs
 Aquí van enteras las que piden trabajo; el resto solo se cuenta. Todas, sea cual sea su
 estado, están en la página de su dominio.
 
-## ABIERTAS (1)
+## ABIERTAS (0)
 
-- `#pokedex-detail-responses-are-heavy` — Las respuestas de detalle de PokeAPI pesan demasiado por página (OPEN 2026-10-23) · none
 
 ## DEUDAS VIVAS (0)
 
@@ -21,9 +20,9 @@ estado, están en la página de su dominio.
 ## PROVISIONALES (0)
 
 
-## EL RESTO (8), SOLO CONTADAS
+## EL RESTO (9), SOLO CONTADAS
 
-CONFIRMADAS 8 · DESCARTADAS 0
+CONFIRMADAS 9 · DESCARTADAS 0
 
 ## Por dominio (5 índices)
 
@@ -33,4 +32,4 @@ CONFIRMADAS 8 · DESCARTADAS 0
 - `docs/registry/index/domain-verification.md` — Puertas, pruebas y su medición: 1 decisiones, 4 lecciones
 - `docs/registry/index/domain-board-and-registry.md` — Tablero, registro y documentos: 1 decisiones, 1 lecciones
 
-## Retiradas (2), en `docs/registry/retired.txt`
+## Retiradas (3), en `docs/registry/retired.txt`

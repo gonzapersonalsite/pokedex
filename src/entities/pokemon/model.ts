@@ -1,17 +1,24 @@
 import type { PokeApiPokemon, PokeApiEvolutionChainLink, PokeApiType } from './types'
 
-/** Domain model: normalized Pokémon for the UI */
-export interface Pokemon {
+/** What a list card shows: identity, artwork and types */
+export interface PokemonSummary {
   id: number
   name: string
+  image: string
+  types: string[]
+}
+
+/** Domain model: a normalized Pokémon with everything its detail view shows */
+export interface Pokemon extends PokemonSummary {
   height: number
   weight: number
-  image: string
   imageShiny: string | null
-  types: string[]
   speciesUrl: string
   moves: string[]
 }
+
+/** Types of every Pokémon the type resources list, in slot order, keyed by Pokémon ID */
+export type TypeIndex = ReadonlyMap<number, readonly string[]>
 
 /** Evolution tree node */
 export interface EvolutionNode {
@@ -27,6 +34,10 @@ export interface TypeOption {
 }
 
 export const SEED_POKEMON_MAX_ID = 24
+const OFFICIAL_ARTWORK_BASE =
+  'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork'
+/** Forms PokeAPI publishes no artwork for, neither official nor sprite, so a card asks for none. */
+const POKEMON_WITHOUT_ARTWORK: ReadonlySet<number> = new Set([10264, 10266, 10268, 10270])
 export const POKEMON_CARD_IMAGE_SIZES = '(min-width: 1280px) 256px, (min-width: 640px) 280px, calc(100vw - 68px)'
 
 function isSeedPokemonId(id: number): boolean {
@@ -47,6 +58,11 @@ export function resolvePokemonArtworkSrcSet(id: number): string | undefined {
     return `/pokemon/${id}-256.webp 256w, /pokemon/${id}.webp 475w`
   }
   return undefined
+}
+
+/** PokeAPI's official artwork for a Pokémon ID, published at a path derived from the ID alone. */
+export function officialArtworkUrl(id: number): string {
+  return `${OFFICIAL_ARTWORK_BASE}/${id}.png`
 }
 
 export function mapPokemonFromApi(api: PokeApiPokemon): Pokemon {
@@ -84,4 +100,42 @@ export function mapEvolutionChain(chain: PokeApiEvolutionChainLink): EvolutionNo
 export function mapTypeFromApi(api: PokeApiType | { id?: number; name: string; url?: string }): TypeOption {
   const id = typeof api.id === 'number' ? api.id : 'url' in api && api.url ? idFromUrl(api.url) : 0
   return { id, name: api.name }
+}
+
+/** Indexes the types each type resource lists, ordering a Pokémon's types by their slot. */
+export function buildTypeIndex(types: readonly PokeApiType[]): TypeIndex {
+  const slotted = new Map<number, Array<{ slot: number; name: string }>>()
+  for (const type of types) {
+    for (const entry of type.pokemon) {
+      const id = idFromUrl(entry.pokemon.url)
+      const known = slotted.get(id) ?? []
+      known.push({ slot: entry.slot, name: type.name })
+      slotted.set(id, known)
+    }
+  }
+  return new Map(
+    [...slotted].map(([id, entries]) => [id, entries.sort((a, b) => a.slot - b.slot).map((entry) => entry.name)]),
+  )
+}
+
+/** The card of a listed Pokémon from the type index, or null when the index does not know the Pokémon. */
+export function summarizeListedPokemon(
+  listed: { id: number; name: string },
+  typeIndex: TypeIndex,
+): PokemonSummary | null {
+  const types = typeIndex.get(listed.id)
+  if (!types) return null
+  return {
+    id: listed.id,
+    name: listed.name,
+    image: POKEMON_WITHOUT_ARTWORK.has(listed.id)
+      ? ''
+      : resolvePokemonArtwork(listed.id, officialArtworkUrl(listed.id)),
+    types: [...types],
+  }
+}
+
+/** The card of a Pokémon whose full detail is known. */
+export function summarizePokemon(pokemon: Pokemon): PokemonSummary {
+  return { id: pokemon.id, name: pokemon.name, image: pokemon.image, types: pokemon.types }
 }

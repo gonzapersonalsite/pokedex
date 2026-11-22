@@ -3,8 +3,8 @@
 El producto es una aplicación React con Vite y TypeScript organizada con
 Feature-Sliced Design. Este documento manda sobre la forma del código de
 `src`: dónde va cada cosa, qué puede importar qué y cómo se llega a la red.
-Cómo se trabaja en el repositorio lo manda `AGENTS.md`, y cómo se pone en
-marcha un clon, `README.md`.
+La puesta en marcha del proyecto está en `README.md`. Cuando se incorpora el
+andamio, el contrato del equipo se recoge en `AGENTS.md`.
 
 **Cada regla dice qué la hace cumplir.** Las que hace cumplir el lint tienen en
 `eslint.config.test.ts` el caso más pequeño que las rompe, y ese test falla si
@@ -22,7 +22,7 @@ plantilla de texto, aunque no tenga huecos, o una variable), ni un tipo que
 importa (`typeof import('…')` o `import('…').Tipo`): lo que se importa así es
 convención, y `eslint.config.test.ts` tiene sus casos.
 Un comentario no apaga ninguna regla: el lint da por aviso un
-`eslint-disable`, y un aviso es rojo (`--max-warnings=0` en `pnpm run lint`),
+`eslint-disable`, y la acción del proyecto `./dev lint` exige cero avisos,
 así que una excepción vive en `eslint.config.js`, junto a su decisión. Las que
 dicen «convención» no las comprueba nada: las sostiene la revisión del diff, y
 se convierten en regla de lint con su caso en cuanto alguien encuentra cómo.

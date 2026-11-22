@@ -25,17 +25,18 @@ Modern Pokédex built with React + Vite + TypeScript. It uses Feature-Sliced Des
 - PWA build.
 
 ## Getting Started
-- Install: `pnpm install --frozen-lockfile --ignore-scripts`
+Requires Docker with Linux containers and Compose (use `.\dev.cmd` on Windows PowerShell/cmd or `./dev` on POSIX):
+- Prepare: `./dev prepare` (`.\dev.cmd prepare` on Windows)
 - Hooks: `git config core.hooksPath .githooks`
-- Gates: `python verify.py`; the full run is the pre-push hook's, and before a
-  commit `python verify.py -- <label>` runs the gates the change can move
-- Dev: `pnpm dev`
-- Test: `pnpm test`
-- Lint: `pnpm lint`
-- Typecheck: `pnpm run typecheck`
-- Format check: `pnpm run format:check`
-- Build: `pnpm build`
-- Preview: `pnpm preview`
+- Gates: `./dev verify` (`.\dev.cmd verify`); the full run is the pre-push hook's, and before a
+  commit `./dev verify -- <label>` runs the gates the change can move
+- Dev: `./dev start` (`.\dev.cmd start`, stop with `./dev stop`)
+- Test: `./dev tests`
+- Lint: `./dev lint`
+- Typecheck: `./dev typecheck`
+- Format check / fix: `./dev format` / `./dev format-fix`
+- Build: `./dev build`
+- Preview: `./dev start --preview` (`.\dev.cmd start --preview`)
 
 ## Tech Stack
 - React, TypeScript, Vite

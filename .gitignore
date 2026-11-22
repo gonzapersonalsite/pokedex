@@ -56,3 +56,6 @@ __pycache__/
 
 # From the agentic scaffold
 reports/
+
+# Container launcher runtime state (locks, barriers, per-run evidence)
+.dev-runtime/

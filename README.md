@@ -46,6 +46,7 @@ Requires Docker with Linux containers and Compose (use `.\dev.cmd` on Windows Po
 
 ## Documentation
 - [Feature-Sliced Design Architecture Contract](docs/ARCHITECTURE.md)
+- [Interface Design Guide](DESIGN.md) (in Spanish): who the interface is for, the visual decisions taken and how to check them
 - [Architecture Guide](ARCHITECTURE.md)
 - [Operations Guide](OPERATIONS.md)
 

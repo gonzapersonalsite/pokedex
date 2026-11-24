@@ -59,7 +59,7 @@ export function NotFoundSection({ pathname, onReturnHome, onInspectPokemon }: No
                     <span>Lv.404</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="px-1.5 py-0.5 rounded bg-slate-900 text-amber-400 font-mono text-[10px] font-black">
+                    <span className="px-1.5 py-0.5 rounded bg-slate-900 text-amber-400 font-mono text-[0.625rem] font-black">
                       HP
                     </span>
                     <div className="flex-1 h-2.5 rounded-full bg-slate-300 dark:bg-slate-700 overflow-hidden border border-slate-700">
@@ -123,7 +123,7 @@ export function NotFoundSection({ pathname, onReturnHome, onInspectPokemon }: No
                         <span className="mt-1 text-xs font-bold text-slate-800 dark:text-slate-200">
                           {pokemon.name}
                         </span>
-                        <span className="font-mono text-[11px] text-slate-500 dark:text-slate-400">
+                        <span className="font-mono text-[0.6875rem] text-slate-500 dark:text-slate-400">
                           #{String(pokemon.id).padStart(3, '0')}
                         </span>
                       </button>
@@ -171,7 +171,7 @@ export function NotFoundSection({ pathname, onReturnHome, onInspectPokemon }: No
               </div>
 
               <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-2 mb-0.5">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-0.5">
                   <span className="text-xs font-bold text-slate-500 dark:text-slate-400 font-mono">
                     #{String(pokemon.id).padStart(3, '0')}
                   </span>
@@ -180,7 +180,7 @@ export function NotFoundSection({ pathname, onReturnHome, onInspectPokemon }: No
                       <span
                         key={type}
                         className={cn(
-                          'text-[11px] font-semibold px-2 py-0.5 rounded-full capitalize',
+                          'text-[0.6875rem] font-semibold px-2 py-0.5 rounded-full capitalize',
                           getTypeBadgeClass(type),
                         )}
                       >

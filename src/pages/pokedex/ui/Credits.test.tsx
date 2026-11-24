@@ -1,5 +1,5 @@
-import { createElement } from 'react'
-import { render, screen } from '@testing-library/react'
+import { createElement, Fragment } from 'react'
+import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { CreditsContent, CreditsDialog, CreditsFooter } from './Credits'
 
@@ -35,6 +35,17 @@ describe('Credits', () => {
     expect(screen.getByRole('contentinfo', { name: 'Credits & legal' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 2, name: 'Credits & legal' })).toBeInTheDocument()
     expect(screen.getByText('Pokédex · System info')).toBeInTheDocument()
+  })
+
+  it('labels each footer with a heading of its own when a page holds two', () => {
+    render(createElement(Fragment, null, createElement(CreditsFooter), createElement(CreditsFooter)))
+
+    const footers = screen.getAllByRole('contentinfo', { name: 'Credits & legal' })
+    const labels = footers.map((footer) => footer.getAttribute('aria-labelledby'))
+    const headings = footers.map((footer) => within(footer).getByRole('heading', { level: 2 }).id)
+
+    expect(labels).toEqual(headings)
+    expect(new Set(headings).size).toBe(2)
   })
 
   it('offers the same credits in a dialog', async () => {

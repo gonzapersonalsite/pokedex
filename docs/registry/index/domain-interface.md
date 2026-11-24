@@ -1,10 +1,16 @@
 # La interfaz: navegación, accesibilidad, textos y créditos (índice)
 
 GENERADO por tools/board desde `docs/registry/decisions/` y `docs/registry/lessons/`. No editar a mano: se reescribe.
-board-fingerprint:f235357dcfcaa427 — su contenido cambió por última vez el 2026-11-19.
+board-fingerprint:2615f164b7df4224 — su contenido cambió por última vez el 2026-11-24.
 
 Cada decisión y cada lección del dominio `interface`, por identidad; todas rigen hoy. Antes de tocar este
 sistema se consulta esta página. El índice principal es `docs/registry/DECISIONS.md`.
+
+## ABIERTAS (3)
+
+- `#first-visit-stores-the-system-theme-as-a-choice` — La primera visita guarda el tema del sistema como si se hubiera elegido (OPEN 2026-11-24) · none
+- `#pokemon-details-dialog-overflows-short-windows` — La ficha de un Pokémon no cabe en una ventana baja y su contenedor no se desplaza (OPEN 2026-11-24) · none
+- `#reduced-motion-covers-only-part-of-the-animations` — El movimiento reducido solo alcanza a una parte de las animaciones (OPEN 2026-11-24) · none
 
 ## CONFIRMADAS (4)
 

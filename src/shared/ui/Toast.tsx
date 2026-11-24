@@ -8,7 +8,8 @@ function ToastCard({ item, onClose }: { item: ToastItem; onClose: () => void }) 
     <div
       role="status"
       className={cn(
-        'w-80 max-w-full rounded-xl shadow-lg border-l-4 p-4 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100',
+        // ToastViewport takes its width from this card, so a max-w-full here bounds nothing: the window does.
+        'w-80 max-w-[calc(100vw-2rem)] rounded-xl shadow-lg border-l-4 p-4 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100',
         color,
       )}
     >

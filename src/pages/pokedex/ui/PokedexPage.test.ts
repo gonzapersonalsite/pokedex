@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { createElement, type ReactNode } from 'react'
+import { createElement, Fragment, type ReactNode } from 'react'
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
 import { QueryProvider, ThemeProvider } from '@/app/providers'
 import { applyTheme, useToastStore } from '@/shared/utils'
 import indexHtml from '../../../../index.html?raw'
-import { PokedexPage } from './PokedexPage'
+import { PokedexPage, SearchBar } from './PokedexPage'
 
 // Extract the synchronous pre-paint script from index.html so the tests run the real script.
 const inlineThemeScriptMatch = indexHtml.match(/<script>([\s\S]*?)<\/script>/)
@@ -157,5 +157,27 @@ describe('PokedexPage', () => {
       'https://pokedex-pokeapi-gonzalo.vercel.app/',
     )
     document.querySelector('link[rel="canonical"]')?.remove()
+  })
+})
+
+describe('SearchBar', () => {
+  it('keeps_the_ids_of_two_search_bars_on_one_page_apart', () => {
+    const props = {
+      value: 'pika',
+      onChange: vi.fn(),
+      onSubmit: vi.fn(),
+      onClear: vi.fn(),
+      suggestions: [{ name: 'pikachu', id: 25 }],
+    }
+    render(createElement(Fragment, null, createElement(SearchBar, props), createElement(SearchBar, props)))
+
+    const searches = screen.getAllByRole('combobox', { name: 'Search Pokémon' })
+    searches.forEach((search) => fireEvent.focus(search))
+    const listboxes = screen.getAllByRole('listbox')
+    const options = screen.getAllByRole('option', { name: /pikachu/ })
+
+    expect(searches.map((search) => search.getAttribute('aria-controls'))).toEqual(listboxes.map(({ id }) => id))
+    expect(searches.map((search) => search.getAttribute('aria-activedescendant'))).toEqual(options.map(({ id }) => id))
+    expect(new Set([...searches, ...listboxes, ...options].map(({ id }) => id)).size).toBe(6)
   })
 })

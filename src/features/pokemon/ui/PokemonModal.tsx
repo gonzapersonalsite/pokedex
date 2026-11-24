@@ -237,7 +237,7 @@ export function PokemonModal({ pokemonIdOrName, open, onClose, onNavigate }: Pok
                             </p>
                             <DialogTitle
                               as="h2"
-                              className="text-2xl font-bold capitalize text-slate-800 dark:text-slate-100"
+                              className="text-2xl font-bold capitalize break-words text-slate-800 dark:text-slate-100"
                             >
                               {pokemon.name.replace(/-/g, ' ')}
                             </DialogTitle>

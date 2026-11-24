@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, Suspense } from 'react'
+import { useState, useRef, useEffect, useId, Suspense } from 'react'
 import { PokemonList, PokemonModal, usePokemonSearch, usePokemonNames, useTypes } from '@/features/pokemon'
 import { Button, Loader, PokeballIcon } from '@/shared/ui'
 import { classifyRequestError, cn, getTypeBadgeClass, toast, useTheme, type RequestErrorKind } from '@/shared/utils'
@@ -355,7 +355,7 @@ function TypeFilter({
   )
 }
 
-function SearchBar({
+export function SearchBar({
   value,
   onChange,
   onActivate,
@@ -377,6 +377,9 @@ function SearchBar({
   const [open, setOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState<number>(-1)
   const containerRef = useRef<HTMLDivElement>(null)
+  const inputId = useId()
+  const listboxId = `${inputId}-suggestions`
+  const optionId = (pokemonId: number) => `${inputId}-option-${pokemonId}`
 
   const q = value.trim().toLowerCase()
   const filtered =
@@ -414,7 +417,7 @@ function SearchBar({
       <div className="relative flex-1 min-w-0">
         <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none z-10" />
         <input
-          id="pokemon-search"
+          id={inputId}
           name="pokemon-search"
           type="search"
           role="combobox"
@@ -461,24 +464,24 @@ function SearchBar({
           className="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           aria-label="Search Pokémon"
           aria-autocomplete="list"
-          aria-controls="search-suggestions"
+          aria-controls={listboxId}
           aria-haspopup="listbox"
           aria-expanded={!!showDropdown}
           aria-activedescendant={
-            activeIndex >= 0 && filtered[activeIndex] ? `search-option-${filtered[activeIndex].id}` : undefined
+            activeIndex >= 0 && filtered[activeIndex] ? optionId(filtered[activeIndex].id) : undefined
           }
         />
         {showDropdown && (
           <ul
             className="absolute top-full left-0 right-0 mt-1 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 shadow-lg max-h-[240px] overflow-y-auto z-50"
             role="listbox"
-            id="search-suggestions"
+            id={listboxId}
           >
             {filtered.map((s, i) => (
               <li
                 key={s.id}
                 role="option"
-                id={`search-option-${s.id}`}
+                id={optionId(s.id)}
                 tabIndex={0}
                 aria-selected={i === activeIndex}
                 className={cn(

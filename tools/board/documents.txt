@@ -34,6 +34,7 @@
 # --- Live documents (AGENTS.md §4, minus the CLOSED archives) ---
 live AGENTS.md
 live README.md
+live DESIGN.md
 live docs/ACTUALIZAR.md
 live docs/registry/README.md
 live tools/board/README.md

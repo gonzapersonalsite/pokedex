@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
 import { Button } from '@/shared/ui'
@@ -66,11 +67,13 @@ export function CreditsContent() {
 }
 
 export function CreditsFooter() {
+  const titleId = useId()
+
   return (
-    <footer aria-labelledby="credits-title" className="mt-8 border-t-4 border-slate-800 bg-slate-900 text-slate-300">
+    <footer aria-labelledby={titleId} className="mt-8 border-t-4 border-slate-800 bg-slate-900 text-slate-300">
       <div className="mx-auto w-full max-w-7xl px-4 pb-24 pt-8 sm:px-6">
         <p className="font-mono text-xs font-bold uppercase tracking-widest text-red-400">Pokédex · System info</p>
-        <h2 id="credits-title" className="mt-1 text-xl font-bold text-white">
+        <h2 id={titleId} className="mt-1 text-xl font-bold text-white">
           Credits &amp; legal
         </h2>
         <div className="mt-4 max-w-3xl">

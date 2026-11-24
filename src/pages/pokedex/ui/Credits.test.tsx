@@ -8,6 +8,16 @@ const GITHUB_URL = 'https://github.com/gonzapersonalsite'
 const EMAIL = 'gonzalomartinezg2001@gmail.com'
 const POKEAPI_URL = 'https://pokeapi.co/'
 
+// A surface or a text colour of the dark scheme written without its dark: variant: in the light
+// scheme it would still paint the credits dark.
+const DARK_SCHEME_ONLY = /^(?:bg-slate-(?:800|900|950)|text-(?:white|slate-(?:100|200|300)))(?:\/\d+)?$/
+
+function coloursThatStayDarkIn(root: Element): string[] {
+  return [root, ...root.querySelectorAll('*')].flatMap((element) =>
+    [...element.classList].filter((className) => DARK_SCHEME_ONLY.test(className)),
+  )
+}
+
 describe('Credits', () => {
   it('names the author, the data source and the trademark disclaimer', () => {
     render(createElement(CreditsContent))
@@ -46,6 +56,18 @@ describe('Credits', () => {
 
     expect(labels).toEqual(headings)
     expect(new Set(headings).size).toBe(2)
+  })
+
+  it('follows_the_theme_in_its_footer_instead_of_staying_dark', () => {
+    render(createElement(CreditsFooter))
+
+    expect(coloursThatStayDarkIn(screen.getByRole('contentinfo'))).toEqual([])
+  })
+
+  it('follows_the_theme_in_its_dialog_instead_of_staying_dark', async () => {
+    render(createElement(CreditsDialog, { open: true, onClose: vi.fn() }))
+
+    expect(coloursThatStayDarkIn(await screen.findByRole('dialog', { name: 'Credits & legal' }))).toEqual([])
   })
 
   it('offers the same credits in a dialog', async () => {

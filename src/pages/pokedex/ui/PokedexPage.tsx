@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useId, Suspense } from 'react'
+import { useState, useEffect, useId, Suspense } from 'react'
 import { PokemonList, PokemonModal, usePokemonSearch, usePokemonNames, useTypes } from '@/features/pokemon'
 import { Button, Loader, PokeballIcon } from '@/shared/ui'
 import {
@@ -389,7 +389,6 @@ export function SearchBar({
 }) {
   const [open, setOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState<number>(-1)
-  const containerRef = useRef<HTMLDivElement>(null)
   const inputId = useId()
   const listboxId = `${inputId}-suggestions`
   const optionId = (pokemonId: number) => `${inputId}-option-${pokemonId}`
@@ -399,16 +398,6 @@ export function SearchBar({
     q.length < 1
       ? []
       : suggestions.filter((s) => s.name.toLowerCase().includes(q) || s.id.toString() === q).slice(0, maxSuggestions)
-
-  useEffect(() => {
-    function handleClickOutside(ev: MouseEvent) {
-      if (containerRef.current?.contains(ev.target as Node)) return
-      setOpen(false)
-      setActiveIndex(-1)
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
 
   const showDropdown = open && filtered.length > 0 && value.length > 0
 
@@ -426,7 +415,7 @@ export function SearchBar({
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2 w-full" ref={containerRef}>
+    <div className="flex flex-wrap items-center gap-2 w-full">
       <div className="relative flex-1 min-w-0">
         <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none z-10" />
         <input
@@ -444,6 +433,12 @@ export function SearchBar({
           onFocus={() => {
             onActivate?.()
             if (value.length > 0) setOpen(true)
+          }}
+          // The suggestions live only while the field has the focus: Tab, a click elsewhere or another
+          // window takes it, and the list goes with it instead of covering the page.
+          onBlur={() => {
+            setOpen(false)
+            setActiveIndex(-1)
           }}
           onKeyDown={(e) => {
             if (e.key === 'ArrowDown') {
@@ -490,24 +485,24 @@ export function SearchBar({
             role="listbox"
             aria-label="Pokémon suggestions"
             id={listboxId}
+            // Chrome makes a box that scrolls a Tab stop of its own: Tab would land here, the field would blur,
+            // the list would close under the focus and leave it on the body. Tab goes on to the next control.
+            tabIndex={-1}
           >
             {filtered.map((s, i) => (
               <li
                 key={s.id}
                 role="option"
                 id={optionId(s.id)}
-                tabIndex={0}
                 aria-selected={i === activeIndex}
                 className={cn(
                   'px-4 py-2.5 text-left flex justify-between items-center gap-2 cursor-pointer',
                   i === activeIndex ? 'bg-slate-100 dark:bg-slate-700' : 'hover:bg-slate-100 dark:hover:bg-slate-700',
                 )}
+                // An option is pointed at from the field (aria-activedescendant), never focused: pressing it
+                // must not take the focus from the field, or the list would close before the click lands.
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => pick(s.name)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    pick(s.name)
-                  }
-                }}
                 onMouseEnter={() => setActiveIndex(i)}
               >
                 <span className="font-medium capitalize text-slate-800 dark:text-slate-100">

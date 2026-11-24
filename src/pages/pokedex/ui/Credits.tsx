@@ -9,7 +9,7 @@ const EMAIL = 'gonzalomartinezg2001@gmail.com'
 const POKEAPI_URL = 'https://pokeapi.co/'
 
 const LINK_CLASS =
-  'font-semibold text-white underline decoration-red-400/60 underline-offset-4 hover:decoration-red-300 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900'
+  'font-semibold text-slate-900 underline decoration-red-600/60 underline-offset-4 hover:decoration-red-700 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:text-white dark:decoration-red-400/60 dark:hover:decoration-red-300 dark:focus-visible:ring-red-400 dark:focus-visible:ring-offset-slate-900'
 
 const EXTERNAL_LINK_PROPS = {
   target: '_blank',
@@ -34,9 +34,10 @@ export function CreditsContent() {
   const year = new Date().getFullYear()
 
   return (
-    <div className="space-y-4 text-sm leading-relaxed text-slate-300">
+    <div className="space-y-4 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
       <p>
-        A fan-made Pokédex by <span className="font-semibold text-white">Gonzalo Martínez García</span>, Full Stack
+        A fan-made Pokédex by{' '}
+        <span className="font-semibold text-slate-900 dark:text-white">Gonzalo Martínez García</span>, Full Stack
         Developer.
       </p>
       <p>
@@ -46,7 +47,7 @@ export function CreditsContent() {
         </a>
         .
       </p>
-      <p className="text-xs leading-relaxed text-slate-400">
+      <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
         Pokémon and Pokémon character names are trademarks of Nintendo, Game Freak, and Creatures. This is an unofficial
         fan project, not affiliated with or endorsed by The Pokémon Company.
       </p>
@@ -61,7 +62,9 @@ export function CreditsContent() {
           Email
         </a>
       </div>
-      <p className="border-t border-white/10 pt-4 font-mono text-xs text-slate-500">© {year} Gonzalo Martínez García</p>
+      <p className="border-t border-slate-200 pt-4 font-mono text-xs text-slate-600 dark:border-white/10 dark:text-slate-500">
+        © {year} Gonzalo Martínez García
+      </p>
     </div>
   )
 }
@@ -70,10 +73,15 @@ export function CreditsFooter() {
   const titleId = useId()
 
   return (
-    <footer aria-labelledby={titleId} className="mt-8 border-t-4 border-slate-800 bg-slate-900 text-slate-300">
+    <footer
+      aria-labelledby={titleId}
+      className="mt-8 border-t-4 border-slate-800 bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-300"
+    >
       <div className="mx-auto w-full max-w-7xl px-4 pb-24 pt-8 sm:px-6">
-        <p className="font-mono text-xs font-bold uppercase tracking-widest text-red-400">Pokédex · System info</p>
-        <h2 id={titleId} className="mt-1 text-xl font-bold text-white">
+        <p className="font-mono text-xs font-bold uppercase tracking-widest text-red-700 dark:text-red-400">
+          Pokédex · System info
+        </p>
+        <h2 id={titleId} className="mt-1 text-xl font-bold text-slate-900 dark:text-white">
           Credits &amp; legal
         </h2>
         <div className="mt-4 max-w-3xl">
@@ -89,17 +97,19 @@ export function CreditsDialog({ open, onClose }: { open: boolean; onClose: () =>
     <Dialog open={open} onClose={onClose} className="relative z-50">
       <div className="fixed inset-0 bg-black/70" aria-hidden />
       <DialogViewport onDismiss={onClose}>
-        <div className="relative m-auto w-full max-w-lg overflow-hidden rounded-2xl border-4 border-slate-700 bg-slate-900 text-slate-200 shadow-2xl">
-          <div className="border-b-4 border-red-600 bg-slate-950 px-5 py-4">
-            <p className="font-mono text-xs font-bold uppercase tracking-widest text-red-400">Pokédex · System info</p>
-            <DialogTitle as="h2" className="mt-1 text-xl font-bold text-white">
+        <div className="relative m-auto w-full max-w-lg overflow-hidden rounded-2xl border-4 border-slate-300 bg-white text-slate-800 shadow-2xl dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+          <div className="border-b-4 border-red-600 bg-slate-100 px-5 py-4 dark:bg-slate-950">
+            <p className="font-mono text-xs font-bold uppercase tracking-widest text-red-700 dark:text-red-400">
+              Pokédex · System info
+            </p>
+            <DialogTitle as="h2" className="mt-1 text-xl font-bold text-slate-900 dark:text-white">
               Credits &amp; legal
             </DialogTitle>
           </div>
           <div className="max-h-[65svh] overflow-y-auto overscroll-contain p-5">
             <CreditsContent />
           </div>
-          <div className="flex justify-end border-t border-white/10 bg-slate-950/60 px-5 py-3">
+          <div className="flex justify-end border-t border-slate-200 bg-slate-100 px-5 py-3 dark:border-white/10 dark:bg-slate-950/60">
             <Button variant="secondary" size="sm" onClick={onClose}>
               Close
             </Button>

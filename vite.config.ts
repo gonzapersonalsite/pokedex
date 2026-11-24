@@ -49,7 +49,7 @@ export default defineConfig({
       manifest: {
         name: 'Pokédex',
         short_name: 'Pokédex',
-        description: 'Pokédex React - Busca Pokémon, tipos y evoluciones',
+        description: 'Pokédex React - Search Pokémon, types and evolutions',
         theme_color: '#ef4444',
         background_color: '#0f172a',
         display: 'standalone',

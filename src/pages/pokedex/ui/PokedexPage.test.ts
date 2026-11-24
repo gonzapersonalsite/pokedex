@@ -237,4 +237,52 @@ describe('SearchBar', () => {
     expect(searches.map((search) => search.getAttribute('aria-activedescendant'))).toEqual(options.map(({ id }) => id))
     expect(new Set([...searches, ...listboxes, ...options].map(({ id }) => id)).size).toBe(6)
   })
+
+  const searchBarFor = (onSelectSuggestion = vi.fn()) =>
+    createElement(SearchBar, {
+      value: 'pi',
+      onChange: vi.fn(),
+      onSubmit: vi.fn(),
+      onClear: vi.fn(),
+      onSelectSuggestion,
+      suggestions: [
+        { name: 'pikachu', id: 25 },
+        { name: 'pichu', id: 172 },
+      ],
+    })
+
+  it('points_at_its_suggestions_from_the_field_without_making_them_tab_stops', () => {
+    render(searchBarFor())
+    fireEvent.focus(screen.getByRole('combobox', { name: 'Search Pokémon' }))
+
+    // Tab leaves the field for the next control; the arrows move between suggestions. The list scrolls, and
+    // Chrome makes a scrolling box a Tab stop unless it says otherwise: jsdom does not, so the attribute is held.
+    expect(screen.getAllByRole('option').map((option) => option.tabIndex)).toEqual([-1, -1])
+    expect(screen.getByRole('listbox', { name: 'Pokémon suggestions' })).toHaveAttribute('tabindex', '-1')
+  })
+
+  it('closes_its_suggestions_when_the_focus_leaves_the_field', () => {
+    render(searchBarFor())
+    const search = screen.getByRole('combobox', { name: 'Search Pokémon' })
+    fireEvent.focus(search)
+    expect(screen.getByRole('listbox', { name: 'Pokémon suggestions' })).toBeInTheDocument()
+
+    fireEvent.blur(search)
+
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+    expect(search).toHaveAttribute('aria-expanded', 'false')
+  })
+
+  it('picks_a_clicked_suggestion_without_taking_the_focus_from_the_field', () => {
+    const onSelectSuggestion = vi.fn()
+    render(searchBarFor(onSelectSuggestion))
+    fireEvent.focus(screen.getByRole('combobox', { name: 'Search Pokémon' }))
+    const pichu = screen.getByRole('option', { name: /pichu/ })
+
+    // false: the press was kept from moving the focus, so the field does not blur and close the list first.
+    expect(fireEvent.mouseDown(pichu)).toBe(false)
+    fireEvent.click(pichu)
+
+    expect(onSelectSuggestion).toHaveBeenCalledWith('pichu')
+  })
 })

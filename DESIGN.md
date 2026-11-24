@@ -20,10 +20,11 @@ esa tarea: llegar a un Pokémon sin esfuerzo, con el dedo o con el teclado.
 
 ## Decisiones tomadas
 
-Cada una dice qué hace hoy el código, por qué y dónde se ve. La que tiene
-registro lo cita, y su porqué largo está allí. Una decisión visual nueva se
+Cada una dice qué hace hoy el código, por qué y dónde se ve, y cita su registro,
+donde están su porqué largo, su refutación y su estado: una decisión visual se
 registra como cualquier otra ([docs/registry/README.md](docs/registry/README.md))
-y deja aquí la línea que la enuncia, con su cita.
+y deja aquí la línea que la enuncia, con su cita. Una línea sin registro no es
+una decisión.
 
 - **El texto sigue el tamaño que cada persona eligió en su navegador**
   (`#narrow-windows-large-text-and-control-names-hold`). Ninguna hoja fija el
@@ -45,8 +46,14 @@ y deja aquí la línea que la enuncia, con su cita.
   [ThemeProvider.tsx](src/app/providers/ThemeProvider.tsx),
   [index.css](src/app/index.css)). Un color que cambia con el esquema lleva su
   par en la variante `dark:`, en la misma clase del componente.
-- **El foco siempre se ve.** Un control al que se le quita el contorno del
-  navegador recibe a cambio un anillo ([Button.tsx](src/shared/ui/Button.tsx),
+- **Los créditos siguen el tema, como el resto de la página**
+  (`#credits-follow-the-colour-scheme`). Su pie y su diálogo usan en claro las
+  superficies y los textos que ya usa la aplicación, y en oscuro los de
+  siempre ([Credits.tsx](src/pages/pokedex/ui/Credits.tsx)). Los botones que
+  flotan sobre la lista, el de los créditos y el de volver arriba, son oscuros
+  translúcidos en los dos esquemas, porque se leen sobre cualquier contenido.
+- **El foco siempre se ve** (`#focus-is-always-visible`). Un control al que se
+  le quita el contorno del navegador recibe a cambio un anillo ([Button.tsx](src/shared/ui/Button.tsx),
   [PokemonCard.tsx](src/features/pokemon/ui/PokemonCard.tsx), el campo de
   búsqueda), y los demás conservan el contorno del navegador. La excepción es
   el `main`, que solo recibe el foco desde el enlace de saltar al contenido.
@@ -59,35 +66,43 @@ y deja aquí la línea que la enuncia, con su cita.
   una lista sin fin dejaría fuera de alcance, se abren con un botón
   (`#credits-reachable-from-an-infinite-list`,
   [Credits.tsx](src/pages/pokedex/ui/Credits.tsx)).
-- **El buscador es un combobox con su lista de sugerencias.** Flechas, Intro y
-  Escape bastan para elegir, y la opción activa se señala sin sacar el foco del
-  campo ([PokedexPage.tsx](src/pages/pokedex/ui/PokedexPage.tsx)): buscar no
-  obliga a soltar el teclado.
-- **Un identificador que une dos elementos sale de `useId()`.** El buscador con
+- **El buscador es un combobox con su lista de sugerencias**
+  (`#search-is-a-combobox-that-keeps-the-focus`). Flechas, Intro y Escape
+  bastan para elegir, y la opción activa se señala sin sacar el foco del
+  campo: las sugerencias no son paradas del tabulador, y la lista se cierra
+  cuando el foco sale del campo ([PokedexPage.tsx](src/pages/pokedex/ui/PokedexPage.tsx)).
+  Buscar no obliga a soltar el teclado, y la lista no se queda tapando la
+  página.
+- **Un identificador que une dos elementos sale de `useId()`**
+  (`#linking-ids-come-from-use-id`). El buscador con
   su lista y su opción activa, y el pie con su título, para que dos en la misma
   página no compartan ninguno
   ([PokedexPage.tsx](src/pages/pokedex/ui/PokedexPage.tsx),
   [Credits.tsx](src/pages/pokedex/ui/Credits.tsx)). Fijos quedan los que son
   únicos por página porque nombran un sitio de ella: el `main`, la cabecera y
   el contenedor raíz.
-- **Lo que viene de fuera no ensancha la página.** Un nombre de PokeAPI cambia
+- **Lo que viene de fuera no ensancha la página**
+  (`#external-text-never-widens-the-page`). Un nombre de PokeAPI cambia
   sus guiones por espacios y, si aun así no cabe, se parte dentro de su
   elemento ([PokemonCard.tsx](src/features/pokemon/ui/PokemonCard.tsx),
   [PokemonModal.tsx](src/features/pokemon/ui/PokemonModal.tsx)); la ruta
   desconocida de la pantalla 404 se parte por cualquier carácter
   ([NotFoundSection.tsx](src/pages/pokedex/ui/NotFoundSection.tsx)); y un aviso
   nunca es más ancho que la ventana ([Toast.tsx](src/shared/ui/Toast.tsx)).
-- **Un estado se dice con palabras y con su papel, no solo con un color.** La
+- **Un estado se dice con palabras y con su papel, no solo con un color**
+  (`#states-are-said-with-words-and-roles`). La
   carga es un `status` que dice «Loading…»
   ([PokeballLoader.tsx](src/shared/ui/PokeballLoader.tsx)), un fallo de la lista
   es un `alert` con su texto
   ([PokemonList.tsx](src/features/pokemon/ui/PokemonList.tsx)), un aviso es un
   `status` con el suyo ([Toast.tsx](src/shared/ui/Toast.tsx)) y un filtro dice
   si está pulsado ([PokedexPage.tsx](src/pages/pokedex/ui/PokedexPage.tsx)).
-- **El color de un tipo es el mismo en toda la aplicación.** Sale de una sola
-  tabla, que usan la tarjeta, los filtros, la ficha y la pantalla 404
-  ([typeBadge.ts](src/shared/utils/typeBadge.ts)): un tipo se reconoce por su
-  color allí donde aparezca.
+- **El color de un tipo es el mismo en toda la aplicación**
+  (`#one-colour-table-per-pokemon-type`). Sale de una sola tabla, que usan la
+  tarjeta, los filtros, la ficha y la pantalla 404
+  ([typeBadge.ts](src/shared/utils/typeBadge.ts)), y el tipo lleva siempre su
+  nombre escrito: el color ayuda a reconocerlo, pero no basta, porque hoy
+  `normal` y `steel` comparten el suyo y la paleta espera al rediseño.
 - **Los textos de la interfaz van en inglés** (`#product-ui-text-is-english`).
 - **Los diálogos se desplazan dentro del visor sin recortar sus controles**
   (`#pokemon-details-dialog-overflows-short-windows`). `DialogViewport`
@@ -111,14 +126,16 @@ y deja aquí la línea que la enuncia, con su cita.
 
 ## Lo que sigue abierto
 
-Todo defecto funcional y de accesibilidad localizado quedó cerrado; solo espera
-el aspecto estético, aplazado hasta que el dueño abra el rediseño visual:
+Queda el aspecto estético, aplazado hasta que el dueño abra el rediseño visual,
+y lo que «Cómo comprobarlo» dice que nadie ha mirado todavía:
 
 - **El aspecto visual (`#choices-of-look-wait-for-the-visual-redesign`).** La
   paleta (el rojo `primary` y los colores de Tailwind), la fuente Outfit con su
   sustituta ajustada, el dibujo de la carcasa de `PokemonModal` y el estilo de
   `NotFoundSection` siguen tal cual sin fijar reglas de marca hasta el
-  rediseño.
+  rediseño. Hoy cada componente escribe la paleta de Tailwind con su par
+  `dark:`; si el rediseño quiere cambiar un color en un solo sitio, tendrá que
+  decidir antes si los colores pasan a ser tokens con nombre en la hoja global.
 
 Cuando se abra el rediseño o se añada una regla visual, se registra en
 [docs/registry/decisions/](docs/registry/decisions/) y pasa arriba con su cita.
@@ -141,8 +158,8 @@ Cuando se abra el rediseño o se añada una regla visual, se registra en
 
 `./dev verify` (en Windows, `.\dev.cmd verify`) corre los tests que sostienen
 estas reglas: ningún tamaño de texto en píxeles
-([textSizes.test.ts](src/app/textSizes.test.ts)), visor desplazable y
-transición en `rem` ([dialogViewport.test.ts](src/app/dialogViewport.test.ts),
+([textSizes.test.ts](src/app/textSizes.test.ts)), visor desplazable y sin
+barra mientras el diálogo se mueve ([dialogViewport.test.ts](src/app/dialogViewport.test.ts),
 [DialogViewport.test.tsx](src/shared/ui/DialogViewport.test.tsx)), guardas de
 movimiento reducido ([motion.test.ts](src/app/motion.test.ts),
 [scroll.test.ts](src/shared/utils/scroll.test.ts)), tema sin escritura en
@@ -150,8 +167,10 @@ primera visita ([themeContext.test.ts](src/shared/utils/themeContext.test.ts),
 [ThemeProvider.test.tsx](src/app/providers/ThemeProvider.test.tsx)),
 controles de carcasa y tarjetas ([PokemonModal.test.tsx](src/features/pokemon/ui/PokemonModal.test.tsx),
 [PokemonCard.test.tsx](src/features/pokemon/ui/PokemonCard.test.tsx)),
-identificadores únicos y filtro «All» ([PokedexPage.test.ts](src/pages/pokedex/ui/PokedexPage.test.ts),
-[Credits.test.tsx](src/pages/pokedex/ui/Credits.test.tsx)) y volver arriba
+identificadores únicos, filtro «All», sugerencias que no son paradas del
+tabulador y se cierran al salir el foco
+([PokedexPage.test.ts](src/pages/pokedex/ui/PokedexPage.test.ts)), créditos
+que siguen el tema ([Credits.test.tsx](src/pages/pokedex/ui/Credits.test.tsx)) y volver arriba
 ([ReturnToTop.test.ts](src/pages/pokedex/ui/ReturnToTop.test.ts)). Lo demás se
 mira en un navegador, con `./dev start` y la dirección que imprime:
 
@@ -171,10 +190,11 @@ mira en un navegador, con `./dev start` y la dirección que imprime:
   eligen una sugerencia; Intro abre la ficha, el foco no sale de ella y Escape
   lo devuelve a donde estaba; y el foco siempre se ve.
 
-Este recorrido se hizo en Chrome 157 y Firefox 160 sobre el servidor de
-desarrollo (`#2026-11-24-design-guide-and-interface-corrections` y
-`#2026-11-24-interface-decisions-closed-before-redesign`). No se ha comprobado
-en Safari, con un lector de pantalla, en un teléfono real ni con la aplicación
+Este recorrido se hizo solo en Chrome, sobre el servidor de desarrollo
+(`#2026-11-24-design-guide-and-interface-corrections`), y se repitió sobre el
+código de hoy en el navegador integrado de Claude, basado en Chromium
+(`#2026-11-24-design-guide-aligned-with-code-and-template`). No se ha comprobado
+en Firefox, en Safari, con un lector de pantalla, en un teléfono real ni con la aplicación
 instalada; tampoco se ha medido el contraste de los colores con herramienta ni si
 las áreas seguras que lee la hoja global llegan a valer algo en un teléfono
 con muesca, porque la página no pide ocupar esa zona. Hazlo antes de dar por

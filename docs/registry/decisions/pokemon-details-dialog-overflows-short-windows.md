@@ -1,9 +1,10 @@
 ---
 title: El diálogo de detalles y créditos se desplaza en ventanas bajas sin recortar sus controles
-state: confirmed
+state: provisional
 date: 2026-11-24
 domain: interface
 phase: none
+criterion: Se confirma cuando el dueño relea esta refutación con el trabajo delante y lo diga en un turno posterior.
 ---
 **Los diálogos (`PokemonModal` y `CreditsDialog`) se montan dentro de `DialogViewport`, que
 hace de `DialogPanel` con desplazamiento propio dentro del visor.** Al centrar su hijo con
@@ -19,16 +20,21 @@ toda la carcasa sin recortar sus controles ni mover el documento que queda detr�
   el área desplazable con margen de scroll evitan que la barra tape controles, y la fila
   inferior de botones envuelve en ventanas estrechas (`PokemonModal.test.tsx`).
 
-Decidido por el agente bajo la delegación del dueño («No quiero deuda de ningun tipo»,
-«Dejo a tu preferencia recomendados»), verificado en
+Propuesto por el agente bajo la delegación del dueño («No quiero deuda de ningun tipo»,
+«Dejo a tu preferencia recomendados»); pasa a confirmada cuando el dueño relea esta
+refutación (`#2026-11-24-design-guide-aligned-with-code-and-template`). Su fase es `none`: F0
+y F1 están hechas y el rediseño visual todavía no tiene fase. Se verificó en
 `#2026-11-24-interface-decisions-closed-before-redesign` y cubierto por
 `DialogViewport.test.tsx`, `dialogViewport.test.ts`, `PokemonModal.test.tsx` y
 `Credits.test.tsx`.
 
 ## Refutación
 
-En contra: encoger permanentemente la carcasa para que quepa en cualquier ventana baja
-cambia proporciones visuales pensadas para escritorio. Se mantiene: desplazar el propio
-`DialogViewport` conserva el diseño actual con mínimo cambio visual y deja todos los
-controles alcanzables; cualquier cambio estético de la carcasa espera al rediseño
-(`#choices-of-look-wait-for-the-visual-redesign`).
+En contra: desplazar todo el visor mueve también la carcasa y su cruceta, así
+que en una ventana baja los controles de la parte de abajo quedan fuera de la
+vista hasta que se baja, y el diálogo se lee como una página larga en vez de
+como un aparato. Encoger la carcasa lo evitaría, a costa de cambiar sus
+proporciones. Se mantiene porque nada queda recortado ni fuera de alcance, el
+teclado lleva cada control a la vista (`scroll-pt-14` deja libre la barra
+fija), y cambiar las proporciones es aspecto y espera a
+`#choices-of-look-wait-for-the-visual-redesign`.

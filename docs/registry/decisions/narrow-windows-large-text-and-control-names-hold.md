@@ -1,9 +1,10 @@
 ---
 title: La interfaz escala en rem, envuelve la cabecera en estrecho y nombra cada control
-state: confirmed
+state: provisional
 date: 2026-11-24
 domain: interface
 phase: none
+criterion: Se confirma cuando el dueño relea esta refutación con el trabajo delante y lo diga en un turno posterior.
 ---
 **Todo tamaño de texto va en `rem`, la cabecera y los filtros envuelven sin solaparse, y
 cada control se identifica sin ambigüedad.**
@@ -20,14 +21,18 @@ cada control se identifica sin ambigüedad.**
   carcasa de `PokemonModal` tiene su `aria-label`, y `SearchBar` y `CreditsFooter`
   generan sus identificadores con `useId`.
 
-Decidido por el agente bajo la delegación del dueño («No quiero deuda de ningun tipo»,
-«Dejo a tu preferencia recomendados») y verificado en
+Propuesto por el agente bajo la delegación del dueño («No quiero deuda de ningun tipo»,
+«Dejo a tu preferencia recomendados»); pasa a confirmada cuando el dueño relea esta
+refutación (`#2026-11-24-design-guide-aligned-with-code-and-template`). Su fase es `none`: F0
+y F1 están hechas y el rediseño visual todavía no tiene fase. Se verificó en
 `#2026-11-24-interface-decisions-closed-before-redesign`.
 
 ## Refutación
 
-En contra: mantener tamaños en `px` para etiquetas pequeñas del 404 impide que escalen con
-la preferencia del lector; usar textos genéricos en tarjetas acorta el DOM pero vuelve
-indistinguibles los botones en un lector de pantalla. Se mantiene: la escala relativa y los
-nombres explícitos no alteran la estética base y evitan regresiones al rediseñar
-(`#choices-of-look-wait-for-the-visual-redesign`).
+En contra: con la letra en 24 px y 320 px de ancho la cabecera pasa a dos o
+tres filas y ocupa buena parte de la pantalla, porque es fija; y los nombres
+que incluyen el del Pokémon («Add Pikachu to favorites») alargan lo que un
+lector de pantalla lee en cada tarjeta. Se mantiene porque lo que se pide es
+que nada se solape ni se tape y que cada control se distinga de los demás, y
+eso se cumple; cuánto ocupa la cabecera fija en una pantalla así es una
+cuestión de aspecto para el rediseño.

@@ -1,9 +1,10 @@
 ---
 title: El movimiento reducido cubre animaciones CSS, spinners y desplazamientos por código
-state: confirmed
+state: provisional
 date: 2026-11-24
 domain: interface
 phase: none
+criterion: Se confirma cuando el dueño relea esta refutación con el trabajo delante y lo diga en un turno posterior.
 ---
 **Toda animación continua, transición de utilidad y desplazamiento por código respeta
 `prefers-reduced-motion`.** Las animaciones de `src/app/index.css` (`.led-blink-blue`) se
@@ -17,14 +18,20 @@ declaran bajo la consulta `no-preference`, las clases de utilidad usan `motion-s
   cruceta de `PokemonModal` consultan `preferredScrollBehavior` para usar desplazamiento
   suave o instantáneo según la preferencia del lector (`scroll.test.ts`).
 
-Decidido por el agente bajo la delegación del dueño («No quiero deuda de ningun tipo»,
-«Dejo a tu preferencia recomendados»), verificado en
+Propuesto por el agente bajo la delegación del dueño («No quiero deuda de ningun tipo»,
+«Dejo a tu preferencia recomendados»); pasa a confirmada cuando el dueño relea esta
+refutación (`#2026-11-24-design-guide-aligned-with-code-and-template`). Su fase es `none`: F0
+y F1 están hechas y el rediseño visual todavía no tiene fase. Se verificó en
 `#2026-11-24-interface-decisions-closed-before-redesign` y cubierto por `motion.test.ts`,
 `scroll.test.ts`, `PokemonModal.test.tsx` y `PokedexPage.test.ts`.
 
 ## Refutación
 
-En contra: proteger solo las transiciones cortas de Tailwind dejaba activas animaciones
-continuas CSS y el desplazamiento suave en JavaScript. Se mantiene: unificar hojas CSS,
-clases y llamadas de scroll asegura coherencia real bajo movimiento reducido sin alterar el
-comportamiento por defecto.
+En contra: `motion-reduce:transition-none` también quita transiciones que no
+son movimiento (un cambio de color o de opacidad), que pedir menos movimiento
+no obliga a quitar; y `motion.test.ts` busca clases y declaraciones con
+expresiones regulares, así que una clase montada por partes en tiempo de
+ejecución, o una animación con la Web Animations API, se le escaparían. Se
+mantiene porque quitar también los fundidos es lo más simple de verificar y
+nadie lo ha echado en falta, y porque hoy ningún código anima por script; si
+alguno llega, su guarda entra con él.

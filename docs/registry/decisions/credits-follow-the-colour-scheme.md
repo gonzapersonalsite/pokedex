@@ -1,10 +1,9 @@
 ---
 title: Los créditos siguen el tema claro u oscuro como el resto de la página
-state: provisional
+state: confirmed
 date: 2026-11-24
 domain: interface
 phase: none
-criterion: Se confirma cuando el dueño relea esta refutación con el trabajo delante y lo diga en un turno posterior.
 ---
 **El pie y el diálogo de créditos siguen el tema, como el resto de la
 página.** En claro usan las superficies y los textos que ya usa la aplicación
@@ -15,6 +14,10 @@ volver arriba, siguen oscuros translúcidos en los dos esquemas, porque se leen
 sobre cualquier contenido.
 
 El dueño eligió esta opción entre las que le puso el agente; no la dictó. Registrada, en `#2026-11-24-design-guide-aligned-with-code-and-template`. Su fase es `none`: F0 y F1 están hechas y el rediseño visual todavía no tiene fase.
+
+**Confirmada por delegación del dueño**, que en un turno posterior, con la
+refutación de abajo escrita, delegó su revisión: «si son correctas las decisiones por mi apruebalas y no las dejes en provisionales»
+(`#2026-11-24-interface-decisions-confirmed-by-the-owner`).
 
 ## Refutación
 

@@ -1,10 +1,9 @@
 ---
 title: El movimiento reducido cubre animaciones CSS, spinners y desplazamientos por código
-state: provisional
+state: confirmed
 date: 2026-11-24
 domain: interface
 phase: none
-criterion: Se confirma cuando el dueño relea esta refutación con el trabajo delante y lo diga en un turno posterior.
 ---
 **Toda animación continua, transición de utilidad y desplazamiento por código respeta
 `prefers-reduced-motion`.** Las animaciones de `src/app/index.css` (`.led-blink-blue`) se
@@ -19,11 +18,15 @@ declaran bajo la consulta `no-preference`, las clases de utilidad usan `motion-s
   suave o instantáneo según la preferencia del lector (`scroll.test.ts`).
 
 Propuesto por el agente bajo la delegación del dueño («No quiero deuda de ningun tipo»,
-«Dejo a tu preferencia recomendados»); pasa a confirmada cuando el dueño relea esta
-refutación (`#2026-11-24-design-guide-aligned-with-code-and-template`). Su fase es `none`: F0
+«Dejo a tu preferencia recomendados»), en
+`#2026-11-24-design-guide-aligned-with-code-and-template`. Su fase es `none`: F0
 y F1 están hechas y el rediseño visual todavía no tiene fase. Se verificó en
 `#2026-11-24-interface-decisions-closed-before-redesign` y cubierto por `motion.test.ts`,
 `scroll.test.ts`, `PokemonModal.test.tsx` y `PokedexPage.test.ts`.
+
+**Confirmada por delegación del dueño**, que en un turno posterior, con la
+refutación de abajo escrita, delegó su revisión: «si son correctas las decisiones por mi apruebalas y no las dejes en provisionales»
+(`#2026-11-24-interface-decisions-confirmed-by-the-owner`).
 
 ## Refutación
 

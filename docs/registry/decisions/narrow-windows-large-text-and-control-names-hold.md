@@ -1,10 +1,9 @@
 ---
 title: La interfaz escala en rem, envuelve la cabecera en estrecho y nombra cada control
-state: provisional
+state: confirmed
 date: 2026-11-24
 domain: interface
 phase: none
-criterion: Se confirma cuando el dueño relea esta refutación con el trabajo delante y lo diga en un turno posterior.
 ---
 **Todo tamaño de texto va en `rem`, la cabecera y los filtros envuelven sin solaparse, y
 cada control se identifica sin ambigüedad.**
@@ -22,10 +21,14 @@ cada control se identifica sin ambigüedad.**
   generan sus identificadores con `useId`.
 
 Propuesto por el agente bajo la delegación del dueño («No quiero deuda de ningun tipo»,
-«Dejo a tu preferencia recomendados»); pasa a confirmada cuando el dueño relea esta
-refutación (`#2026-11-24-design-guide-aligned-with-code-and-template`). Su fase es `none`: F0
+«Dejo a tu preferencia recomendados»), en
+`#2026-11-24-design-guide-aligned-with-code-and-template`. Su fase es `none`: F0
 y F1 están hechas y el rediseño visual todavía no tiene fase. Se verificó en
 `#2026-11-24-interface-decisions-closed-before-redesign`.
+
+**Confirmada por delegación del dueño**, que en un turno posterior, con la
+refutación de abajo escrita, delegó su revisión: «si son correctas las decisiones por mi apruebalas y no las dejes en provisionales»
+(`#2026-11-24-interface-decisions-confirmed-by-the-owner`).
 
 ## Refutación
 

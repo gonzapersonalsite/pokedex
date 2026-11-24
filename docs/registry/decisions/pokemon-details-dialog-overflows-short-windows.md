@@ -1,10 +1,9 @@
 ---
 title: El diálogo de detalles y créditos se desplaza en ventanas bajas sin recortar sus controles
-state: provisional
+state: confirmed
 date: 2026-11-24
 domain: interface
 phase: none
-criterion: Se confirma cuando el dueño relea esta refutación con el trabajo delante y lo diga en un turno posterior.
 ---
 **Los diálogos (`PokemonModal` y `CreditsDialog`) se montan dentro de `DialogViewport`, que
 hace de `DialogPanel` con desplazamiento propio dentro del visor.** Al centrar su hijo con
@@ -21,12 +20,16 @@ toda la carcasa sin recortar sus controles ni mover el documento que queda detr�
   inferior de botones envuelve en ventanas estrechas (`PokemonModal.test.tsx`).
 
 Propuesto por el agente bajo la delegación del dueño («No quiero deuda de ningun tipo»,
-«Dejo a tu preferencia recomendados»); pasa a confirmada cuando el dueño relea esta
-refutación (`#2026-11-24-design-guide-aligned-with-code-and-template`). Su fase es `none`: F0
+«Dejo a tu preferencia recomendados»), en
+`#2026-11-24-design-guide-aligned-with-code-and-template`. Su fase es `none`: F0
 y F1 están hechas y el rediseño visual todavía no tiene fase. Se verificó en
 `#2026-11-24-interface-decisions-closed-before-redesign` y cubierto por
 `DialogViewport.test.tsx`, `dialogViewport.test.ts`, `PokemonModal.test.tsx` y
 `Credits.test.tsx`.
+
+**Confirmada por delegación del dueño**, que en un turno posterior, con la
+refutación de abajo escrita, delegó su revisión: «si son correctas las decisiones por mi apruebalas y no las dejes en provisionales»
+(`#2026-11-24-interface-decisions-confirmed-by-the-owner`).
 
 ## Refutación
 

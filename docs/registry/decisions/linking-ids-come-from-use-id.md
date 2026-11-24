@@ -1,10 +1,9 @@
 ---
 title: Un identificador que une dos elementos sale de useId
-state: provisional
+state: confirmed
 date: 2026-11-24
 domain: interface
 phase: none
-criterion: Se confirma cuando el dueño relea esta refutación con el trabajo delante y lo diga en un turno posterior.
 ---
 **Un identificador que une dos elementos sale de `useId`.** El buscador con
 su lista y cada opción, y el pie de créditos con su título: dos en la misma
@@ -13,6 +12,10 @@ página: el `main`, destino del enlace de saltar, la cabecera y el contenedor
 raíz, destino de volver arriba.
 
 Propuesta por el agente, en `#2026-11-24-design-guide-aligned-with-code-and-template`. Su fase es `none`: F0 y F1 están hechas y el rediseño visual todavía no tiene fase.
+
+**Confirmada por delegación del dueño**, que en un turno posterior, con la
+refutación de abajo escrita, delegó su revisión: «si son correctas las decisiones por mi apruebalas y no las dejes en provisionales»
+(`#2026-11-24-interface-decisions-confirmed-by-the-owner`).
 
 ## Refutación
 

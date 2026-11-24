@@ -1,35 +1,33 @@
 ---
-title: La primera visita guarda el tema del sistema como si se hubiera elegido
-state: open
+title: La primera visita sigue el tema del sistema y solo se guarda la elección manual
+state: confirmed
 date: 2026-11-24
 domain: interface
 phase: none
 ---
-**La primera visita guarda el tema del sistema como si se hubiera elegido.**
-`readInitialTheme` toma el tema guardado y, si no hay ninguno, el del sistema.
-`applyTheme` lo guarda cada vez que lo aplica, también la primera, cuando nadie
-ha pulsado nada. Desde esa visita manda lo guardado: un cambio del esquema del
-sistema ya no se sigue, y solo el botón de la cabecera cambia el tema.
+**En la primera visita el tema sigue el esquema del sistema (`prefers-color-scheme`) sin
+escribir en `localStorage`.** Mientras no haya una elección manual guardada, la interfaz
+cambia automáticamente si el lector cambia el tema del sistema con la página abierta.
 
-**Lo visto**, en Chrome sobre el servidor de desarrollo. Con el almacenamiento
-vacío y el sistema en oscuro, la página sale oscura y deja guardado el tema
-oscuro; al volver con el sistema en claro, sigue oscura. Al revés ocurre lo
-mismo: la primera visita en claro deja la página clara aunque el sistema pase
-después a oscuro. El botón cambia el tema y lo guarda, como se espera.
+- **Solo el botón del encabezado guarda o borra la elección.** `themeChoiceAfterToggle`
+  guarda en `localStorage` el tema elegido cuando difiere del sistema y elimina la clave
+  cuando coincide para volver a seguirlo.
+- **Tolerancia a datos inválidos o bloqueados.** `readThemeChoice` ignora cualquier valor
+  que no sea `'light'` ni `'dark'`, y tanto la lectura como la escritura toleran un
+  `SecurityError` si el navegador bloquea el almacenamiento.
+- **Sincronización entre pestañas.** `ThemeProvider` escucha el evento `storage` y
+  actualiza el tema cuando otra pestaña lo cambia. El script de `index.html` lee sin
+  escribir antes del primer pintado.
 
-**Qué hay que decidir.** Si la Pokédex sigue al sistema hasta que la persona
-elija, y entonces solo se guarda al pulsar el botón, o si fijar el tema en la
-primera visita es lo que se quiere. El script de `index.html` y
-`ThemeProvider` ya distinguen lo guardado de lo que dice el sistema; lo que no
-distinguen es quién lo guardó.
+Decidido por el agente bajo la delegación del dueño («No quiero deuda de ningun tipo»,
+«Dejo a tu preferencia recomendados»), verificado en
+`#2026-11-24-interface-decisions-closed-before-redesign` y cubierto por
+`ThemeProvider.test.tsx`, `themeContext.test.ts` y `PokedexPage.test.ts`.
 
-El agente recomienda seguir al sistema hasta que alguien elija: es lo que
-espera quien tiene el sistema en automático y ve cambiar de esquema al resto
-de sus aplicaciones al anochecer.
+## Refutación
 
-**Por qué sigue abierta.** Es comportamiento del producto y nadie lo ha
-decidido; la parte que lo encontró,
-`#2026-11-24-design-guide-and-interface-corrections`, enuncia en `DESIGN.md` lo
-que el código hace hoy y no lo cambia. No cae en ninguna fase: las del plan
-están hechas y no hay ninguna abierta. Se cierra con la decisión; si es seguir
-al sistema, cuando una visita que no toca el botón no deje nada guardado.
+En contra: guardar el tema del sistema en la primera visita fija la apariencia desde ese
+momento aunque cambie el entorno más tarde. Se mantiene: seguir al sistema hasta una
+acción explícita evita fijar preferencias sin permiso y mantiene sincronizada cada pestaña;
+los colores y contrastes de la paleta esperan al rediseño
+(`#choices-of-look-wait-for-the-visual-redesign`).

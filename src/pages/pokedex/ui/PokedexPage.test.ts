@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createElement, Fragment, type ReactNode } from 'react'
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react'
 import { QueryProvider, ThemeProvider } from '@/app/providers'
+import { PREFERS_DARK, PREFERS_REDUCED_MOTION, stubSystemPreferences } from '@/shared/test/systemPreferences'
 import { applyTheme, useToastStore } from '@/shared/utils'
 import indexHtml from '../../../../index.html?raw'
 import { PokedexPage, SearchBar } from './PokedexPage'
@@ -34,8 +35,9 @@ describe('PokedexPage', () => {
   beforeEach(() => {
     window.history.replaceState(null, '', '/')
     vi.stubGlobal('scrollTo', vi.fn())
-    // ThemeProvider falls back to matchMedia, which jsdom does not implement.
-    localStorage.setItem('pokedex-theme', 'light')
+    // The theme and the scroll back to the list ask the system through matchMedia, which jsdom lacks.
+    stubSystemPreferences()
+    localStorage.removeItem('pokedex-theme')
     useToastStore.getState().clear()
     vi.stubGlobal(
       'fetch',
@@ -120,6 +122,7 @@ describe('PokedexPage', () => {
 
     applyTheme('dark')
     expect(document.documentElement.style.colorScheme).toBe('dark')
+    expect(localStorage.getItem('pokedex-theme')).toBeNull()
 
     const link = document.createElement('link')
     link.id = 'app-fonts'
@@ -151,12 +154,66 @@ describe('PokedexPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /back to pokédex/i }))
 
     expect(window.location.pathname).toBe('/')
+    expect(window.scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' })
     expect(screen.queryByRole('heading', { name: 'Wild Missing Route Appeared!' })).toBeNull()
     expect(document.querySelector('link[rel="canonical"]')).toHaveAttribute(
       'href',
       'https://pokedex-pokeapi-gonzalo.vercel.app/',
     )
     document.querySelector('link[rel="canonical"]')?.remove()
+  })
+
+  it('returns_to_the_list_without_animating_the_scroll_for_a_reader_who_asked_for_less_motion', () => {
+    stubSystemPreferences([PREFERS_REDUCED_MOTION])
+    window.history.replaceState(null, '', '/route-404-tall-grass')
+    render(createElement(PokedexPage), { wrapper: Providers })
+
+    fireEvent.click(screen.getByRole('button', { name: /back to pokédex/i }))
+
+    expect(window.scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'auto' })
+  })
+
+  it('follows_the_system_theme_on_a_first_visit_and_stores_only_what_the_header_button_chooses', () => {
+    stubSystemPreferences([PREFERS_DARK])
+    render(createElement(PokedexPage), { wrapper: Providers })
+
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark')
+    expect(localStorage.getItem('pokedex-theme')).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Light mode' }))
+
+    expect(document.documentElement.getAttribute('data-theme')).toBe('light')
+    expect(localStorage.getItem('pokedex-theme')).toBe('light')
+    expect(screen.getByRole('button', { name: 'Dark mode' })).toBeInTheDocument()
+  })
+
+  it('goes_back_from_the_favourites_to_every_pokemon_with_the_all_filter', async () => {
+    render(createElement(PokedexPage), { wrapper: Providers })
+    const all = screen.getByRole('button', { name: 'All' })
+    const favorites = screen.getByRole('button', { name: 'Favorites' })
+
+    fireEvent.click(favorites)
+    expect(await screen.findByText('You haven’t added any favorites yet.')).toBeInTheDocument()
+    expect(all).toHaveAttribute('aria-pressed', 'false')
+    // What looks pressed is what is announced as pressed.
+    expect(all).not.toHaveClass('bg-primary-500')
+
+    fireEvent.click(all)
+    await waitFor(() => expect(screen.queryByText('You haven’t added any favorites yet.')).not.toBeInTheDocument())
+    expect(all).toHaveAttribute('aria-pressed', 'true')
+    expect(all).toHaveClass('bg-primary-500')
+    expect(favorites).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('lets_the_title_and_the_actions_of_the_header_wrap_instead_of_running_into_each_other', () => {
+    render(createElement(PokedexPage), { wrapper: Providers })
+
+    const title = screen.getByRole('heading', { level: 1, name: 'Pokédex' }).parentElement
+    const actions = screen.getByRole('button', { name: 'Dark mode' }).parentElement
+    expect(title?.parentElement).toBe(actions?.parentElement)
+    expect(title?.parentElement).toHaveClass('flex', 'flex-wrap')
+    // Pushed to the end of whichever line they land on.
+    expect(actions).toHaveClass('ml-auto')
   })
 })
 
@@ -173,7 +230,7 @@ describe('SearchBar', () => {
 
     const searches = screen.getAllByRole('combobox', { name: 'Search Pokémon' })
     searches.forEach((search) => fireEvent.focus(search))
-    const listboxes = screen.getAllByRole('listbox')
+    const listboxes = screen.getAllByRole('listbox', { name: 'Pokémon suggestions' })
     const options = screen.getAllByRole('option', { name: /pikachu/ })
 
     expect(searches.map((search) => search.getAttribute('aria-controls'))).toEqual(listboxes.map(({ id }) => id))

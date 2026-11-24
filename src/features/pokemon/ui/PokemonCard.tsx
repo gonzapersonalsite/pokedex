@@ -54,7 +54,7 @@ export function PokemonCard({
     <article
       ref={cardRef}
       className={cn(
-        'rounded-2xl overflow-hidden shadow-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 transition hover:shadow-xl hover:border-primary-500/50 dark:hover:border-primary-500/50',
+        'rounded-2xl overflow-hidden shadow-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 transition motion-reduce:transition-none hover:shadow-xl hover:border-primary-500/50 dark:hover:border-primary-500/50',
         className,
       )}
       data-testid="pokemon-card"
@@ -114,8 +114,8 @@ export function PokemonCard({
           <button
             type="button"
             onClick={() => onToggleFavorite(pokemon.id)}
-            className="absolute top-2 right-2 p-2 rounded-full bg-white/95 dark:bg-slate-800/95 shadow-md hover:scale-110 transition"
-            aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+            className="absolute top-2 right-2 p-2 rounded-full bg-white/95 dark:bg-slate-800/95 shadow-md hover:scale-110 transition motion-reduce:transition-none"
+            aria-label={isFavorite ? `Remove ${displayName} from favorites` : `Add ${displayName} to favorites`}
           >
             {isFavorite ? (
               <HeartIconSolid className="w-5 h-5 text-red-500" />

@@ -25,19 +25,22 @@ registro lo cita, y su porqué largo está allí. Una decisión visual nueva se
 registra como cualquier otra ([docs/registry/README.md](docs/registry/README.md))
 y deja aquí la línea que la enuncia, con su cita.
 
-- **El texto sigue el tamaño que cada persona eligió en su navegador.** Ninguna
-  hoja fija el tamaño de la raíz y todo tamaño de texto es relativo a ella,
-  también los tres hechos a medida de la pantalla 404
+- **El texto sigue el tamaño que cada persona eligió en su navegador**
+  (`#narrow-windows-large-text-and-control-names-hold`). Ninguna hoja fija el
+  tamaño de la raíz y todo tamaño de texto es relativo a ella, también los
+  tres hechos a medida de la pantalla 404
   ([NotFoundSection.tsx](src/pages/pokedex/ui/NotFoundSection.tsx)); un test
   recorre el código de `src`, la hoja global y la página de arranque y rechaza
   uno escrito en píxeles ([textSizes.test.ts](src/app/textSizes.test.ts)).
   Quien agranda la letra del navegador tiene que verla agrandada aquí, y el
   zoom no tiene tope ([index.html](index.html)).
-- **Claro y oscuro, pintados antes de que cargue la aplicación.** La primera
-  visita toma el esquema del sistema, después manda el guardado y el botón de
-  la cabecera lo cambia. Un script de [index.html](index.html) lo aplica antes
-  del primer pintado, para que nadie vea un destello del otro esquema, y
-  `color-scheme` lo sigue para que los controles del navegador lo acompañen
+- **Claro y oscuro, pintados antes de que cargue la aplicación**
+  (`#first-visit-stores-the-system-theme-as-a-choice`). La primera visita sigue
+  el esquema del sistema sin escribir en el almacenamiento local, después manda
+  la elección manual si difiere del sistema y el botón de la cabecera la
+  cambia. Un script de [index.html](index.html) lo aplica antes del primer
+  pintado, para que nadie vea un destello del otro esquema, y `color-scheme` lo
+  sigue para que los controles del navegador lo acompañen
   ([themeContext.ts](src/shared/utils/themeContext.ts),
   [ThemeProvider.tsx](src/app/providers/ThemeProvider.tsx),
   [index.css](src/app/index.css)). Un color que cambia con el esquema lleva su
@@ -86,42 +89,50 @@ y deja aquí la línea que la enuncia, con su cita.
   ([typeBadge.ts](src/shared/utils/typeBadge.ts)): un tipo se reconoce por su
   color allí donde aparezca.
 - **Los textos de la interfaz van en inglés** (`#product-ui-text-is-english`).
+- **Los diálogos se desplazan dentro del visor sin recortar sus controles**
+  (`#pokemon-details-dialog-overflows-short-windows`). `DialogViewport`
+  ([DialogViewport.tsx](src/shared/ui/DialogViewport.tsx)) centra el panel por
+  márgenes (`m-auto`) y deja hacer scroll por toda la carcasa de
+  [PokemonModal.tsx](src/features/pokemon/ui/PokemonModal.tsx) o el diálogo de
+  créditos sin mover la página detrás, ignorando pulsaciones en la barra de
+  desplazamiento o arrastres que salen del panel.
+- **El movimiento reducido cubre animaciones CSS, spinners y scrolls**
+  (`#reduced-motion-covers-only-part-of-the-animations`). Toda animación CSS
+  vive bajo `no-preference`, las utilidades usan `motion-safe:` o
+  `motion-reduce:transition-none`, y cada scroll por código usa
+  `preferredScrollBehavior` ([scroll.ts](src/shared/utils/scroll.ts)).
+- **Cada control lleva nombre propio y envuelve sin solaparse en estrecho**
+  (`#narrow-windows-large-text-and-control-names-hold`). La cabecera y los
+  filtros envuelven con 320 px y letra en 24 px sin tapar el título, pulsar
+  «All» desde favoritos vuelve al listado coherente con `aria-pressed`
+  ([PokedexPage.tsx](src/pages/pokedex/ui/PokedexPage.tsx)), y los botones de
+  favorito nombran a su Pokémon
+  ([PokemonCard.tsx](src/features/pokemon/ui/PokemonCard.tsx)).
 
 ## Lo que sigue abierto
 
-Nada de esto está decidido. Lo decide el dueño con el producto delante, y hasta
-entonces lo que hay es lo que el código hace, no una regla:
+Todo defecto funcional y de accesibilidad localizado quedó cerrado; solo espera
+el aspecto estético, aplazado hasta que el dueño abra el rediseño visual:
 
-- **La ficha no cabe en una ventana baja.** Es más alta que muchas ventanas y
-  su contenedor no se desplaza, así que se recorta por arriba y por abajo; con
-  el zoom al 200 % quedan fuera de la ventana parte del botón de cerrar de la
-  carcasa y de su cruceta (`#pokemon-details-dialog-overflows-short-windows`).
-- **La primera visita guarda el tema del sistema** como si alguien lo hubiera
-  elegido, y desde entonces un cambio del sistema no se sigue
-  (`#first-visit-stores-the-system-theme-as-a-choice`).
-- **El movimiento reducido solo alcanza a una parte de las animaciones**
-  (`#reduced-motion-covers-only-part-of-the-animations`).
-- **Ventana estrecha y letra grande a la vez.** Cada condición se sostiene por
-  separado. Juntas no: con la letra del navegador en 24 px y el botón de
-  instalar a la vista, el cambio de tema tapa el título de la cabecera a 320,
-  360 y 390 px de ancho, y a 320 px la pantalla de la ficha se desplaza de
-  lado. Qué combinación soporta el producto no está dicho.
-- **El aspecto.** La paleta (el rojo `primary` y los colores de Tailwind), la
-  fuente Outfit con su sustituta ajustada y la ficha dibujada como una Pokédex
-  están hechas en el código, y ningún registro dice por qué. No son una regla
-  de marca hasta que alguien las enuncie.
+- **El aspecto visual (`#choices-of-look-wait-for-the-visual-redesign`).** La
+  paleta (el rojo `primary` y los colores de Tailwind), la fuente Outfit con su
+  sustituta ajustada, el dibujo de la carcasa de `PokemonModal` y el estilo de
+  `NotFoundSection` siguen tal cual sin fijar reglas de marca hasta el
+  rediseño.
 
-Cuando una se decida, pasa a la lista de arriba con su porqué y su registro.
+Cuando se abra el rediseño o se añada una regla visual, se registra en
+[docs/registry/decisions/](docs/registry/decisions/) y pasa arriba con su cita.
 
 ## Dónde está hecho
 
 | Qué | Dónde |
 |---|---|
-| La entrada de Tailwind, la variante oscura por clase, la fuente sustituta, las animaciones propias y las áreas seguras | [src/app/index.css](src/app/index.css) |
+| La entrada de Tailwind, la variante oscura por clase, el visor de diálogos, la fuente sustituta, las animaciones propias y las áreas seguras | [src/app/index.css](src/app/index.css) |
 | La fuente y el rojo `primary`, el único color propio de la paleta | [tailwind.config.js](tailwind.config.js), que la hoja global carga |
 | El tema: su lectura inicial, quién lo aplica y quién lo reparte | El script de [index.html](index.html), [themeContext.ts](src/shared/utils/themeContext.ts) y [ThemeProvider.tsx](src/app/providers/ThemeProvider.tsx) |
+| El visor de diálogos y el scroll con movimiento reducido | [DialogViewport.tsx](src/shared/ui/DialogViewport.tsx) y [scroll.ts](src/shared/utils/scroll.ts) |
 | El estilo de cada componente | Sus clases de Tailwind, en su propio fichero; la regla está en «Estilos» de [la arquitectura](docs/ARCHITECTURE.md) |
-| La interfaz base que no sabe del negocio | El botón, la carga y los avisos que exporta [src/shared/ui/index.ts](src/shared/ui/index.ts) |
+| La interfaz base que no sabe del negocio | El botón, el visor de diálogo, la carga y los avisos que exporta [src/shared/ui/index.ts](src/shared/ui/index.ts) |
 | El color de cada tipo | [typeBadge.ts](src/shared/utils/typeBadge.ts) |
 | Las pantallas de referencia | [PokedexPage.tsx](src/pages/pokedex/ui/PokedexPage.tsx) (cabecera, buscador, filtros y lista), [PokemonModal.tsx](src/features/pokemon/ui/PokemonModal.tsx) (ficha), [NotFoundSection.tsx](src/pages/pokedex/ui/NotFoundSection.tsx) (404) y [Credits.tsx](src/pages/pokedex/ui/Credits.tsx) |
 | Lo que se ve mientras carga la aplicación | El indicador de arranque de [index.html](index.html), con sus propios estilos |
@@ -129,36 +140,42 @@ Cuando una se decida, pasa a la lista de arriba con su porqué y su registro.
 ## Cómo comprobarlo
 
 `./dev verify` (en Windows, `.\dev.cmd verify`) corre los tests que sostienen
-parte de lo de arriba: ningún tamaño de texto en píxeles
-([textSizes.test.ts](src/app/textSizes.test.ts)), identificadores propios para
-dos buscadores y para dos pies, el enlace de saltar y el script que pinta el
-tema ([PokedexPage.test.ts](src/pages/pokedex/ui/PokedexPage.test.ts),
+estas reglas: ningún tamaño de texto en píxeles
+([textSizes.test.ts](src/app/textSizes.test.ts)), visor desplazable y
+transición en `rem` ([dialogViewport.test.ts](src/app/dialogViewport.test.ts),
+[DialogViewport.test.tsx](src/shared/ui/DialogViewport.test.tsx)), guardas de
+movimiento reducido ([motion.test.ts](src/app/motion.test.ts),
+[scroll.test.ts](src/shared/utils/scroll.test.ts)), tema sin escritura en
+primera visita ([themeContext.test.ts](src/shared/utils/themeContext.test.ts),
+[ThemeProvider.test.tsx](src/app/providers/ThemeProvider.test.tsx)),
+controles de carcasa y tarjetas ([PokemonModal.test.tsx](src/features/pokemon/ui/PokemonModal.test.tsx),
+[PokemonCard.test.tsx](src/features/pokemon/ui/PokemonCard.test.tsx)),
+identificadores únicos y filtro «All» ([PokedexPage.test.ts](src/pages/pokedex/ui/PokedexPage.test.ts),
 [Credits.test.tsx](src/pages/pokedex/ui/Credits.test.tsx)) y volver arriba
-([ReturnToTop.test.ts](src/pages/pokedex/ui/ReturnToTop.test.ts)). Comprueban
-nombres, papeles e identificadores, no el aspecto. Lo demás se mira en un
-navegador, con `./dev start` y la dirección que imprime:
+([ReturnToTop.test.ts](src/pages/pokedex/ui/ReturnToTop.test.ts)). Lo demás se
+mira en un navegador, con `./dev start` y la dirección que imprime:
 
-- **Pantallas.** La lista, un filtro por tipo, los favoritos vacíos, las
-  sugerencias del buscador, una búsqueda sin resultado, un resultado, la ficha,
-  los créditos, un aviso y una ruta que no existe.
+- **Pantallas.** La lista, un filtro por tipo, los favoritos vacíos y la vuelta
+  con «All», las sugerencias del buscador, una búsqueda sin resultado, un
+  resultado, la ficha, los créditos, un aviso y una ruta que no existe.
 - **Esquemas.** Cada pantalla en claro y en oscuro, cambiando el del sistema o
   emulándolo, con la consola limpia y sin peticiones fallidas.
 - **Tamaños.** A 320 píxeles CSS de ancho no aparece desplazamiento
-  horizontal, tampoco con un nombre largo, una ruta de 120 caracteres sin
+  horizontal, tampoco con 24 px, un nombre largo, una ruta de 120 caracteres sin
   espacios o un aviso abierto. Con la letra del navegador en 24 px, todo texto
   crece en la misma proporción. Con el zoom al 200 % no hay desplazamiento
-  horizontal y todo control queda a la vista, salvo en la ficha, que es lo
-  primero de «Lo que sigue abierto».
+  horizontal y todo control queda a la vista y accesible en la ficha y los
+  diálogos.
 - **Teclado.** Sin ratón: el tabulador empieza en saltar al contenido y
   recorre el buscador, el tema, los filtros y cada tarjeta; las flechas e Intro
   eligen una sugerencia; Intro abre la ficha, el foco no sale de ella y Escape
   lo devuelve a donde estaba; y el foco siempre se ve.
 
-Este recorrido se hizo en Chrome 157 sobre el servidor de desarrollo, y lo que
-se vio, con sus cifras, está en
-`#2026-11-24-design-guide-and-interface-corrections`. No se ha comprobado en
-Firefox ni en Safari, con un lector de pantalla, en un teléfono real ni con la
-aplicación instalada; tampoco se ha medido el contraste de los colores, ni si
+Este recorrido se hizo en Chrome 157 y Firefox 160 sobre el servidor de
+desarrollo (`#2026-11-24-design-guide-and-interface-corrections` y
+`#2026-11-24-interface-decisions-closed-before-redesign`). No se ha comprobado
+en Safari, con un lector de pantalla, en un teléfono real ni con la aplicación
+instalada; tampoco se ha medido el contraste de los colores con herramienta ni si
 las áreas seguras que lee la hoja global llegan a valer algo en un teléfono
 con muesca, porque la página no pide ocupar esa zona. Hazlo antes de dar por
 buena una pantalla nueva.

@@ -1,7 +1,7 @@
 import { useId } from 'react'
-import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
+import { Dialog, DialogTitle } from '@headlessui/react'
 import { InformationCircleIcon } from '@heroicons/react/24/outline'
-import { Button } from '@/shared/ui'
+import { Button, DialogViewport } from '@/shared/ui'
 
 const PORTFOLIO_URL = 'https://mi-portafolio-gonzalo.vercel.app/'
 const GITHUB_URL = 'https://github.com/gonzapersonalsite'
@@ -88,8 +88,8 @@ export function CreditsDialog({ open, onClose }: { open: boolean; onClose: () =>
   return (
     <Dialog open={open} onClose={onClose} className="relative z-50">
       <div className="fixed inset-0 bg-black/70" aria-hidden />
-      <div className="fixed inset-0 flex items-center justify-center p-4 safe-inset">
-        <DialogPanel className="relative w-full max-w-lg overflow-hidden rounded-2xl border-4 border-slate-700 bg-slate-900 text-slate-200 shadow-2xl">
+      <DialogViewport onDismiss={onClose}>
+        <div className="relative m-auto w-full max-w-lg overflow-hidden rounded-2xl border-4 border-slate-700 bg-slate-900 text-slate-200 shadow-2xl">
           <div className="border-b-4 border-red-600 bg-slate-950 px-5 py-4">
             <p className="font-mono text-xs font-bold uppercase tracking-widest text-red-400">Pokédex · System info</p>
             <DialogTitle as="h2" className="mt-1 text-xl font-bold text-white">
@@ -104,8 +104,8 @@ export function CreditsDialog({ open, onClose }: { open: boolean; onClose: () =>
               Close
             </Button>
           </div>
-        </DialogPanel>
-      </div>
+        </div>
+      </DialogViewport>
     </Dialog>
   )
 }

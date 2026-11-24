@@ -1,4 +1,5 @@
 export { Button } from './Button'
+export { DialogViewport } from './DialogViewport'
 export { Loader } from './Loader'
 export { PokeballLoader } from './PokeballLoader'
 export { PokeballIcon } from './PokeballIcon'

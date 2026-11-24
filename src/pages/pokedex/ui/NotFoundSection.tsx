@@ -108,7 +108,7 @@ export function NotFoundSection({ pathname, onReturnHome, onInspectPokemon }: No
                         key={pokemon.id}
                         type="button"
                         onClick={() => onInspectPokemon(pokemon.id)}
-                        className="group flex flex-col items-center p-2 rounded-xl hover:bg-white/80 dark:hover:bg-slate-800 transition focus:outline-hidden focus:ring-2 focus:ring-primary-500"
+                        className="group flex flex-col items-center p-2 rounded-xl hover:bg-white/80 dark:hover:bg-slate-800 transition motion-reduce:transition-none focus:outline-hidden focus:ring-2 focus:ring-primary-500"
                       >
                         <img
                           src={shinyMode ? `${OFFICIAL_SHINY_BASE}/${pokemon.id}.png` : pokemon.image}
@@ -118,7 +118,7 @@ export function NotFoundSection({ pathname, onReturnHome, onInspectPokemon }: No
                           decoding="async"
                           loading={index === 0 ? 'eager' : 'lazy'}
                           fetchPriority={index === 0 ? 'high' : undefined}
-                          className="w-20 h-20 object-contain group-hover:scale-110 transition"
+                          className="w-20 h-20 object-contain group-hover:scale-110 transition motion-reduce:transition-none"
                         />
                         <span className="mt-1 text-xs font-bold text-slate-800 dark:text-slate-200">
                           {pokemon.name}
@@ -156,7 +156,7 @@ export function NotFoundSection({ pathname, onReturnHome, onInspectPokemon }: No
             <button
               type="button"
               onClick={() => onInspectPokemon(pokemon.id)}
-              className="w-full h-full text-left rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-md hover:shadow-xl hover:border-primary-500 dark:hover:border-primary-500 transition flex items-center gap-4 focus:outline-hidden focus:ring-2 focus:ring-primary-500"
+              className="w-full h-full text-left rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-md hover:shadow-xl hover:border-primary-500 dark:hover:border-primary-500 transition motion-reduce:transition-none flex items-center gap-4 focus:outline-hidden focus:ring-2 focus:ring-primary-500"
             >
               <div className="w-20 h-20 sm:w-24 sm:h-24 shrink-0 rounded-2xl bg-gradient-to-b from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 p-2 flex items-center justify-center">
                 <img

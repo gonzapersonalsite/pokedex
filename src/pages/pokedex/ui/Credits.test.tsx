@@ -1,5 +1,5 @@
 import { createElement, Fragment } from 'react'
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { CreditsContent, CreditsDialog, CreditsFooter } from './Credits'
 
@@ -53,5 +53,25 @@ describe('Credits', () => {
 
     expect(await screen.findByRole('dialog', { name: 'Credits & legal' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Portfolio' })).toHaveAttribute('href', PORTFOLIO_URL)
+  })
+
+  it('sits_its_dialog_in_the_viewport_that_scrolls_centred_by_its_own_margins', async () => {
+    render(createElement(CreditsDialog, { open: true, onClose: vi.fn() }))
+
+    const viewport = (await screen.findByRole('dialog', { name: 'Credits & legal' })).querySelector('.dialog-viewport')
+    expect(viewport?.children).toHaveLength(1)
+    expect(viewport?.firstElementChild).toHaveClass('m-auto')
+    expect(viewport?.firstElementChild).toContainElement(screen.getByRole('button', { name: 'Close' }))
+  })
+
+  it('closes_from_its_backdrop', async () => {
+    const onClose = vi.fn()
+    render(createElement(CreditsDialog, { open: true, onClose }))
+    const viewport = (await screen.findByRole('dialog', { name: 'Credits & legal' })).querySelector('.dialog-viewport')
+
+    fireEvent.pointerDown(viewport as Element)
+    fireEvent.click(viewport as Element)
+
+    expect(onClose).toHaveBeenCalledTimes(1)
   })
 })

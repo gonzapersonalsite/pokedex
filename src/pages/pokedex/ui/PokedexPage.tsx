@@ -1,7 +1,15 @@
 import { useState, useRef, useEffect, useId, Suspense } from 'react'
 import { PokemonList, PokemonModal, usePokemonSearch, usePokemonNames, useTypes } from '@/features/pokemon'
 import { Button, Loader, PokeballIcon } from '@/shared/ui'
-import { classifyRequestError, cn, getTypeBadgeClass, toast, useTheme, type RequestErrorKind } from '@/shared/utils'
+import {
+  classifyRequestError,
+  cn,
+  getTypeBadgeClass,
+  preferredScrollBehavior,
+  toast,
+  useTheme,
+  type RequestErrorKind,
+} from '@/shared/utils'
 import { SunIcon, MoonIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { isNotFoundPathname } from '../model/notFoundRoute'
 import { CreditsButton, CreditsDialog, CreditsFooter } from './Credits'
@@ -66,7 +74,7 @@ export function PokedexPage() {
       window.history.pushState(null, '', '/')
     }
     setPathname('/')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, behavior: preferredScrollBehavior() })
   }
 
   const handleSearch = () => {
@@ -147,12 +155,15 @@ export function PokedexPage() {
         className="sticky top-0 z-20 border-b-4 border-slate-800 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xs"
       >
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4">
-          <div className="grid grid-cols-[auto_1fr_auto] grid-rows-[auto_auto] gap-3 lg:grid-rows-1 lg:items-center">
-            <div className="flex min-w-0 items-center gap-3 col-span-2 row-start-1 lg:col-span-1 lg:col-start-1 lg:row-start-1 lg:justify-self-start">
+          {/* Below lg the title and the actions share a line while they fit and wrap when they do not (a narrow
+              window with large text): a grid row would let the title run under the buttons. The order is the
+              visual one; the keyboard still reaches the search first. */}
+          <div className="flex flex-wrap gap-3 lg:grid lg:grid-cols-[auto_1fr_auto] lg:grid-rows-1 lg:items-center">
+            <div className="flex min-w-0 items-center gap-3 order-1 lg:order-none lg:col-start-1 lg:row-start-1 lg:justify-self-start">
               <PokeballIcon size={40} className="shrink-0" />
               <h1 className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100">Pokédex</h1>
             </div>
-            <div className="w-full min-w-0 col-span-3 row-start-2 lg:col-span-1 lg:col-start-2 lg:row-start-1 lg:justify-self-center lg:max-w-2xl">
+            <div className="order-3 basis-full w-full min-w-0 lg:order-none lg:col-start-2 lg:row-start-1 lg:justify-self-center lg:max-w-2xl">
               <SearchBar
                 value={searchQuery}
                 onChange={setSearchQuery}
@@ -167,7 +178,7 @@ export function PokedexPage() {
                 maxSuggestions={SUGGESTIONS_MAX}
               />
             </div>
-            <div className="flex items-center gap-2 justify-self-end row-start-1 col-start-3 self-start lg:self-auto lg:col-start-3 lg:row-start-1 lg:justify-self-end">
+            <div className="flex flex-wrap items-center justify-end gap-2 order-2 ml-auto self-start lg:order-none lg:ml-0 lg:self-auto lg:col-start-3 lg:row-start-1 lg:justify-self-end">
               <Button
                 variant="ghost"
                 size="sm"
@@ -254,7 +265,7 @@ export function PokedexPage() {
               selectedType={typeFilter}
               onSelectType={(t) => {
                 setTypeFilter(t)
-                if (t !== null) setShowFavorites(false)
+                setShowFavorites(false)
               }}
               showFavorites={showFavorites}
               onToggleFavorites={() => {
@@ -301,17 +312,19 @@ function TypeFilter({
   showFavorites: boolean
   onToggleFavorites: () => void
 }) {
+  const showsAll = selectedType === null && !showFavorites
+
   return (
     <div className="mb-6">
       <h2 className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Filter by type</h2>
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
-          aria-pressed={selectedType === null && !showFavorites}
+          aria-pressed={showsAll}
           onClick={() => onSelectType(null)}
           className={cn(
-            'px-3 py-1.5 rounded-full text-sm font-medium transition',
-            selectedType === null
+            'px-3 py-1.5 rounded-full text-sm font-medium transition motion-reduce:transition-none',
+            showsAll
               ? 'ring-2 ring-offset-2 ring-primary-500 bg-primary-500 text-white dark:ring-offset-slate-900'
               : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600',
           )}
@@ -323,7 +336,7 @@ function TypeFilter({
           aria-pressed={showFavorites}
           onClick={onToggleFavorites}
           className={cn(
-            'px-3 py-1.5 rounded-full text-sm font-medium transition',
+            'px-3 py-1.5 rounded-full text-sm font-medium transition motion-reduce:transition-none',
             showFavorites
               ? 'ring-2 ring-offset-2 ring-amber-500 bg-amber-500 text-slate-900 dark:ring-offset-slate-900'
               : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600',
@@ -340,7 +353,7 @@ function TypeFilter({
               aria-pressed={isSelected}
               onClick={() => onSelectType(isSelected ? null : t.name)}
               className={cn(
-                'px-3 py-1.5 rounded-full text-sm font-medium capitalize transition',
+                'px-3 py-1.5 rounded-full text-sm font-medium capitalize transition motion-reduce:transition-none',
                 getTypeBadgeClass(t.name),
                 isSelected &&
                   'ring-2 ring-offset-2 ring-slate-900 dark:ring-slate-100 ring-offset-slate-100 dark:ring-offset-slate-900',
@@ -475,6 +488,7 @@ export function SearchBar({
           <ul
             className="absolute top-full left-0 right-0 mt-1 rounded-xl border-2 border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 shadow-lg max-h-[240px] overflow-y-auto z-50"
             role="listbox"
+            aria-label="Pokémon suggestions"
             id={listboxId}
           >
             {filtered.map((s, i) => (
@@ -558,7 +572,7 @@ function SearchResult({
       <button
         type="button"
         onClick={() => onSelect(data.id)}
-        className="w-full rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 p-4 hover:border-primary-500 dark:hover:border-primary-500 transition text-left shadow-xs"
+        className="w-full rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 p-4 hover:border-primary-500 dark:hover:border-primary-500 transition motion-reduce:transition-none text-left shadow-xs"
       >
         <span className="font-semibold capitalize text-slate-800 dark:text-slate-100">{capitalized}</span>
         <span className="text-slate-500 dark:text-slate-400 ml-2">#{String(data.id).padStart(3, '0')}</span>

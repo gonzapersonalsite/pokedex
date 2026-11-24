@@ -28,7 +28,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         type="button"
         disabled={disabled ?? isLoading}
         className={[
-          'inline-flex items-center justify-center rounded-lg font-medium transition focus:outline-hidden focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 disabled:opacity-50',
+          'inline-flex items-center justify-center rounded-lg font-medium transition motion-reduce:transition-none focus:outline-hidden focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 disabled:opacity-50',
           variantClasses[variant],
           sizeClasses[size],
           className,
@@ -38,7 +38,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {isLoading ? (
           <>
             <svg
-              className="mr-2 h-4 w-4 animate-spin"
+              className="mr-2 h-4 w-4 motion-safe:animate-spin"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"

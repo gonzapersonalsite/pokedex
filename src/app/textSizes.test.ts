@@ -43,6 +43,9 @@ describe('text sizes', () => {
   it('never_sizes_text_in_pixels_so_it_follows_the_font_size_of_the_browser', () => {
     // The glob reaches this folder and the layers below it: an empty one would read as no pixel size.
     expect(Object.keys(sources)).toEqual(expect.arrayContaining(['./App.tsx', '../shared/ui/Button.tsx']))
+    // So would a stylesheet that Vitest replaced with nothing (the css option of the app project).
+    expect(globalStyles).toContain("@import 'tailwindcss'")
+    expect(indexHtml).toContain('.app-startup-brand')
 
     expect(pixelTextSizesIn({ ...sources, 'src/app/index.css': globalStyles, 'index.html': indexHtml })).toEqual([])
   })

@@ -1,6 +1,6 @@
 import { createElement } from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { PokemonCard } from './PokemonCard'
 
 const ZYGARDE_TEN = {
@@ -33,5 +33,16 @@ describe('PokemonCard', () => {
     render(createElement(PokemonCard, { pokemon: { ...ZYGARDE_TEN, image: '' }, priority: true }))
 
     expect(screen.getByText('No image')).toBeInTheDocument()
+  })
+
+  it('names_its_favourite_button_after_the_pokemon_so_two_cards_do_not_sound_alike', () => {
+    const onToggleFavorite = vi.fn()
+    const { rerender } = render(createElement(PokemonCard, { pokemon: ZYGARDE_TEN, onToggleFavorite }))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Add Zygarde 10 power construct to favorites' }))
+    expect(onToggleFavorite).toHaveBeenCalledWith(ZYGARDE_TEN.id)
+
+    rerender(createElement(PokemonCard, { pokemon: ZYGARDE_TEN, onToggleFavorite, isFavorite: true }))
+    expect(screen.getByRole('button', { name: 'Remove Zygarde 10 power construct from favorites' })).toBeInTheDocument()
   })
 })

@@ -1,41 +1,30 @@
 ---
-title: El movimiento reducido solo alcanza a una parte de las animaciones
-state: open
+title: El movimiento reducido cubre animaciones CSS, spinners y desplazamientos por código
+state: confirmed
 date: 2026-11-24
 domain: interface
 phase: none
 ---
-**El movimiento reducido solo alcanza a una parte de las animaciones.** Quien
-pide menos movimiento a su sistema deja de ver unas animaciones de la Pokédex
-y sigue viendo otras, sin que nada diga cuáles tenían que respetarlo.
+**Toda animación continua, transición de utilidad y desplazamiento por código respeta
+`prefers-reduced-motion`.** Las animaciones de `src/app/index.css` (`.led-blink-blue`) se
+declaran bajo la consulta `no-preference`, las clases de utilidad usan `motion-safe:` o
+`motion-reduce:transition-none`, y todo `scrollTo` o `scrollBy` toma el comportamiento de
+`preferredScrollBehavior`.
 
-**Lo que ya lo respeta.** Los tres bucles propios de `src/app/index.css` (la
-carga que se balancea, el barrido de la pantalla de la ficha y el pulso de sus
-botones), el giro del indicador de arranque de `index.html`, y
-las transiciones del enlace de saltar al contenido, de volver arriba y del
-botón de créditos.
+- **Animaciones y transiciones verificadas.** `motion.test.ts` rechaza cualquier animación o
+  transición fuera de esa guarda en hojas de estilo, componentes e `index.html`.
+- **Desplazamiento controlado.** `scrollToTop`, el retorno desde 404 en `PokedexPage` y la
+  cruceta de `PokemonModal` consultan `preferredScrollBehavior` para usar desplazamiento
+  suave o instantáneo según la preferencia del lector (`scroll.test.ts`).
 
-**Lo que no.**
+Decidido por el agente bajo la delegación del dueño («No quiero deuda de ningun tipo»,
+«Dejo a tu preferencia recomendados»), verificado en
+`#2026-11-24-interface-decisions-closed-before-redesign` y cubierto por `motion.test.ts`,
+`scroll.test.ts`, `PokemonModal.test.tsx` y `PokedexPage.test.ts`.
 
-- La entrada y la salida de la ficha en `PokemonModal`: un segundo de
-  desplazamiento, escala y giro al abrir.
-- La luz azul de la carcasa, que late sin fin.
-- El destello de las dos luces de la carcasa al cambiar de Pokémon.
-- Los desplazamientos suaves: al volver a la lista desde la pantalla 404, al
-  cambiar de Pokémon dentro de la ficha y con la cruceta.
+## Refutación
 
-Esto sale de leer el código. No se ha mirado en un navegador con la
-preferencia activada.
-
-**Qué hay que decidir.** Si toda animación de la interfaz respeta la
-preferencia o si alguna es parte del producto y se queda. El agente recomienda
-que la respeten todas: la entrada de la ficha gira y escala un panel que ocupa
-casi toda la ventana, que es el tipo de movimiento que esa preferencia existe
-para evitar.
-
-**Por qué sigue abierta.** La parte que lo encontró,
-`#2026-11-24-design-guide-and-interface-corrections`, no tenía encargo de
-cambiar el movimiento. No cae en ninguna fase: las del plan están hechas y no
-hay ninguna abierta. Se cierra con la decisión; si es respetarla en todo,
-cuando con la preferencia activada la ficha aparezca sin girar ni desplazarse,
-ninguna luz lata y los desplazamientos sean instantáneos.
+En contra: proteger solo las transiciones cortas de Tailwind dejaba activas animaciones
+continuas CSS y el desplazamiento suave en JavaScript. Se mantiene: unificar hojas CSS,
+clases y llamadas de scroll asegura coherencia real bajo movimiento reducido sin alterar el
+comportamiento por defecto.

@@ -119,6 +119,9 @@ export default defineConfig({
           include: ['src/**/*.test.{ts,tsx}', 'eslint.config.test.ts'],
           environment: 'jsdom',
           setupFiles: ['src/shared/test/setup.ts'],
+          // Vitest hands a test an empty string for any stylesheet it is not told to keep, `?raw` included:
+          // the tests that read the global stylesheet would then pass over nothing.
+          css: { include: [/\/src\/app\/index\.css/] },
         },
       },
       {
